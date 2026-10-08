@@ -165,6 +165,14 @@ async function selectAvatar(name: string) {
     await loadDetail(name);
 }
 
+/** 手机端详情是整页视图，需要一个显式返回列表的入口 */
+function backToList() {
+    revokeVariants(variants.value);
+    variants.value = [];
+    previewVariant.value = null;
+    selected.value = null;
+}
+
 watch(() => state.value.avatarCount, () => {
     if (selected.value && !names.value.includes(selected.value)) {
         revokeVariants(variants.value);
@@ -466,7 +474,7 @@ function moodLabel(moodId: string): string {
 </script>
 
 <template>
-  <div class="bd-page">
+  <div class="bd-page" :class="{ 'is-detail': !!selected }">
     <!-- 左栏：列表 -->
     <div class="bd-col-left">
       <div class="bd-row">
@@ -558,17 +566,20 @@ function moodLabel(moodId: string): string {
         <button v-for="name in filtered" :key="name" type="button"
                 class="bd-item" :class="{ active: selected === name }"
                 @click="selectAvatar(name)">
-          <img v-if="thumbs[name]" class="bd-thumb" :src="thumbs[name]" alt="" />
-          <span v-else class="bd-thumb-fallback">{{ name.slice(0, 1) }}</span>
+          <span class="bd-item-main">
+            <img v-if="thumbs[name]" class="bd-thumb" :src="thumbs[name]" alt="" />
+            <span v-else class="bd-thumb-fallback">{{ name.slice(0, 1) }}</span>
 
-          <input v-if="renaming === name" class="bd-rename" v-model="renameDraft"
-                 :ref="focusRename" @click.stop
-                 @keydown.enter.stop="confirmRename(name)"
-                 @keydown.esc.stop="cancelRename()"
-                 @blur="confirmRename(name)" />
-          <span v-else class="bd-item-name">{{ name }}</span>
+            <input v-if="renaming === name" class="bd-rename" v-model="renameDraft"
+                   :ref="focusRename" @click.stop
+                   @keydown.enter.stop="confirmRename(name)"
+                   @keydown.esc.stop="cancelRename()"
+                   @blur="confirmRename(name)" />
+            <span v-else class="bd-item-name">{{ name }}</span>
+          </span>
 
-          <!-- 三个行内操作：改正文颜色 / 替换默认头像 / 重命名 -->
+          <!-- 行内操作：改正文颜色 / 替换默认头像 / 重命名 / 删除 -->
+          <span class="bd-item-actions">
           <span class="bd-icon" :class="{ on: !!colorOf(name) }"
                 :style="colorOf(name) ? { color: colorOf(name) } : undefined"
                 :title="t('bubbleRender.btnColor')" @click.stop="pickColor(name)">
@@ -592,9 +603,10 @@ function moodLabel(moodId: string): string {
             </svg>
           </span>
 
-          <span class="bd-item-del" :class="{ busy: state.deletingName === name }"
-                :title="state.deletingName === name ? t('bubbleRender.deleting') : t('bubbleRender.btnDelete')"
-                @click.stop="removeAvatar(name)">{{ state.deletingName === name ? '…' : '×' }}</span>
+            <span class="bd-item-del" :class="{ busy: state.deletingName === name }"
+                  :title="state.deletingName === name ? t('bubbleRender.deleting') : t('bubbleRender.btnDelete')"
+                  @click.stop="removeAvatar(name)">{{ state.deletingName === name ? '…' : '×' }}</span>
+          </span>
         </button>
       </div>
     </div>
@@ -605,6 +617,10 @@ function moodLabel(moodId: string): string {
 
       <template v-else>
         <section class="bd-detail-head">
+          <button type="button" class="bd-back" @click="backToList">
+            <span aria-hidden="true">←</span>
+            {{ t('bubbleRender.backToList') }}
+          </button>
           <h3>{{ selected }}</h3>
           <span class="bd-detail-meta">
             <template v-if="detailLoading">{{ t('bubbleRender.loading') }}</template>
@@ -720,6 +736,10 @@ function moodLabel(moodId: string): string {
 .bd-list { display: flex; flex-direction: column; gap: 5px; }
 .bd-item { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 8px; background: var(--ttbd-surface-2, rgba(255,255,255,0.04)); border: 1px solid transparent; cursor: pointer; color: inherit; text-align: left; width: 100%; }
 .bd-item.active { border-color: var(--ttbd-accent, #58a6ff); background: rgba(88,166,255,0.1); }
+.bd-item-main { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+.bd-item-actions { display: flex; align-items: center; gap: 2px; flex-shrink: 0; }
+/* 手机端专用的「返回列表」，桌面端隐藏 */
+.bd-back { display: none; }
 .bd-thumb { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
 .bd-thumb-fallback { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.08); font-size: 13px; opacity: 0.7; }
 .bd-item-name { flex: 1; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -771,4 +791,95 @@ function moodLabel(moodId: string): string {
 .bd-btn { padding: 7px 14px; border-radius: 8px; border: 1px solid var(--ttbd-border, rgba(255,255,255,0.12)); background: var(--ttbd-accent, #58a6ff); color: #fff; cursor: pointer; font-size: 13px; }
 .bd-btn.ghost { background: transparent; color: inherit; }
 .bd-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ---------- 手机端：列表与详情分成两级视图 + 放大触控目标 ---------- */
+@media (max-width: 768px) {
+    .bd-page {
+        display: block;
+        height: auto;
+    }
+
+    .bd-col-left {
+        overflow: visible;
+        padding-right: 0;
+    }
+
+    .bd-col-right {
+        display: none;
+    }
+
+    /* 选中头像后详情作为整页视图，避免用户要往下滚很久才看到 */
+    .bd-page.is-detail .bd-col-left {
+        display: none;
+    }
+
+    .bd-page.is-detail .bd-col-right {
+        display: flex;
+        overflow: visible;
+        border-left: none;
+        padding-left: 0;
+    }
+
+    .bd-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        align-self: flex-start;
+        min-height: 40px;
+        padding: 6px 12px;
+        border: 1px solid var(--ttbd-border, rgba(255,255,255,0.14));
+        border-radius: 8px;
+        background: transparent;
+        color: inherit;
+        font-size: 13px;
+        cursor: pointer;
+    }
+
+    .bd-stats-row { gap: 6px; }
+    .bd-stat { padding: 8px; }
+    .bd-stat-value { font-size: 15px; }
+
+    .bd-mode-row { gap: 10px; }
+    .bd-mode-row .bd-segmented { flex: 1 1 100%; }
+    .bd-mode-row .bd-seg { flex: 1 1 0; min-height: 40px; }
+    .bd-mode-row .bd-mini { flex: 1 1 0; min-height: 40px; padding: 6px 10px; font-size: 12px; }
+
+    .bd-drop { padding: 18px 14px; }
+    .bd-input { min-height: 40px; }
+
+    /* 头像行改成上下两段：上排「头像 + 名字」，下排四个操作按钮 */
+    .bd-list { gap: 8px; }
+    .bd-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .bd-item-main { gap: 12px; }
+    .bd-thumb, .bd-thumb-fallback { width: 40px; height: 40px; }
+    .bd-item-name { font-size: 14px; }
+
+    .bd-item-actions { justify-content: flex-end; gap: 8px; }
+
+    .bd-icon, .bd-item-del {
+        width: 40px;
+        height: 40px;
+        opacity: 0.8;
+    }
+
+    .bd-item-del { font-size: 18px; }
+    .bd-rename { min-height: 36px; font-size: 15px; }
+
+    /* 差分列表 + 大图改成上下排布 */
+    .bd-variants-layout { grid-template-columns: 1fr; gap: 12px; }
+    .bd-variant-col { max-height: none; overflow: visible; padding-right: 0; }
+    .bd-variant { min-height: 56px; }
+    .bd-variant-mood { font-size: 14px; }
+    .bd-preview { min-height: 200px; }
+    .bd-preview-img { max-height: 56vh; }
+
+    .bd-cg-grid { grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 8px; }
+    .bd-detail-empty { min-height: 120px; }
+}
 </style>

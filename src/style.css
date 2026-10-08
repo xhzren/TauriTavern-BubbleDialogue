@@ -277,3 +277,43 @@
 .ttbd-theme-root ::-webkit-scrollbar-thumb:hover {
   background: var(--ttbd-scrollbar-hover);
 }
+/* ---------- 窄屏基础适配 ----------
+   目标：触控目标够大、聚焦输入框不触发 iOS 自动缩放、横向列表不出丑滚动条。
+   只作用于窄屏，桌面端保持原样。 */
+@media (max-width: 768px) {
+  .ttbd-theme-root {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* 触控目标：窄屏下按钮不小于 40px */
+  .ttbd-theme-root button {
+    min-height: 40px;
+  }
+
+  /* iOS / WKWebView 会在聚焦小于 16px 的输入框时自动放大页面，这里统一到 16px */
+  .ttbd-theme-root[data-ttbd-appearance] input,
+  .ttbd-theme-root[data-ttbd-appearance] select,
+  .ttbd-theme-root[data-ttbd-appearance] textarea {
+    font-size: 16px;
+  }
+
+  .ttbd-theme-root[data-ttbd-appearance] input[type='checkbox'] {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+  }
+
+  .ttbd-theme-root[data-ttbd-appearance] input[type='checkbox']::before {
+    width: 12px;
+    height: 12px;
+  }
+
+  .ttbd-theme-root input[type='radio'] {
+    width: 20px;
+    height: 20px;
+  }
+
+  .ttbd-theme-root input[type='range'] {
+    min-height: 32px;
+  }
+}

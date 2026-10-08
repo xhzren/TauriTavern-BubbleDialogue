@@ -127,4 +127,41 @@ section { display: flex; flex-direction: column; gap: 10px; }
 .bd-btn.ghost { background: transparent; color: inherit; }
 .bd-btn.small { padding: 6px 12px; }
 .bd-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ---------- 手机端：词条更好点，按钮更好按 ---------- */
+@media (max-width: 768px) {
+    .bd-tab { gap: 16px; }
+
+    .bd-textarea {
+        min-height: 160px;
+        max-height: 45vh;
+    }
+
+    .bd-group-head { gap: 10px; }
+    .bd-color { width: 40px; height: 40px; }
+
+    .bd-words { gap: 8px; padding: 10px; }
+    .bd-word { padding: 5px 6px 5px 10px; gap: 6px; font-size: 13px; }
+
+    .bd-word-del {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        min-width: 32px;
+        min-height: 32px;
+        height: 32px;
+        padding: 0;
+        border-radius: 6px;
+        font-size: 16px;
+        line-height: 1;
+        opacity: 0.7;
+    }
+
+    .bd-add-row { gap: 10px; }
+    .bd-add-row .bd-btn.small { min-width: 56px; font-size: 16px; }
+
+    .bd-actions { flex-direction: column-reverse; gap: 10px; }
+    .bd-actions .bd-btn { width: 100%; min-height: 44px; }
+}
 </style>

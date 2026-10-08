@@ -8,7 +8,7 @@ const { bubbleBus, layout, settings, shell } = useCreatorApp();
 // 仅在触屏设备（手机/平板）上启用自动吸边，桌面端保持原版行为
 const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-const BUBBLE_SIZE = isTouchDevice ? 40 : 48;
+const BUBBLE_SIZE = isTouchDevice ? 44 : 48;
 const BUBBLE_PADDING = 12;
 const FEED_GAP = 12;
 const FEED_MAX_WIDTH = 360;
@@ -368,8 +368,8 @@ const customIconStyle = computed(() => {
 }
 
 .floating-bubble-container.is-mobile {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
 }
 
 .floating-bubble-container.is-dragging {

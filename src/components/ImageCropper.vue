@@ -176,7 +176,12 @@ const onPointerMove = (e: PointerEvent) => {
         const dx = e.clientX - lastPointer.x;
         const dy = e.clientY - lastPointer.y;
         lastPointer = { x: e.clientX, y: e.clientY };
-        moveImage(dx, dy);
+        // 窄屏上 canvas 会被 CSS 缩小（max-width:100%），
+        // 拖拽位移必须按实际显示尺寸换算回画布坐标，否则手感会飘。
+        const canvas = e.currentTarget as HTMLCanvasElement | null;
+        const rect = canvas?.getBoundingClientRect();
+        const ratio = rect && rect.width > 0 ? CANVAS_SIZE / rect.width : 1;
+        moveImage(dx * ratio, dy * ratio);
     } else if (activePointers.size === 2) {
         const currentDistance = getPinchDistance();
         if (initialPinchDistance > 0) {
@@ -405,5 +410,31 @@ canvas:active {
 .btn-confirm {
     background: var(--ttbd-accent-blue);
     color: white;
+}
+
+/* ---------- 手机端：弹窗不超过可视高度，画布与按钮更好操作 ---------- */
+@media (max-width: 768px) {
+    .cropper-modal {
+        width: min(94vw, 380px);
+        max-height: calc(
+            var(--tt-base-viewport-height, 100dvh) - var(--tt-inset-top, 0px) - var(--tt-viewport-bottom-inset, var(--tt-inset-bottom, 0px)) - 24px
+        );
+    }
+
+    .cropper-header { padding: 10px 12px; }
+    .cropper-header h3 { font-size: 14px; }
+
+    .btn-close {
+        min-width: 44px;
+        min-height: 44px;
+        font-size: 22px;
+    }
+
+    .controls { padding: 10px 12px; gap: 8px; }
+    .controls .icon { font-size: 16px; }
+    .scale-slider { min-height: 32px; }
+
+    .cropper-footer { padding: 10px 12px; gap: 10px; }
+    .cropper-footer button { min-height: 44px; font-size: 15px; }
 }
 </style>

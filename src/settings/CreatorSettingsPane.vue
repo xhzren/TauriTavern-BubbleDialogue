@@ -379,6 +379,12 @@ const removeCustomIcon = () => {
 @media (max-width: 760px) {
     .settings-card {
         align-items: flex-start;
+        gap: 12px;
+        padding: 12px;
+    }
+
+    .settings-card-master {
+        align-items: center;
     }
 
     .appearance-card {
@@ -394,9 +400,31 @@ const removeCustomIcon = () => {
 
     .appearance-option {
         min-width: 0;
+        min-height: 40px;
         padding: 6px 8px;
         font-size: 12px;
         flex: 1 1 0;
+    }
+}
+
+@media (max-width: 560px) {
+    /* 窄屏：说明文字与操作区上下排布，避免互相挤到只剩几像素 */
+    .appearance-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .appearance-toggle {
+        flex: 1 1 auto;
+        width: 100%;
+    }
+
+    .custom-icon-actions { flex-wrap: wrap; }
+
+    .settings-toggle {
+        width: 22px;
+        height: 22px;
     }
 }
 </style>

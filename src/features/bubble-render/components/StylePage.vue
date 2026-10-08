@@ -215,4 +215,42 @@ input[type="range"] { width: 100%; accent-color: var(--ttbd-accent, #58a6ff); cu
 
 .bd-actions { display: flex; justify-content: center; }
 .bd-btn { padding: 8px 22px; border-radius: 8px; border: 1px solid var(--ttbd-border, rgba(255,255,255,0.12)); background: var(--ttbd-surface-2, rgba(255,255,255,0.06)); color: inherit; cursor: pointer; font-size: 13px; }
+
+/* ---------- 手机端：标签与控件竖向排布，触控目标放大 ---------- */
+@media (max-width: 768px) {
+    .bd-tab { gap: 16px; }
+
+    .bd-inline {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+
+    .bd-select {
+        width: 100%;
+        min-width: 0;
+        min-height: 40px;
+    }
+
+    .bd-field-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .bd-segmented { width: 100%; }
+
+    .bd-seg {
+        flex: 1 1 0;
+        min-height: 40px;
+        padding: 8px 10px;
+    }
+
+    .bd-radio { min-height: 40px; gap: 10px; }
+    .bd-color { width: 40px; height: 40px; }
+
+    .bd-slider-head { font-size: 14px; }
+
+    .bd-actions .bd-btn { width: 100%; min-height: 44px; }
+}
 </style>

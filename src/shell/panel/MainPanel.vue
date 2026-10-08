@@ -46,8 +46,8 @@ const setTab = (id: string) => {
 </script>
 
 <template>
-  <div class="main-panel-backdrop" @click="shell.closePanel()">
-    <div class="main-panel-window" @click.stop>
+  <div class="main-panel-backdrop" data-tt-mobile-surface="backdrop" @click="shell.closePanel()">
+    <div class="main-panel-window" data-tt-mobile-surface="fullscreen-window" @click.stop>
       <!-- Sidebar -->
       <div class="panel-sidebar">
         <div class="sidebar-header">
@@ -283,12 +283,15 @@ const setTab = (id: string) => {
         height: 100%;
         max-width: none;
         border-radius: 0;
+        border-left: none;
+        border-right: none;
         flex-direction: column;
     }
 
     .panel-sidebar {
         width: 100%;
         height: auto;
+        flex-shrink: 0;
         border-right: none;
         border-bottom: 1px solid var(--ttbd-border);
     }
@@ -298,16 +301,26 @@ const setTab = (id: string) => {
         display: none;
     }
 
+    /* 标签条：隐藏滚动条、贴边吸附、加大触控高度 */
     .mobile-nav {
         display: flex;
-        gap: 8px;
+        gap: 6px;
         overflow-x: auto;
-        padding: 10px 12px;
-        scrollbar-width: thin;
+        padding: 8px 10px;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x proximity;
+        overscroll-behavior-x: contain;
+    }
+
+    .mobile-nav::-webkit-scrollbar {
+        display: none;
     }
 
     .mobile-tab {
-        padding: 8px 12px;
+        flex: 0 0 auto;
+        min-height: 40px;
+        padding: 8px 10px;
         border: 1px solid var(--ttbd-border);
         border-radius: 999px;
         background: var(--ttbd-bg-0);
@@ -315,21 +328,50 @@ const setTab = (id: string) => {
         font-size: 13px;
         white-space: nowrap;
         cursor: pointer;
+        scroll-snap-align: center;
+        -webkit-tap-highlight-color: transparent;
     }
 
     .mobile-tab.active {
         border-color: var(--ttbd-border-strong);
         background: var(--ttbd-surface-active);
         color: var(--ttbd-text);
+        font-weight: 600;
     }
 
     .content-header {
-        padding: 0 10px;
+        height: 44px;
+        flex-shrink: 0;
+        padding: 0 8px;
+    }
+
+    .close-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 44px;
+        min-height: 44px;
+        font-size: 20px;
     }
 
     .content-body {
-        padding: 16px;
+        padding: 10px 12px;
     }
 
+    /* 内容区是 flex 行容器，页面根节点会被压成 max-content 宽度。
+       窄屏下强制铺满，否则设置页 / 头像详情页右边会空一条。 */
+    .feature-host > * {
+        width: 100%;
+        min-width: 0;
+    }
+
+    /* 键盘弹出时让底部可滚动到底，避免输入框被挡住 */
+    .feature-host,
+    .settings-host {
+        scroll-padding-bottom: max(
+            calc(var(--tt-viewport-bottom-inset, var(--tt-inset-bottom, 0px)) - var(--tt-inset-bottom, 0px)),
+            0px
+        );
+    }
 }
 </style>

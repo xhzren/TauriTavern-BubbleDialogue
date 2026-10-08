@@ -191,6 +191,7 @@ export interface Messages {
     'bubbleRender.noCardTag': string;
     'bubbleRender.noCardHint': string;
     'bubbleRender.detailEmpty': string;
+    'bubbleRender.backToList': string;
     'bubbleRender.variantCount': string;
     'bubbleRender.secVariants': string;
     'bubbleRender.noVariants': string;

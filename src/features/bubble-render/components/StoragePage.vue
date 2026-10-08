@@ -160,9 +160,9 @@ onMounted(() => {
 
           <div v-for="scope in dbScopes" :key="scope.charId" class="bd-tr">
             <span class="bd-scope" :title="scope.charId">{{ scopeLabel(scope.charId) }}</span>
-            <span>{{ scope.avatars }}</span>
-            <span>{{ scope.moodAvatars }}</span>
-            <span>{{ formatSize(scope.bytes) }}</span>
+            <span :data-label="t('bubbleRender.avatarCount')">{{ scope.avatars }}</span>
+            <span :data-label="t('bubbleRender.moodCount')">{{ scope.moodAvatars }}</span>
+            <span :data-label="t('bubbleRender.colSize')">{{ formatSize(scope.bytes) }}</span>
             <span class="bd-actions">
               <template v-if="pendingDelete === scope.charId">
                 <button type="button" class="bd-btn tiny danger" :disabled="rowBusy !== null"
@@ -279,4 +279,75 @@ onMounted(() => {
 .bd-detail-empty { display: flex; align-items: center; justify-content: center; opacity: 0.45; font-size: 13px; }
 .bd-detail-empty.small { min-height: 0; padding: 16px 0; }
 .bd-file { display: none; }
+
+/* ---------- 手机端：表格改成卡片，避免固定列宽把内容顶出屏幕 ---------- */
+@media (max-width: 768px) {
+    .bd-page { gap: 14px; }
+
+    .bd-panel-btn { min-height: 46px; font-size: 14px; }
+
+    .bd-sec { flex-wrap: wrap; gap: 8px; }
+    .bd-mini { min-height: 40px; padding: 6px 12px; font-size: 12px; }
+
+    .bd-table { gap: 10px; }
+
+    /* 手机上表头只保留「一键转换并删除」，四个列名交给卡片内标签 */
+    .bd-tr {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px 10px;
+        padding: 12px;
+        font-size: 13px;
+    }
+
+    .bd-th {
+        display: flex;
+        padding: 0 0 4px;
+        background: transparent;
+    }
+
+    .bd-th > span:not(.bd-th-actions) { display: none; }
+    .bd-th-actions { width: 100%; justify-content: flex-start; }
+
+    .bd-scope {
+        grid-column: 1 / -1;
+        font-size: 14px;
+        font-weight: 600;
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    .bd-tr > span[data-label] {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .bd-tr > span[data-label]::before {
+        content: attr(data-label);
+        font-size: 10px;
+        opacity: 0.6;
+    }
+
+    .bd-actions {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        margin-top: 2px;
+    }
+
+    .bd-actions .bd-btn,
+    .bd-th-actions .bd-btn { flex: 1 1 auto; min-height: 40px; }
+
+    .bd-btn { min-height: 40px; }
+    .bd-note { overflow-wrap: anywhere; }
+
+    .bd-stats-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .bd-stat { padding: 10px 12px; }
+    .bd-stat-value { font-size: 16px; }
+
+    .bd-actions-row { gap: 10px; }
+    .bd-actions-row .bd-btn { flex: 1 1 100%; min-height: 44px; }
+}
 </style>

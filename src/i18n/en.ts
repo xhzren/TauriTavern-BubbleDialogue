@@ -255,6 +255,7 @@ export const en: Messages = {
     'bubbleRender.noCardTag': 'no character card',
     'bubbleRender.noCardHint': 'Open a character card to use per-character storage',
     'bubbleRender.detailEmpty': 'Select an avatar on the left to see its mood variants and CG images.',
+    'bubbleRender.backToList': 'Back to list',
     'bubbleRender.variantCount': '{n} mood variants',
     'bubbleRender.secVariants': 'Mood variants',
     'bubbleRender.noVariants': 'This avatar has no mood variants yet.',

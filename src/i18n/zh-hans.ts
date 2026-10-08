@@ -255,6 +255,7 @@ export const zhHans: Messages = {
     'bubbleRender.noCardTag': '未打开角色卡',
     'bubbleRender.noCardHint': '打开一张角色卡后才能使用按角色卡存储',
     'bubbleRender.detailEmpty': '点击左侧头像，这里会显示它的情绪差分和 CG 图片。',
+    'bubbleRender.backToList': '返回列表',
     'bubbleRender.variantCount': '{n} 个情绪差分',
     'bubbleRender.secVariants': '情绪差分',
     'bubbleRender.noVariants': '这个头像还没有情绪差分。',
