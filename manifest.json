@@ -1,0 +1,11 @@
+{
+  "display_name": "Bubble Dialogue",
+  "author": "TauriTavern-BubbleDialogue",
+  "version": "1.1.0",
+  "js": "dist/index.js",
+  "css": "dist/style.css",
+  "homePage": "https://github.com/xhzren/TauriTavern-BubbleDialogue",
+  "auto_update": false,
+  "minimum_client_version": "1.16.0",
+  "dependencies": []
+}

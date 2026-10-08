@@ -1,0 +1,279 @@
+.ttbd-theme-root {
+  --ttbd-font-sans: "Segoe UI", "Noto Sans", sans-serif;
+  --ttbd-font-mono: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+
+  --ttbd-accent-blue: #3a78c2;
+  --ttbd-accent-green: #4f8d5d;
+  --ttbd-accent-amber: #b58a47;
+  --ttbd-accent-red: #b65a54;
+
+  --ttbd-bg-0: #111111;
+  --ttbd-bg-1: #171717;
+  --ttbd-bg-2: #202020;
+  --ttbd-bg-3: #252525;
+  --ttbd-bg-sidebar: #111111;
+  --ttbd-bg-code: #0c0c0c;
+
+  --ttbd-border: #323232;
+  --ttbd-border-strong: #4a4a4a;
+
+  --ttbd-text: #ece9e1;
+  --ttbd-text-muted: #969089;
+  --ttbd-text-soft: #7f786f;
+  --ttbd-text-inverse: #111111;
+  --ttbd-on-accent: #fffaf3;
+
+  --ttbd-surface-hover: #222222;
+  --ttbd-surface-active: #232c38;
+  --ttbd-chip-bg: rgba(255, 255, 255, 0.04);
+  --ttbd-chip-strong-bg: rgba(255, 255, 255, 0.1);
+  --ttbd-control-bg: #131313;
+  --ttbd-control-border: #323232;
+  --ttbd-control-border-focus: #3a78c2;
+  --ttbd-control-placeholder: #7f786f;
+  --ttbd-control-shadow-focus: 0 0 0 3px rgba(58, 120, 194, 0.16);
+  --ttbd-checkbox-bg: #131313;
+  --ttbd-checkbox-border: #4a4a4a;
+  --ttbd-checkbox-checked-bg: #4f8d5d;
+  --ttbd-checkbox-checked-border: #4f8d5d;
+  --ttbd-checkbox-check: #fffaf3;
+
+  --ttbd-primary-bg: #202933;
+  --ttbd-primary-bg-hover: #243241;
+  --ttbd-primary-border: #35506d;
+  --ttbd-primary-text: #edf2f7;
+
+  --ttbd-accent-blue-soft-bg: rgba(58, 120, 194, 0.14);
+  --ttbd-accent-blue-soft-text: #8ab6ef;
+  --ttbd-accent-green-soft-bg: rgba(79, 141, 93, 0.14);
+  --ttbd-accent-green-soft-text: #9ad3a6;
+  --ttbd-accent-amber-soft-bg: rgba(181, 138, 71, 0.16);
+  --ttbd-accent-amber-soft-text: #d7b378;
+  --ttbd-accent-red-soft-bg: rgba(182, 90, 84, 0.12);
+  --ttbd-accent-red-soft-border: rgba(182, 90, 84, 0.45);
+  --ttbd-accent-red-soft-text: #f1c2bc;
+
+  --ttbd-dot-neutral: #8e877e;
+  --ttbd-indicator-neutral: #555555;
+
+  --ttbd-bubble-button-bg: #ffffff;
+  --ttbd-bubble-button-text: #111111;
+  --ttbd-bubble-button-hover: #f0f0f0;
+  --ttbd-bubble-button-active: #e8e8e8;
+
+  --ttbd-backdrop: rgba(0, 0, 0, 0.72);
+  --ttbd-shadow-panel: 0 16px 40px rgba(0, 0, 0, 0.4);
+  --ttbd-shadow-floating: 0 6px 20px rgba(0, 0, 0, 0.25);
+  --ttbd-shadow-dialog: 0 18px 50px rgba(0, 0, 0, 0.45);
+
+  --ttbd-scrollbar: #3a3a3a;
+  --ttbd-scrollbar-hover: #4a4a4a;
+
+  font-family: var(--ttbd-font-sans);
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--ttbd-text);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color-scheme: dark;
+}
+
+.ttbd-theme-root[data-ttbd-appearance='day'] {
+  --ttbd-bg-0: #f4ede3;
+  --ttbd-bg-1: #fbf6ee;
+  --ttbd-bg-2: #f1e8dc;
+  --ttbd-bg-3: #e8dccd;
+  --ttbd-bg-sidebar: #efe3d5;
+  --ttbd-bg-code: #f7f1e8;
+
+  --ttbd-border: #d7cab7;
+  --ttbd-border-strong: #bcae99;
+
+  --ttbd-text: #2e261f;
+  --ttbd-text-muted: #6d6256;
+  --ttbd-text-soft: #8b8073;
+  --ttbd-text-inverse: #faf6ef;
+  --ttbd-on-accent: #fffaf3;
+
+  --ttbd-surface-hover: #ede2d4;
+  --ttbd-surface-active: #e4d7c8;
+  --ttbd-chip-bg: rgba(70, 52, 36, 0.06);
+  --ttbd-chip-strong-bg: rgba(70, 52, 36, 0.12);
+  --ttbd-control-bg: #f8f2e9;
+  --ttbd-control-border: #d7cab7;
+  --ttbd-control-border-focus: #7b9ac0;
+  --ttbd-control-placeholder: #938675;
+  --ttbd-control-shadow-focus: 0 0 0 3px rgba(123, 154, 192, 0.18);
+  --ttbd-checkbox-bg: #f8f2e9;
+  --ttbd-checkbox-border: #bcae99;
+  --ttbd-checkbox-checked-bg: #5f8c67;
+  --ttbd-checkbox-checked-border: #5f8c67;
+  --ttbd-checkbox-check: #fffaf3;
+
+  --ttbd-primary-bg: #e4dacc;
+  --ttbd-primary-bg-hover: #dbcfbe;
+  --ttbd-primary-border: #b7a58f;
+  --ttbd-primary-text: #31271f;
+
+  --ttbd-accent-blue-soft-bg: rgba(58, 120, 194, 0.12);
+  --ttbd-accent-blue-soft-text: #416d97;
+  --ttbd-accent-green-soft-bg: rgba(79, 141, 93, 0.12);
+  --ttbd-accent-green-soft-text: #53785a;
+  --ttbd-accent-amber-soft-bg: rgba(181, 138, 71, 0.14);
+  --ttbd-accent-amber-soft-text: #8f6a32;
+  --ttbd-accent-red-soft-bg: rgba(182, 90, 84, 0.1);
+  --ttbd-accent-red-soft-border: rgba(162, 94, 87, 0.28);
+  --ttbd-accent-red-soft-text: #8e554f;
+
+  --ttbd-dot-neutral: #9f927f;
+  --ttbd-indicator-neutral: #8f8475;
+
+  --ttbd-bubble-button-bg: #2e261f;
+  --ttbd-bubble-button-text: #faf6ef;
+  --ttbd-bubble-button-hover: #45382d;
+  --ttbd-bubble-button-active: #58483a;
+
+  --ttbd-backdrop: rgba(58, 41, 27, 0.26);
+  --ttbd-shadow-panel: 0 18px 44px rgba(67, 48, 31, 0.18);
+  --ttbd-shadow-floating: 0 8px 22px rgba(67, 48, 31, 0.2);
+  --ttbd-shadow-dialog: 0 22px 56px rgba(67, 48, 31, 0.24);
+
+  --ttbd-scrollbar: #c5b7a4;
+  --ttbd-scrollbar-hover: #b4a28c;
+
+  color-scheme: light;
+}
+
+.ttbd-theme-root,
+.ttbd-theme-root * {
+  box-sizing: border-box;
+}
+
+.ttbd-theme-root[data-ttbd-appearance] button,
+.ttbd-theme-root[data-ttbd-appearance] input,
+.ttbd-theme-root[data-ttbd-appearance] select,
+.ttbd-theme-root[data-ttbd-appearance] textarea {
+  font: inherit;
+  color-scheme: inherit;
+}
+
+.ttbd-theme-root[data-ttbd-appearance] .ttbd-control {
+  font: inherit;
+  color: var(--ttbd-text);
+  -webkit-text-fill-color: var(--ttbd-text);
+  background-color: var(--ttbd-control-bg);
+  border: 1px solid var(--ttbd-control-border);
+  background-image: none;
+  box-shadow: inset 0 0 0 999px var(--ttbd-control-bg);
+  caret-color: var(--ttbd-text);
+  color-scheme: inherit;
+}
+
+.ttbd-theme-root[data-ttbd-appearance] .ttbd-control::placeholder {
+  color: var(--ttbd-control-placeholder);
+  opacity: 1;
+}
+
+.ttbd-theme-root[data-ttbd-appearance] .ttbd-control:focus {
+  border-color: var(--ttbd-control-border-focus);
+  box-shadow: inset 0 0 0 999px var(--ttbd-control-bg), var(--ttbd-control-shadow-focus);
+}
+
+.ttbd-theme-root[data-ttbd-appearance] .ttbd-input-control {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.ttbd-theme-root[data-ttbd-appearance] .ttbd-number-control {
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.ttbd-theme-root[data-ttbd-appearance] .ttbd-number-control::-webkit-inner-spin-button,
+.ttbd-theme-root[data-ttbd-appearance] .ttbd-number-control::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.ttbd-theme-root[data-ttbd-appearance] .ttbd-select-control {
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ttbd-text-soft) 50%),
+    linear-gradient(135deg, var(--ttbd-text-soft) 50%, transparent 50%);
+  background-position:
+    calc(100% - 16px) calc(50% - 1px),
+    calc(100% - 11px) calc(50% - 1px);
+  background-repeat: no-repeat;
+  background-size: 5px 5px;
+}
+
+.ttbd-theme-root[data-ttbd-appearance] .ttbd-select-control option {
+  color: var(--ttbd-text);
+  background-color: var(--ttbd-control-bg);
+}
+
+.ttbd-theme-root[data-ttbd-appearance] input[type='checkbox'] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 1px solid var(--ttbd-checkbox-border);
+  border-radius: 5px;
+  background: var(--ttbd-checkbox-bg);
+  display: inline-grid;
+  place-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.ttbd-theme-root[data-ttbd-appearance] input[type='checkbox']::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  background: var(--ttbd-checkbox-check);
+  clip-path: polygon(14% 52%, 0 66%, 41% 100%, 100% 20%, 86% 6%, 41% 70%);
+  transform: scale(0);
+  transform-origin: center;
+  transition: transform 0.12s ease;
+}
+
+.ttbd-theme-root[data-ttbd-appearance] input[type='checkbox']:hover {
+  border-color: var(--ttbd-control-border-focus);
+}
+
+.ttbd-theme-root[data-ttbd-appearance] input[type='checkbox']:checked {
+  background: var(--ttbd-checkbox-checked-bg);
+  border-color: var(--ttbd-checkbox-checked-border);
+}
+
+.ttbd-theme-root[data-ttbd-appearance] input[type='checkbox']:checked::before {
+  transform: scale(1);
+}
+
+.ttbd-theme-root[data-ttbd-appearance] :is(input, select, textarea, button):focus-visible {
+  outline: none;
+}
+
+.ttbd-theme-root ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.ttbd-theme-root ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.ttbd-theme-root ::-webkit-scrollbar-thumb {
+  background: var(--ttbd-scrollbar);
+  border-radius: 4px;
+}
+
+.ttbd-theme-root ::-webkit-scrollbar-thumb:hover {
+  background: var(--ttbd-scrollbar-hover);
+}
