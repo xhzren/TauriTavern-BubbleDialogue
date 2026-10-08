@@ -100,7 +100,14 @@ const store = {
     async setJson({ namespace, table = "main", key, value }: any) { kv.set(p(namespace, table, key), value); },
     async updateJson() {}, async renameKey() {}, async deleteJson({ namespace, table = "main", key }: any) { kv.delete(p(namespace, table, key)); },
     async listKeys({ namespace, table = "main" }: any) { return [...kv.keys()].filter((k) => k.startsWith(`${namespace}/${table}/`)).map((k) => k.split("/").pop()!); },
-    async listTables() { return []; },
+    async listTables({ namespace = "" }: any = {}) {
+        const names = new Set<string>();
+        for (const k of [...kv.keys(), ...blobs.keys()]) {
+            const [ns, table] = k.split("/");
+            if (ns === namespace && table) names.add(table);
+        }
+        return [...names];
+    },
     async deleteTable({ namespace, table }: any) { for (const k of [...kv.keys()]) if (k.startsWith(`${namespace}/${table}/`)) kv.delete(k); for (const k of [...blobs.keys()]) if (k.startsWith(`${namespace}/${table}/`)) blobs.delete(k); },
     async setBlob({ namespace, table = "main", key, data }: any) { blobs.set(p(namespace, table, key), new Uint8Array(await data.arrayBuffer())); },
     async getBlob({ namespace, table = "main", key }: any) { const b = blobs.get(p(namespace, table, key)); if (!b) throw new Error("nf"); return new Blob([b.slice().buffer], { type: "image/webp" }); },
@@ -123,6 +130,32 @@ check("global survived", after.some((s) => s.charId === GLOBAL));
 const gLib = createIndexedDbAvatarLibrary({ mode: "global", charId: null });
 check("global avatar still readable", (await gLib.getAvatar("全局角色")) !== null);
 check("global mood still readable", (await gLib.getMoodAvatar("全局角色", "mood-joy__outfit-casual__act-sfw")) !== null);
+
+// ---- 5) 原生库：按范围删除只删该 namespace ----
+const nativeGlobal = createNativeAvatarLibrary(store, { mode: "global", charId: null });
+await nativeGlobal.putAvatar("全局头像", blob("global-native", 30));
+const nativeChar = createNativeAvatarLibrary(store, scope);
+
+const nativeBefore = await nativeChar.listScopes();
+check("native lists char + global", nativeBefore.length === 2, JSON.stringify(nativeBefore.map((s) => s.charId)));
+const beforeChar = nativeBefore.find((s) => s.charId === "1921")!;
+const beforeGlobal = nativeBefore.find((s) => s.charId === GLOBAL)!;
+check("native char row counts", beforeChar.avatars === 2 && beforeChar.moodAvatars === 1, JSON.stringify(beforeChar));
+check("native global row counts", beforeGlobal.avatars === 1, JSON.stringify(beforeGlobal));
+
+await nativeChar.clearScope("1921");
+
+const nativeAfter = await nativeChar.listScopes();
+const afterChar = nativeAfter.find((s) => s.charId === "1921")!;
+const afterGlobal = nativeAfter.find((s) => s.charId === GLOBAL)!;
+check("native char scope emptied", afterChar.avatars === 0 && afterChar.moodAvatars === 0, JSON.stringify(afterChar));
+check("native char avatars gone", (await nativeChar.listAvatarNames()).length === 0);
+check("native global survives scoped delete", afterGlobal.avatars === 1, JSON.stringify(afterGlobal));
+
+// 幂等：范围已经空了，重复删除不应报错，也不该去删不存在的表
+await nativeChar.clearScope("1921");
+check("native scoped delete is idempotent",
+    (await nativeChar.listScopes()).find((s) => s.charId === "1921")!.avatars === 0);
 
 console.log(fail === 0 ? "\nALL PASS" : "\n" + fail + " FAILED");
 process.exit(fail === 0 ? 0 : 1);

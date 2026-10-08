@@ -5238,12 +5238,14 @@ function Fu(e, t = hu) {
 		},
 		async clearScope(i) {
 			let a = String(i || "_global_"), o = a === (t.charId ?? "_global_") && a !== "_global_" ? n : a === "_global_" ? r : null;
-			if (o) for (let t of [
+			if (!o) return;
+			let s = new Set(await e.listTables({ namespace: o }));
+			for (let t of [
 				yu,
 				bu,
 				Su,
 				Cu
-			]) try {
+			]) if (s.has(t)) try {
 				await e.deleteTable({
 					namespace: o,
 					table: t
@@ -6559,33 +6561,15 @@ function jf() {
 	};
 }
 async function Mf(e, t) {
-	let n = [hu];
-	t && n.push({
-		mode: "character",
-		charId: t
-	});
-	let r = {
-		avatars: 0,
-		moodAvatars: 0,
-		cgImages: 0,
-		bytes: 0
-	};
-	for (let t of n) {
-		let n = Fu(e, t);
-		try {
-			let e = await n.getScopeStats();
-			r.avatars += e.avatars, r.moodAvatars += e.moodAvatars, r.bytes += e.bytes;
-		} catch {}
-	}
-	let i = t ? {
+	let n = t ? {
 		mode: "character",
 		charId: t
 	} : hu;
 	try {
-		let t = await Fu(e, i).listScopes();
-		for (let e of t) r.cgImages += e.cgImages;
-	} catch {}
-	return r;
+		return (await Fu(e, n).listScopes()).sort((e, t) => Number(t.charId === el) - Number(e.charId === el));
+	} catch (e) {
+		return console.warn("[BubbleDialogue] native scope stats failed.", e), [];
+	}
 }
 function Nf(e) {
 	let t = jf(), n = /* @__PURE__ */ Dt({
@@ -6614,6 +6598,7 @@ function Nf(e) {
 		totalStatsLoading: !0,
 		totalStatsError: !1,
 		totalStatsStale: !1,
+		nativeScopes: [],
 		deletingName: null,
 		avatarColors: {}
 	});
@@ -6769,8 +6754,14 @@ function Nf(e) {
 				n.totalStatsError = !0;
 				return;
 			}
-			let r = await Mf(t, n.charId);
-			n.totalAvatars = r.avatars, n.totalMoodAvatars = r.moodAvatars, n.totalCgImages = r.cgImages, n.totalStorageBytes = r.bytes, C = !0, n.totalStatsStale = !1;
+			let r = await Mf(t, n.charId), i = {
+				avatars: 0,
+				moodAvatars: 0,
+				cgImages: 0,
+				bytes: 0
+			};
+			for (let e of r) i.avatars += e.avatars, i.moodAvatars += e.moodAvatars, i.cgImages += e.cgImages, i.bytes += e.bytes;
+			n.nativeScopes = r, n.totalAvatars = i.avatars, n.totalMoodAvatars = i.moodAvatars, n.totalCgImages = i.cgImages, n.totalStorageBytes = i.bytes, C = !0, n.totalStatsStale = !1;
 		} catch (e) {
 			console.warn("[BubbleDialogue] total stats failed.", e), n.totalStatsError = !0;
 		} finally {
@@ -7111,6 +7102,22 @@ function Nf(e) {
 		async refreshTotalStats() {
 			await ie();
 		},
+		async removeNativeScope(t) {
+			let r = e.host.api.extension?.store;
+			if (!r) throw Error("宿主不支持原生扩展存储，无法删除");
+			await Fu(r, t === "_global_" ? hu : {
+				mode: "character",
+				charId: t
+			}).clearScope(t), te(t), b(t), D(t), o.clearCache(), n.backend === "native" && await he(), g.refresh(), g.hydrateAll();
+			let i = n.nativeScopes.findIndex((e) => e.charId === t);
+			i >= 0 && (n.nativeScopes = n.nativeScopes.map((e, t) => t === i ? {
+				charId: e.charId,
+				avatars: 0,
+				moodAvatars: 0,
+				cgImages: 0,
+				bytes: 0
+			} : e)), n.totalStatsStale = !0;
+		},
 		async refreshScopeStats() {
 			await L({ force: !0 });
 		},
@@ -7269,6 +7276,8 @@ var If = {
 	"bubbleRender.panelLegacy": "Original DB",
 	"bubbleRender.panelNative": "TauriTavern native",
 	"bubbleRender.dbScopesTitle": "Database usage by scope",
+	"bubbleRender.nativeScopesHint": "Native storage can only reach \"global + current character card\"; press Refresh statistics to rescan.",
+	"bubbleRender.colCgCount": "CG images",
 	"bubbleRender.btnRescan": "Rescan",
 	"bubbleRender.scanDb": "Scanning database…",
 	"bubbleRender.noDbData": "No legacy database data found.",
@@ -7525,6 +7534,8 @@ var If = {
 	"bubbleRender.panelLegacy": "原版 DB",
 	"bubbleRender.panelNative": "TT 原生",
 	"bubbleRender.dbScopesTitle": "各范围占用统计",
+	"bubbleRender.nativeScopesHint": "原生存储只能触达「全局 + 当前角色卡」两个范围；数据变动后点「刷新统计」重新扫描。",
+	"bubbleRender.colCgCount": "CG 图",
 	"bubbleRender.btnRescan": "重新扫描",
 	"bubbleRender.scanDb": "正在扫描数据库…",
 	"bubbleRender.noDbData": "未发现原版数据库数据。",
@@ -7781,6 +7792,8 @@ var If = {
 	"bubbleRender.panelLegacy": "原版 DB",
 	"bubbleRender.panelNative": "TT 原生",
 	"bubbleRender.dbScopesTitle": "各範圍佔用統計",
+	"bubbleRender.nativeScopesHint": "原生儲存只能觸達「全域 + 目前角色卡」兩個範圍；資料變動後點「重新統計」重新掃描。",
+	"bubbleRender.colCgCount": "CG 圖",
 	"bubbleRender.btnRescan": "重新掃描",
 	"bubbleRender.scanDb": "正在掃描資料庫…",
 	"bubbleRender.noDbData": "未發現原版資料庫資料。",
@@ -9066,7 +9079,13 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Ws(/* @__PURE__ */
 }, tg = {
 	key: 1,
 	class: "bd-hint"
-}, ng = { class: "bd-stats-row" }, rg = { class: "bd-stat" }, ig = { class: "bd-stat-label" }, ag = { class: "bd-stat-value" }, og = { class: "bd-stat" }, sg = { class: "bd-stat-label" }, cg = { class: "bd-stat-value" }, lg = { class: "bd-stat" }, ug = { class: "bd-stat-label" }, dg = { class: "bd-stat-value" }, fg = { class: "bd-stat" }, pg = { class: "bd-stat-label" }, mg = { class: "bd-stat-value" }, hg = { class: "bd-actions-row" }, gg = ["disabled"], _g = { class: "bd-section" }, vg = { class: "bd-sec" }, yg = { class: "bd-stats-row" }, bg = { class: "bd-stat" }, xg = { class: "bd-stat-label" }, Sg = { class: "bd-stat-value" }, Cg = { class: "bd-stat" }, wg = { class: "bd-stat-label" }, Tg = { class: "bd-stat-value" }, Eg = { class: "bd-stat" }, Dg = { class: "bd-stat-label" }, Og = { class: "bd-stat-value" }, kg = { class: "bd-actions-row" }, Ag = /* @__PURE__ */ Ws(/* @__PURE__ */ or({
+}, ng = { class: "bd-stats-row" }, rg = { class: "bd-stat" }, ig = { class: "bd-stat-label" }, ag = { class: "bd-stat-value" }, og = { class: "bd-stat" }, sg = { class: "bd-stat-label" }, cg = { class: "bd-stat-value" }, lg = { class: "bd-stat" }, ug = { class: "bd-stat-label" }, dg = { class: "bd-stat-value" }, fg = { class: "bd-stat" }, pg = { class: "bd-stat-label" }, mg = { class: "bd-stat-value" }, hg = { class: "bd-actions-row" }, gg = ["disabled"], _g = { class: "bd-section" }, vg = { class: "bd-sec" }, yg = { class: "bd-hint" }, bg = {
+	key: 0,
+	class: "bd-detail-empty small"
+}, xg = {
+	key: 1,
+	class: "bd-table"
+}, Sg = { class: "bd-tr bd-th cols-6" }, Cg = ["title"], wg = ["data-label"], Tg = ["data-label"], Eg = ["data-label"], Dg = ["data-label"], Og = { class: "bd-actions" }, kg = ["disabled", "onClick"], Ag = ["disabled", "onClick"], jg = { class: "bd-section" }, Mg = { class: "bd-sec" }, Ng = { class: "bd-stats-row" }, Pg = { class: "bd-stat" }, Fg = { class: "bd-stat-label" }, Ig = { class: "bd-stat-value" }, Lg = { class: "bd-stat" }, Rg = { class: "bd-stat-label" }, zg = { class: "bd-stat-value" }, Bg = { class: "bd-stat" }, Vg = { class: "bd-stat-label" }, Hg = { class: "bd-stat-value" }, Ug = { class: "bd-actions-row" }, Wg = /* @__PURE__ */ Ws(/* @__PURE__ */ or({
 	__name: "StoragePage",
 	props: { controller: {} },
 	setup(e) {
@@ -9125,6 +9144,23 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Ws(/* @__PURE__ */
 		}
 		function v(e) {
 			return e >= 1024 * 1024 ? (e / 1024 / 1024).toFixed(1) + " MB" : e >= 1024 ? (e / 1024).toFixed(1) + " KB" : e + " B";
+		}
+		let y = /* @__PURE__ */ U(null);
+		function b(e) {
+			return e.avatars + e.moodAvatars + e.cgImages > 0;
+		}
+		function x(e) {
+			return e === "_global_" ? r("bubbleRender.scopeGlobal") : String(a.value.charId ?? "") === String(e) && a.value.charName || e;
+		}
+		async function S(e) {
+			y.value = null, l.value = e, a.value.lastResult = null;
+			try {
+				await i.removeNativeScope(e), a.value.lastResult = r("bubbleRender.deleteScopeDone", { scope: x(e) });
+			} catch (t) {
+				a.value.lastResult = `${x(e)}: ${t instanceof Error ? t.message : String(t)}`;
+			} finally {
+				l.value = null;
+			}
 		}
 		return xr(() => {
 			p();
@@ -9209,61 +9245,104 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Ws(/* @__PURE__ */
 			]))), 128))])),
 			Y("p", Jh, B(W(r)("bubbleRender.dbHint")), 1),
 			a.value.lastResult ? (q(), J("p", Yh, B(a.value.lastResult), 1)) : fa("", !0)
-		])) : (q(), J(K, { key: 1 }, [Y("section", Xh, [
-			Y("h4", Zh, B(W(r)("bubbleRender.statsTitle")), 1),
-			Y("p", Qh, B(W(r)("bubbleRender.statsAllScopesHint")), 1),
-			Y("div", $h, [X(Yf, {
-				loading: a.value.totalStatsLoading,
-				"loading-text": W(r)("bubbleRender.loadingStats"),
-				"done-text": W(r)("common.loaded")
-			}, null, 8, [
-				"loading",
-				"loading-text",
-				"done-text"
-			])]),
-			a.value.totalStatsError ? (q(), J("p", eg, B(W(r)("bubbleRender.statsUnavailable")), 1)) : a.value.totalStatsStale ? (q(), J("p", tg, B(W(r)("bubbleRender.statsStaleHint")), 1)) : fa("", !0),
-			Y("div", ng, [
-				Y("div", rg, [Y("span", ig, B(W(r)("bubbleRender.totalAvatars")), 1), Y("span", ag, B(a.value.totalAvatars), 1)]),
-				Y("div", og, [Y("span", sg, B(W(r)("bubbleRender.totalMoodAvatars")), 1), Y("span", cg, B(a.value.totalMoodAvatars), 1)]),
-				Y("div", lg, [Y("span", ug, B(W(r)("bubbleRender.totalCgImages")), 1), Y("span", dg, B(a.value.totalCgImages), 1)]),
-				Y("div", fg, [Y("span", pg, B(W(r)("bubbleRender.totalStorageSize")), 1), Y("span", mg, B(v(a.value.totalStorageBytes)), 1)])
+		])) : (q(), J(K, { key: 1 }, [
+			Y("section", Xh, [
+				Y("h4", Zh, B(W(r)("bubbleRender.statsTitle")), 1),
+				Y("p", Qh, B(W(r)("bubbleRender.statsAllScopesHint")), 1),
+				Y("div", $h, [X(Yf, {
+					loading: a.value.totalStatsLoading,
+					"loading-text": W(r)("bubbleRender.loadingStats"),
+					"done-text": W(r)("common.loaded")
+				}, null, 8, [
+					"loading",
+					"loading-text",
+					"done-text"
+				])]),
+				a.value.totalStatsError ? (q(), J("p", eg, B(W(r)("bubbleRender.statsUnavailable")), 1)) : a.value.totalStatsStale ? (q(), J("p", tg, B(W(r)("bubbleRender.statsStaleHint")), 1)) : fa("", !0),
+				Y("div", ng, [
+					Y("div", rg, [Y("span", ig, B(W(r)("bubbleRender.totalAvatars")), 1), Y("span", ag, B(a.value.totalAvatars), 1)]),
+					Y("div", og, [Y("span", sg, B(W(r)("bubbleRender.totalMoodAvatars")), 1), Y("span", cg, B(a.value.totalMoodAvatars), 1)]),
+					Y("div", lg, [Y("span", ug, B(W(r)("bubbleRender.totalCgImages")), 1), Y("span", dg, B(a.value.totalCgImages), 1)]),
+					Y("div", fg, [Y("span", pg, B(W(r)("bubbleRender.totalStorageSize")), 1), Y("span", mg, B(v(a.value.totalStorageBytes)), 1)])
+				]),
+				Y("div", hg, [Y("button", {
+					type: "button",
+					class: "bd-btn ghost",
+					disabled: a.value.totalStatsLoading,
+					onClick: t[5] ||= (e) => W(i).refreshTotalStats()
+				}, B(W(r)("bubbleRender.btnRefreshStats")), 9, gg)])
 			]),
-			Y("div", hg, [Y("button", {
-				type: "button",
-				class: "bd-btn ghost",
-				disabled: a.value.totalStatsLoading,
-				onClick: t[5] ||= (e) => W(i).refreshTotalStats()
-			}, B(W(r)("bubbleRender.btnRefreshStats")), 9, gg)])
-		]), Y("section", _g, [
-			Y("h4", vg, B(W(r)("bubbleRender.sectionRuntime")), 1),
-			Y("div", yg, [
-				Y("div", bg, [Y("span", xg, B(W(r)("bubbleRender.statReady")), 1), Y("span", Sg, B(a.value.ready ? W(r)("bubbleRender.yes") : W(r)("bubbleRender.no")), 1)]),
-				Y("div", Cg, [Y("span", wg, B(W(r)("bubbleRender.statBubbles")), 1), Y("span", Tg, B(a.value.bubbleCount), 1)]),
-				Y("div", Eg, [Y("span", Dg, B(W(r)("bubbleRender.statInjected")), 1), Y("span", Og, B(a.value.injected ? W(r)("bubbleRender.yes") : W(r)("bubbleRender.no")), 1)])
+			Y("section", _g, [
+				Y("h4", vg, B(W(r)("bubbleRender.dbScopesTitle")), 1),
+				Y("p", yg, B(W(r)("bubbleRender.nativeScopesHint")), 1),
+				a.value.nativeScopes.length === 0 ? (q(), J("div", bg, B(a.value.totalStatsLoading ? W(r)("bubbleRender.loading") : W(r)("bubbleRender.noDbData")), 1)) : (q(), J("div", xg, [Y("div", Sg, [
+					Y("span", null, B(W(r)("bubbleRender.colScope")), 1),
+					Y("span", null, B(W(r)("bubbleRender.avatarCount")), 1),
+					Y("span", null, B(W(r)("bubbleRender.moodCount")), 1),
+					Y("span", null, B(W(r)("bubbleRender.colCgCount")), 1),
+					Y("span", null, B(W(r)("bubbleRender.colSize")), 1),
+					t[10] ||= Y("span", { class: "bd-th-actions" }, null, -1)
+				]), (q(!0), J(K, null, G(a.value.nativeScopes, (e) => (q(), J("div", {
+					key: e.charId,
+					class: "bd-tr cols-6"
+				}, [
+					Y("span", {
+						class: "bd-scope",
+						title: e.charId
+					}, B(x(e.charId)), 9, Cg),
+					Y("span", { "data-label": W(r)("bubbleRender.avatarCount") }, B(e.avatars), 9, wg),
+					Y("span", { "data-label": W(r)("bubbleRender.moodCount") }, B(e.moodAvatars), 9, Tg),
+					Y("span", { "data-label": W(r)("bubbleRender.colCgCount") }, B(e.cgImages), 9, Eg),
+					Y("span", { "data-label": W(r)("bubbleRender.colSize") }, B(v(e.bytes)), 9, Dg),
+					Y("span", Og, [y.value === e.charId ? (q(), J(K, { key: 0 }, [Y("button", {
+						type: "button",
+						class: "bd-btn tiny danger",
+						disabled: l.value !== null,
+						onClick: (t) => S(e.charId)
+					}, B(W(r)("bubbleRender.btnConfirm")), 9, kg), Y("button", {
+						type: "button",
+						class: "bd-btn tiny ghost",
+						onClick: t[6] ||= (e) => y.value = null
+					}, B(W(r)("bubbleRender.btnCancel")), 1)], 64)) : (q(), J("button", {
+						key: 1,
+						type: "button",
+						class: "bd-btn tiny ghost danger-text",
+						disabled: l.value !== null || !b(e),
+						onClick: (t) => y.value = e.charId
+					}, B(l.value === e.charId ? W(r)("bubbleRender.deleting") : W(r)("bubbleRender.btnDelete")), 9, Ag))])
+				]))), 128))]))
 			]),
-			Y("div", kg, [
-				Y("button", {
-					type: "button",
-					class: "bd-btn ghost",
-					onClick: t[6] ||= (e) => W(i).hydrateNow()
-				}, B(W(r)("bubbleRender.btnHydrate")), 1),
-				Y("button", {
-					type: "button",
-					class: "bd-btn ghost",
-					onClick: t[7] ||= (e) => W(i).refreshAvatars()
-				}, B(W(r)("bubbleRender.btnRefresh")), 1),
-				Y("button", {
-					type: "button",
-					class: "bd-btn ghost",
-					onClick: t[8] ||= (e) => W(i).reinject()
-				}, B(W(r)("bubbleRender.btnReinject")), 1)
+			Y("section", jg, [
+				Y("h4", Mg, B(W(r)("bubbleRender.sectionRuntime")), 1),
+				Y("div", Ng, [
+					Y("div", Pg, [Y("span", Fg, B(W(r)("bubbleRender.statReady")), 1), Y("span", Ig, B(a.value.ready ? W(r)("bubbleRender.yes") : W(r)("bubbleRender.no")), 1)]),
+					Y("div", Lg, [Y("span", Rg, B(W(r)("bubbleRender.statBubbles")), 1), Y("span", zg, B(a.value.bubbleCount), 1)]),
+					Y("div", Bg, [Y("span", Vg, B(W(r)("bubbleRender.statInjected")), 1), Y("span", Hg, B(a.value.injected ? W(r)("bubbleRender.yes") : W(r)("bubbleRender.no")), 1)])
+				]),
+				Y("div", Ug, [
+					Y("button", {
+						type: "button",
+						class: "bd-btn ghost",
+						onClick: t[7] ||= (e) => W(i).hydrateNow()
+					}, B(W(r)("bubbleRender.btnHydrate")), 1),
+					Y("button", {
+						type: "button",
+						class: "bd-btn ghost",
+						onClick: t[8] ||= (e) => W(i).refreshAvatars()
+					}, B(W(r)("bubbleRender.btnRefresh")), 1),
+					Y("button", {
+						type: "button",
+						class: "bd-btn ghost",
+						onClick: t[9] ||= (e) => W(i).reinject()
+					}, B(W(r)("bubbleRender.btnReinject")), 1)
+				])
 			])
-		])], 64))]));
+		], 64))]));
 	}
-}), [["__scopeId", "data-v-bec1835d"]]);
+}), [["__scopeId", "data-v-8044aea8"]]);
 //#endregion
 //#region src/features/bubble-render/modules.ts
-function jg(e) {
+function Gg(e) {
 	let t = Ff(e);
 	return {
 		runtime: t,
@@ -9275,7 +9354,7 @@ function jg(e) {
 		}
 	};
 }
-function Mg(e, t, n, r, i) {
+function Kg(e, t, n, r, i) {
 	return {
 		id: e,
 		area: "bubble-dialogue",
@@ -9285,29 +9364,29 @@ function Mg(e, t, n, r, i) {
 		capabilities: [],
 		defaultEnabled: !0,
 		component: i,
-		createController: jg
+		createController: Gg
 	};
 }
 //#endregion
 //#region src/features/modules.ts
-var Ng = [...[
-	Mg("bubble-avatar", "bubbleRender.pageAvatar", "bubbleRender.pageAvatarDesc", 10, Dm),
-	Mg("bubble-style", "bubbleRender.pageStyle", "bubbleRender.pageStyleDesc", 20, lh),
-	Mg("bubble-mood", "bubbleRender.pageMood", "bubbleRender.pageMoodDesc", 30, Dh),
-	Mg("bubble-storage", "bubbleRender.pageStorage", "bubbleRender.pageStorageDesc", 40, Ag)
+var qg = [...[
+	Kg("bubble-avatar", "bubbleRender.pageAvatar", "bubbleRender.pageAvatarDesc", 10, Dm),
+	Kg("bubble-style", "bubbleRender.pageStyle", "bubbleRender.pageStyleDesc", 20, lh),
+	Kg("bubble-mood", "bubbleRender.pageMood", "bubbleRender.pageMoodDesc", 30, Dh),
+	Kg("bubble-storage", "bubbleRender.pageStorage", "bubbleRender.pageStorageDesc", 40, Wg)
 ]];
 //#endregion
 //#region src/features/catalog.ts
-function Pg(e) {
+function Jg(e) {
 	return e.slice().sort((e, t) => e.order - t.order);
 }
-function Fg(e) {
-	return Pg(Ng).filter((t) => e.supportsAll(t.capabilities));
+function Yg(e) {
+	return Jg(qg).filter((t) => e.supportsAll(t.capabilities));
 }
 //#endregion
 //#region src/features/registry.ts
-function Ig(e) {
-	let t = /* @__PURE__ */ Dt(Fg(e.host).map((t) => ({
+function Xg(e) {
+	let t = /* @__PURE__ */ Dt(Yg(e.host).map((t) => ({
 		id: t.id,
 		area: t.area,
 		titleKey: t.titleKey,
@@ -9358,7 +9437,7 @@ function Ig(e) {
 }
 //#endregion
 //#region src/app/shell-store.ts
-function Lg(e, t) {
+function Zg(e, t) {
 	let n = /* @__PURE__ */ Dt({
 		panelOpen: !1,
 		activeTab: e.state.activeTab
@@ -9385,8 +9464,8 @@ function Lg(e, t) {
 }
 //#endregion
 //#region src/app/settings-store.ts
-var Rg = "ttbd:settings";
-function zg() {
+var Qg = "ttbd:settings";
+function $g() {
 	return {
 		enabled: !0,
 		enabledFeatures: {},
@@ -9397,23 +9476,23 @@ function zg() {
 		customBubbleBgTransparent: !1
 	};
 }
-function Bg() {
-	let e = localStorage.getItem(Rg);
-	if (!e) return zg();
+function e_() {
+	let e = localStorage.getItem(Qg);
+	if (!e) return $g();
 	try {
 		let t = JSON.parse(e);
 		return {
-			...zg(),
+			...$g(),
 			...t,
 			appearanceMode: t.appearanceMode === "day" ? "day" : sc,
 			customBubbleIcon: t.customBubbleIcon ?? null,
 			customBubbleBgTransparent: !!t.customBubbleBgTransparent
 		};
 	} catch {
-		return zg();
+		return $g();
 	}
 }
-function Vg(e) {
+function t_(e) {
 	return {
 		enabled: e.enabled,
 		enabledFeatures: { ...e.enabledFeatures },
@@ -9424,9 +9503,9 @@ function Vg(e) {
 		customBubbleBgTransparent: e.customBubbleBgTransparent
 	};
 }
-function Hg() {
-	let e = /* @__PURE__ */ Dt(Bg()), t = /* @__PURE__ */ new Set(), n = () => {
-		localStorage.setItem(Rg, JSON.stringify(Vg(e)));
+function n_() {
+	let e = /* @__PURE__ */ Dt(e_()), t = /* @__PURE__ */ new Set(), n = () => {
+		localStorage.setItem(Qg, JSON.stringify(t_(e)));
 	}, r = () => {
 		n(), t.forEach((e) => e());
 	};
@@ -9465,8 +9544,8 @@ function Hg() {
 }
 //#endregion
 //#region src/app/layout-store.ts
-var Ug = 768;
-function Wg(e = 0, t = 0, n = 0, r = 0) {
+var r_ = 768;
+function i_(e = 0, t = 0, n = 0, r = 0) {
 	return {
 		top: Math.max(0, e),
 		right: Math.max(0, t),
@@ -9474,7 +9553,7 @@ function Wg(e = 0, t = 0, n = 0, r = 0) {
 		left: Math.max(0, r)
 	};
 }
-function Gg(e = 0, t = 0, n = 0, r = 0) {
+function a_(e = 0, t = 0, n = 0, r = 0) {
 	let i = Math.max(0, e), a = Math.max(0, t), o = Math.max(0, n), s = Math.max(0, r);
 	return {
 		left: i,
@@ -9485,29 +9564,29 @@ function Gg(e = 0, t = 0, n = 0, r = 0) {
 		bottom: a + s
 	};
 }
-function Kg(e, t, n, r, i) {
+function o_(e, t, n, r, i) {
 	e.left = Math.max(0, t), e.top = Math.max(0, n), e.width = Math.max(0, r), e.height = Math.max(0, i), e.right = e.left + e.width, e.bottom = e.top + e.height;
 }
-function qg(e, t) {
-	let n = t.safeInsets ?? Wg();
+function s_(e, t) {
+	let n = t.safeInsets ?? i_();
 	e.safeInsets.top = n.top, e.safeInsets.right = n.right, e.safeInsets.bottom = n.bottom, e.safeInsets.left = n.left;
-	let r = t.viewport ?? Gg();
-	Kg(e.viewportFrame, r.left, r.top, r.width, r.height);
-	let i = t.safeFrame ?? Gg();
-	Kg(e.safeFrame, i.left, i.top, i.width, i.height), e.compact = e.safeFrame.width <= Ug;
+	let r = t.viewport ?? a_();
+	o_(e.viewportFrame, r.left, r.top, r.width, r.height);
+	let i = t.safeFrame ?? a_();
+	o_(e.safeFrame, i.left, i.top, i.width, i.height), e.compact = e.safeFrame.width <= r_;
 }
-async function Jg(e) {
+async function c_(e) {
 	let t = /* @__PURE__ */ Dt({
 		compact: !1,
-		safeInsets: Wg(),
-		viewportFrame: Gg(),
-		safeFrame: Gg()
+		safeInsets: i_(),
+		viewportFrame: a_(),
+		safeFrame: a_()
 	}), n = null, r = !1, i = () => {
 		if (r) throw Error("Layout store is disposed.");
-		qg(t, e.snapshot());
+		s_(t, e.snapshot());
 	};
 	return i(), n = await e.subscribe((e) => {
-		r || qg(t, e);
+		r || s_(t, e);
 	}), {
 		state: t,
 		refresh: i,
@@ -9518,17 +9597,17 @@ async function Jg(e) {
 }
 //#endregion
 //#region src/app/create-creator-app.ts
-async function Yg(e, t = {}) {
-	let n = t.settings ?? Hg(), r = t.i18n ?? Vf();
+async function l_(e, t = {}) {
+	let n = t.settings ?? n_(), r = t.i18n ?? Vf();
 	if (!e.api.layout) throw Error("Host layout API is unavailable.");
-	let i = await Jg(e.api.layout), a = Ds(), o = {
+	let i = await c_(e.api.layout), a = Ds(), o = {
 		host: e,
 		settings: n,
-		shell: Lg(n, a),
+		shell: Zg(n, a),
 		layout: i,
 		bubbleBus: a,
 		i18n: r
-	}, s = Ig(o);
+	}, s = Xg(o);
 	return await s.activateEnabledFeatures(), {
 		...o,
 		registry: s
@@ -9536,22 +9615,22 @@ async function Yg(e, t = {}) {
 }
 //#endregion
 //#region src/host/api.ts
-function Xg() {
+function u_() {
 	return window.__TAURITAVERN__?.api ?? null;
 }
-async function Zg() {
+async function d_() {
 	let e = window.__TAURITAVERN__?.ready ?? window.__TAURITAVERN_MAIN_READY__;
 	e && await e;
 }
 //#endregion
 //#region src/host/client.ts
-function Qg(e) {
+function f_(e) {
 	let t = /* @__PURE__ */ new Set();
 	return e.layout && t.add("layout"), e.chat && t.add("chat"), e.dev?.frontendLogs && t.add("dev.frontendLogs"), e.dev?.backendLogs && t.add("dev.backendLogs"), e.dev?.llmApiLogs && t.add("dev.llmApiLogs"), e.worldInfo && t.add("worldInfo"), e.extension?.store && t.add("extension.store"), t;
 }
-function $g(e = Xg()) {
+function p_(e = u_()) {
 	if (!e) throw Error("TauriTavern host API is unavailable.");
-	let t = Qg(e);
+	let t = f_(e);
 	return {
 		api: e,
 		capabilities: t,
@@ -9573,7 +9652,7 @@ function $g(e = Xg()) {
 }
 //#endregion
 //#region src/settings-page/ExtensionsPagePanel.vue?vue&type=script&setup=true&lang.ts
-var e_ = { class: "inline-drawer wide100p ttbd-settings-drawer" }, t_ = { class: "inline-drawer-content" }, n_ = ["data-ttbd-appearance"], r_ = /* @__PURE__ */ Ws(/* @__PURE__ */ or({
+var m_ = { class: "inline-drawer wide100p ttbd-settings-drawer" }, h_ = { class: "inline-drawer-content" }, g_ = ["data-ttbd-appearance"], __ = /* @__PURE__ */ Ws(/* @__PURE__ */ or({
 	__name: "ExtensionsPagePanel",
 	props: {
 		settings: {},
@@ -9598,7 +9677,7 @@ var e_ = { class: "inline-drawer wide100p ttbd-settings-drawer" }, t_ = { class:
 		}, l = async ({ id: e, enabled: n }) => {
 			await t.setFeatureEnabled(e, n);
 		};
-		return (e, u) => (q(), J("div", e_, [u[1] ||= Y("div", { class: "inline-drawer-toggle inline-drawer-header" }, [Y("div", { class: "ttbd-settings-header" }, [Y("i", { class: "fa-solid fa-code" }), Y("b", null, "Bubble Dialogue")]), Y("div", { class: "inline-drawer-icon fa-solid fa-circle-chevron-down down" })], -1), Y("div", t_, [Y("div", {
+		return (e, u) => (q(), J("div", m_, [u[1] ||= Y("div", { class: "inline-drawer-toggle inline-drawer-header" }, [Y("div", { class: "ttbd-settings-header" }, [Y("i", { class: "fa-solid fa-code" }), Y("b", null, "Bubble Dialogue")]), Y("div", { class: "inline-drawer-icon fa-solid fa-circle-chevron-down down" })], -1), Y("div", h_, [Y("div", {
 			class: "ttbd-theme-root ttbd-settings-surface",
 			"data-ttbd-appearance": t.settings.state.appearanceMode
 		}, [X(Mc, {
@@ -9624,32 +9703,32 @@ var e_ = { class: "inline-drawer wide100p ttbd-settings-drawer" }, t_ = { class:
 			"custom-bubble-bg-transparent",
 			"features",
 			"i18n"
-		])], 8, n_)])]));
+		])], 8, g_)])]));
 	}
-}), [["__scopeId", "data-v-629f97bf"]]), i_ = "tauritavern-bubble-dialogue-root", a_ = "tauritavern-bubble-dialogue-settings-root", o_ = "ttbd-theme-root", s_ = null, c_ = null, l_ = null, u_ = null, d_ = null, f_ = null, p_ = null, m_ = null, h_ = [], g_ = null, __ = Promise.resolve();
-function v_() {
+}), [["__scopeId", "data-v-629f97bf"]]), v_ = "tauritavern-bubble-dialogue-root", y_ = "tauritavern-bubble-dialogue-settings-root", b_ = "ttbd-theme-root", x_ = null, S_ = null, C_ = null, w_ = null, T_ = null, E_ = null, D_ = null, O_ = null, k_ = [], A_ = null, j_ = Promise.resolve();
+function M_() {
 	return document.readyState === "loading" ? new Promise((e) => {
 		document.addEventListener("DOMContentLoaded", () => e(), { once: !0 });
 	}) : Promise.resolve();
 }
-function y_(e, t, n) {
+function N_(e, t, n) {
 	document.getElementById(e)?.remove();
 	let r = document.createElement("div");
 	return r.id = e, r.className = n, t.appendChild(r), r;
 }
-function b_() {
+function P_() {
 	return document.getElementById("extensions_settings2") ?? document.getElementById("extensions_settings");
 }
-function x_() {
-	!c_ || !p_ || (c_.dataset.ttbdAppearance = p_.state.appearanceMode);
+function F_() {
+	!S_ || !D_ || (S_.dataset.ttbdAppearance = D_.state.appearanceMode);
 }
-async function S_() {
-	if (s_ || !f_ || !p_ || !p_.state.enabled) return;
-	let e = await Yg(f_, {
-		settings: p_,
-		i18n: m_
+async function I_() {
+	if (x_ || !E_ || !D_ || !D_.state.enabled) return;
+	let e = await l_(E_, {
+		settings: D_,
+		i18n: O_
 	});
-	if (!p_.state.enabled) {
+	if (!D_.state.enabled) {
 		try {
 			await e.registry.deactivateAllFeatures();
 		} finally {
@@ -9657,72 +9736,72 @@ async function S_() {
 		}
 		return;
 	}
-	d_ = e, c_ = y_(i_, document.body, o_), x_(), s_ = xs(qc), s_.provide(ws, e), s_.provide(Hf, e.i18n), s_.mount(c_);
+	T_ = e, S_ = N_(v_, document.body, b_), F_(), x_ = xs(qc), x_.provide(ws, e), x_.provide(Hf, e.i18n), x_.mount(S_);
 }
-async function C_() {
-	let e = d_;
-	if (d_ = null, e) try {
+async function L_() {
+	let e = T_;
+	if (T_ = null, e) try {
 		await e.registry.deactivateAllFeatures();
 	} finally {
 		await e.layout.dispose();
 	}
-	s_?.unmount(), s_ = null, c_?.remove(), c_ = null;
+	x_?.unmount(), x_ = null, S_?.remove(), S_ = null;
 }
-async function w_() {
-	if (p_) {
-		if (p_.state.enabled) {
-			await S_(), x_();
+async function R_() {
+	if (D_) {
+		if (D_.state.enabled) {
+			await I_(), F_();
 			return;
 		}
-		await C_();
+		await L_();
 	}
 }
-function T_() {
-	return __ = __.catch((e) => {
+function z_() {
+	return j_ = j_.catch((e) => {
 		console.error("[BubbleDialogue] Runtime lifecycle sync failed.", e);
-	}).then(() => w_()), __;
+	}).then(() => R_()), j_;
 }
-function E_() {
-	if (l_ || !p_) return;
-	let e = b_();
+function B_() {
+	if (C_ || !D_) return;
+	let e = P_();
 	if (!e) {
 		console.warn("[BubbleDialogue] Extensions settings container is unavailable.");
 		return;
 	}
-	u_ = y_(a_, e, "extension_container");
-	let t = m_ ?? Vf();
-	l_ = xs(r_, {
-		settings: p_,
-		features: h_,
+	w_ = N_(y_, e, "extension_container");
+	let t = O_ ?? Vf();
+	C_ = xs(__, {
+		settings: D_,
+		features: k_,
 		setFeatureEnabled: async (e, t) => {
-			if (d_) {
-				await d_.registry.setFeatureEnabled(e, t);
+			if (T_) {
+				await T_.registry.setFeatureEnabled(e, t);
 				return;
 			}
-			p_?.setFeatureEnabled(e, t);
+			D_?.setFeatureEnabled(e, t);
 		}
-	}), l_.provide(Hf, t), l_.mount(u_);
+	}), C_.provide(Hf, t), C_.mount(w_);
 }
-function D_() {
-	l_?.unmount(), l_ = null, u_?.remove(), u_ = null;
+function V_() {
+	C_?.unmount(), C_ = null, w_?.remove(), w_ = null;
 }
-function O_() {
-	g_?.(), g_ = null, __.finally(() => {
-		C_(), D_();
+function H_() {
+	A_?.(), A_ = null, j_.finally(() => {
+		L_(), V_();
 	});
 }
-async function k_() {
-	await v_(), await Zg();
-	let e = Xg();
+async function U_() {
+	await M_(), await d_();
+	let e = u_();
 	if (!e) {
 		console.error("[BubbleDialogue] Host API is unavailable.");
 		return;
 	}
-	f_ = $g(e), p_ = Hg(), m_ = Vf(), h_ = Fg(f_), E_(), g_ = p_.subscribe(() => {
-		T_();
-	}), await T_(), window.addEventListener("pagehide", O_, { once: !0 });
+	E_ = p_(e), D_ = n_(), O_ = Vf(), k_ = Yg(E_), B_(), A_ = D_.subscribe(() => {
+		z_();
+	}), await z_(), window.addEventListener("pagehide", H_, { once: !0 });
 }
-k_();
+U_();
 //#endregion
 
 //# sourceMappingURL=index.js.map

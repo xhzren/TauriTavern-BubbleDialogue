@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useI18n } from '../../../i18n';
 import type { BubblePageController } from '../modules';
 import type { LibraryScopeStat } from '../storage-types';
+import { GLOBAL_CHAR_ID } from '../constants';
 import LoadingHint from '../../../components/LoadingHint.vue';
 
 const props = defineProps<{ controller: BubblePageController }>();
@@ -98,6 +99,38 @@ function formatSize(bytes: number): string {
     if (bytes >= 1024 * 1024) return (bytes / 1024 / 1024).toFixed(1) + ' MB';
     if (bytes >= 1024) return (bytes / 1024).toFixed(1) + ' KB';
     return bytes + ' B';
+}
+
+// ---------------- TT 原生：各范围明细 ----------------
+
+/** 正在等确认删除的原生范围 */
+const pendingNativeDelete = ref<string | null>(null);
+
+function hasNativeData(scope: LibraryScopeStat): boolean {
+    return scope.avatars + scope.moodAvatars + scope.cgImages > 0;
+}
+
+/**
+ * 原生存储只能触达「全局 + 当前角色卡」两个范围，
+ * 所以非全局的那一行就是当前这张卡，直接显示卡名更好认。
+ */
+function nativeScopeLabel(charId: string): string {
+    if (charId === GLOBAL_CHAR_ID) return t('bubbleRender.scopeGlobal');
+    return String(state.value.charId ?? '') === String(charId) ? state.value.charName || charId : charId;
+}
+
+async function deleteNativeScope(charId: string) {
+    pendingNativeDelete.value = null;
+    rowBusy.value = charId;
+    state.value.lastResult = null;
+    try {
+        await runtime.removeNativeScope(charId);
+        state.value.lastResult = t('bubbleRender.deleteScopeDone', { scope: nativeScopeLabel(charId) });
+    } catch (error) {
+        state.value.lastResult = `${nativeScopeLabel(charId)}: ${error instanceof Error ? error.message : String(error)}`;
+    } finally {
+        rowBusy.value = null;
+    }
 }
 
 onMounted(() => {
@@ -216,6 +249,50 @@ onMounted(() => {
       </section>
 
       <section class="bd-section">
+        <h4 class="bd-sec">{{ t('bubbleRender.dbScopesTitle') }}</h4>
+        <p class="bd-hint">{{ t('bubbleRender.nativeScopesHint') }}</p>
+
+        <div v-if="state.nativeScopes.length === 0" class="bd-detail-empty small">
+          {{ state.totalStatsLoading ? t('bubbleRender.loading') : t('bubbleRender.noDbData') }}
+        </div>
+
+        <div v-else class="bd-table">
+          <div class="bd-tr bd-th cols-6">
+            <span>{{ t('bubbleRender.colScope') }}</span>
+            <span>{{ t('bubbleRender.avatarCount') }}</span>
+            <span>{{ t('bubbleRender.moodCount') }}</span>
+            <span>{{ t('bubbleRender.colCgCount') }}</span>
+            <span>{{ t('bubbleRender.colSize') }}</span>
+            <span class="bd-th-actions"></span>
+          </div>
+
+          <div v-for="scope in state.nativeScopes" :key="scope.charId" class="bd-tr cols-6">
+            <span class="bd-scope" :title="scope.charId">{{ nativeScopeLabel(scope.charId) }}</span>
+            <span :data-label="t('bubbleRender.avatarCount')">{{ scope.avatars }}</span>
+            <span :data-label="t('bubbleRender.moodCount')">{{ scope.moodAvatars }}</span>
+            <span :data-label="t('bubbleRender.colCgCount')">{{ scope.cgImages }}</span>
+            <span :data-label="t('bubbleRender.colSize')">{{ formatSize(scope.bytes) }}</span>
+            <span class="bd-actions">
+              <template v-if="pendingNativeDelete === scope.charId">
+                <button type="button" class="bd-btn tiny danger" :disabled="rowBusy !== null"
+                        @click="deleteNativeScope(scope.charId)">{{ t('bubbleRender.btnConfirm') }}</button>
+                <button type="button" class="bd-btn tiny ghost" @click="pendingNativeDelete = null">
+                  {{ t('bubbleRender.btnCancel') }}
+                </button>
+              </template>
+              <template v-else>
+                <button type="button" class="bd-btn tiny ghost danger-text"
+                        :disabled="rowBusy !== null || !hasNativeData(scope)"
+                        @click="pendingNativeDelete = scope.charId">
+                  {{ rowBusy === scope.charId ? t('bubbleRender.deleting') : t('bubbleRender.btnDelete') }}
+                </button>
+              </template>
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <section class="bd-section">
         <h4 class="bd-sec">{{ t('bubbleRender.sectionRuntime') }}</h4>
         <div class="bd-stats-row">
           <div class="bd-stat"><span class="bd-stat-label">{{ t('bubbleRender.statReady') }}</span><span class="bd-stat-value">{{ state.ready ? t('bubbleRender.yes') : t('bubbleRender.no') }}</span></div>
@@ -249,6 +326,8 @@ onMounted(() => {
 /* 表格式列表 */
 .bd-table { display: flex; flex-direction: column; gap: 4px; }
 .bd-tr { display: grid; grid-template-columns: minmax(90px, 1.6fr) 54px 54px 74px minmax(150px, 1.4fr); gap: 8px; align-items: center; padding: 7px 9px; border-radius: 8px; background: var(--ttbd-surface-2, rgba(255,255,255,0.04)); font-size: 12.5px; }
+/* 「TT 原生」各范围统计比原版 DB 多一列 CG */
+.bd-tr.cols-6 { grid-template-columns: minmax(120px, 1.6fr) 54px 54px 54px 74px minmax(120px, 1fr); }
 .bd-th { background: transparent; opacity: 0.6; font-size: 11px; padding-bottom: 4px; }
 .bd-th-actions { display: flex; gap: 6px; justify-content: flex-end; }
 .bd-scope { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -298,6 +377,10 @@ onMounted(() => {
         padding: 12px;
         font-size: 13px;
     }
+
+    /* 6 列的表：手机上不显示表头（卡片内已有 data-label），指标 2×2 排 */
+    .bd-th.cols-6 { display: none; }
+    .bd-tr.cols-6 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
     .bd-th {
         display: flex;

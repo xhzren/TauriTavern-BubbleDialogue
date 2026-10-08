@@ -447,11 +447,17 @@ export function createNativeAvatarLibrary(
                     ? globalNamespace
                     : null;
             if (!ns) return;
+
+            // 宿主对「删除不存在的表」返回 NotFound，并在命令层弹「后端错误」，
+            // 扩展的 try/catch 挡不住那个提示。所以先问一次 listTables，只删确实存在的表；
+            // 顺带让「重复删除同一个范围」变成真正的幂等操作。
+            const existing = new Set(await store.listTables({ namespace: ns }));
             for (const table of [TABLE_AVATARS, TABLE_MOOD, TABLE_CG_GROUPS, TABLE_CG_IMAGES]) {
+                if (!existing.has(table)) continue;
                 try {
                     await store.deleteTable({ namespace: ns, table });
                 } catch {
-                    /* ignore */
+                    /* 单表失败不中断其它表 */
                 }
             }
         },

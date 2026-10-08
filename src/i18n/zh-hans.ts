@@ -144,6 +144,8 @@ export const zhHans: Messages = {
     'bubbleRender.panelLegacy': '原版 DB',
     'bubbleRender.panelNative': 'TT 原生',
     'bubbleRender.dbScopesTitle': '各范围占用统计',
+    'bubbleRender.nativeScopesHint': '原生存储只能触达「全局 + 当前角色卡」两个范围；数据变动后点「刷新统计」重新扫描。',
+    'bubbleRender.colCgCount': 'CG 图',
     'bubbleRender.btnRescan': '重新扫描',
     'bubbleRender.scanDb': '正在扫描数据库…',
     'bubbleRender.noDbData': '未发现原版数据库数据。',

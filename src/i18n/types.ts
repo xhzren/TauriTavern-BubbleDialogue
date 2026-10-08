@@ -152,6 +152,8 @@ export interface Messages {
     'bubbleRender.panelLegacy': string;
     'bubbleRender.panelNative': string;
     'bubbleRender.dbScopesTitle': string;
+    'bubbleRender.nativeScopesHint': string;
+    'bubbleRender.colCgCount': string;
     'bubbleRender.btnRescan': string;
     'bubbleRender.scanDb': string;
     'bubbleRender.noDbData': string;

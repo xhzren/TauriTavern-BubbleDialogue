@@ -85,6 +85,8 @@ export interface BubbleRuntime {
         totalStatsError: boolean;
         /** 数据已变动但统计还是旧的（提示用户手动刷新，不自动重扫） */
         totalStatsStale: boolean;
+        /** 分范围明细：全局 + 当前角色卡（存储页「TT 原生」表格用） */
+        nativeScopes: LibraryScopeStat[];
         /** 正在删除的头像名（界面上把删除按钮置灰，避免连点） */
         deletingName: string | null;
         /** 「按角色」配色：名字(小写) → 正文颜色；供界面显示与正文上色 */
@@ -124,8 +126,10 @@ export interface BubbleRuntime {
     removeDbScope(charId: string): Promise<void>;
     /** 把原版 DB 的所有范围转换到原生存储，成功后逐个删除 */
     convertAllAndRemove(): Promise<{ scopes: number; converted: number; failed: number }>;
-    /** 手动重算全库统计（存储页「刷新统计」按钮用） */
+    /** 手动重算全库统计（存储页「刷新统计」按钮用），同时刷新各范围明细 */
     refreshTotalStats(): Promise<void>;
+    /** 删除原生存储里某个范围的全部数据（全局 / 当前角色卡），另一个范围不受影响 */
+    removeNativeScope(charId: string): Promise<void>;
     /** 强制重扫当前范围的统计（忽略缓存；用户手动刷新时用） */
     refreshScopeStats(): Promise<void>;
 }
@@ -155,42 +159,27 @@ function readCharIdentity(): { id: string | null; name: string; hasCard: boolean
 }
 
 /**
- * 汇总原生存储里所有可触达范围的数据。
+ * 原生存储里「能触达」的各范围统计。
  *
  * 宿主 API 无法枚举 namespace，只能按名字操作，因此范围清单靠构造：
- * 全局 + 当前角色卡（没有角色卡时只有全局）。两个 namespace 同名时只算一次。
+ * 全局 + 当前角色卡（没有角色卡时只有全局）。
+ * 必须用「角色卡」句柄调 listScopes()：全局句柄只会返回全局一条。
+ *
+ * 明细与总量用同一次扫描拿到，避免同一批数据读两遍（全局几千条差分会明显变慢）。
  */
-async function collectNativeTotals(
+async function collectNativeScopes(
     store: TauriTavernExtensionStoreApi,
     charId: string | null,
-): Promise<{ avatars: number; moodAvatars: number; cgImages: number; bytes: number }> {
-    const scopes: AvatarScope[] = [GLOBAL_SCOPE];
-    if (charId) scopes.push({ mode: "character", charId });
-
-    const totals = { avatars: 0, moodAvatars: 0, cgImages: 0, bytes: 0 };
-    // 各库自己按主范围统计（内部已并发读元数据），这里只做汇总；
-    // 单一范围失败不影响其它范围。
-    for (const scope of scopes) {
-        const lib = createNativeAvatarLibrary(store, scope);
-        try {
-            const stat = await lib.getScopeStats();
-            totals.avatars += stat.avatars;
-            totals.moodAvatars += stat.moodAvatars;
-            totals.bytes += stat.bytes;
-        } catch {
-            /* 单个范围失败不影响其它 */
-        }
-    }
-    // CG 只有 listScopes() 会统计；它内含全局+本卡两个 namespace，
-    // 所以只在「本卡」这一支取一次即可，避免重复计数。
-    const cgSource: AvatarScope = charId ? { mode: "character", charId } : GLOBAL_SCOPE;
+): Promise<LibraryScopeStat[]> {
+    const scope: AvatarScope = charId ? { mode: "character", charId } : GLOBAL_SCOPE;
     try {
-        const entries = await createNativeAvatarLibrary(store, cgSource).listScopes();
-        for (const entry of entries) totals.cgImages += entry.cgImages;
-    } catch {
-        /* CG 统计失败不影响主统计 */
+        const rows = await createNativeAvatarLibrary(store, scope).listScopes();
+        // 全局排最前：表格里读起来更顺
+        return rows.sort((a, b) => Number(b.charId === GLOBAL_CHAR_ID) - Number(a.charId === GLOBAL_CHAR_ID));
+    } catch (error) {
+        console.warn("[BubbleDialogue] native scope stats failed.", error);
+        return [];
     }
-    return totals;
 }
 
 export function createBubbleRuntime(context: CreatorRuntimeContext): BubbleRuntime {
@@ -223,6 +212,8 @@ export function createBubbleRuntime(context: CreatorRuntimeContext): BubbleRunti
         totalStatsLoading: true,
         totalStatsError: false,
         totalStatsStale: false,
+        /** 分范围明细（存储页「TT 原生」的各范围统计表）：全局 + 当前角色卡 */
+        nativeScopes: [] as LibraryScopeStat[],
         deletingName: null as string | null,
         avatarColors: {} as Record<string, string>,
     });
@@ -560,7 +551,15 @@ async function refreshAvatarStats(options: { force?: boolean } = {}) {
                 state.totalStatsError = true;
                 return;
             }
-            const totals = await collectNativeTotals(store, state.charId);
+            const scopes = await collectNativeScopes(store, state.charId);
+            const totals = { avatars: 0, moodAvatars: 0, cgImages: 0, bytes: 0 };
+            for (const row of scopes) {
+                totals.avatars += row.avatars;
+                totals.moodAvatars += row.moodAvatars;
+                totals.cgImages += row.cgImages;
+                totals.bytes += row.bytes;
+            }
+            state.nativeScopes = scopes;
             state.totalAvatars = totals.avatars;
             state.totalMoodAvatars = totals.moodAvatars;
             state.totalCgImages = totals.cgImages;
@@ -1156,6 +1155,34 @@ async function refreshAvatarStats(options: { force?: boolean } = {}) {
         },
         async refreshTotalStats() {
             await forceTotalStats();
+        },
+        async removeNativeScope(charId) {
+            const store = context.host.api.extension?.store as TauriTavernExtensionStoreApi | undefined;
+            if (!store) {
+                throw new Error("宿主不支持原生扩展存储，无法删除");
+            }
+            const scope: AvatarScope =
+                charId === GLOBAL_CHAR_ID ? GLOBAL_SCOPE : { mode: "character", charId };
+            await createNativeAvatarLibrary(store, scope).clearScope(charId);
+            // 只有被删的那个范围变了：按范围失效缓存，其它范围的统计继续复用
+            invalidateStatsCache(charId);
+            invalidateMoodRecords(charId);
+            invalidateCgGroups(charId);
+            resolver.clearCache();
+            if (state.backend === "native") {
+                await rebuild();
+            }
+            hydrator.refresh();
+            hydrator.hydrateAll();
+            // 明细里该范围立即归零，避免用户对空范围再点一次删除
+            const index = state.nativeScopes.findIndex((row) => row.charId === charId);
+            if (index >= 0) {
+                state.nativeScopes = state.nativeScopes.map((row, i) =>
+                    i === index ? { charId: row.charId, avatars: 0, moodAvatars: 0, cgImages: 0, bytes: 0 } : row,
+                );
+            }
+            // 与导入/转换一致：不自动重扫全库统计，标成过期交给「刷新统计」
+            state.totalStatsStale = true;
         },
         async refreshScopeStats() {
             await refreshAvatarStats({ force: true });

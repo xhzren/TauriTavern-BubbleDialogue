@@ -144,6 +144,8 @@ export const en: Messages = {
     'bubbleRender.panelLegacy': 'Original DB',
     'bubbleRender.panelNative': 'TauriTavern native',
     'bubbleRender.dbScopesTitle': 'Database usage by scope',
+    'bubbleRender.nativeScopesHint': 'Native storage can only reach "global + current character card"; press Refresh statistics to rescan.',
+    'bubbleRender.colCgCount': 'CG images',
     'bubbleRender.btnRescan': 'Rescan',
     'bubbleRender.scanDb': 'Scanning database…',
     'bubbleRender.noDbData': 'No legacy database data found.',

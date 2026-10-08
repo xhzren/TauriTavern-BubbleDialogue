@@ -144,6 +144,8 @@ export const zhHant: Messages = {
     'bubbleRender.panelLegacy': '原版 DB',
     'bubbleRender.panelNative': 'TT 原生',
     'bubbleRender.dbScopesTitle': '各範圍佔用統計',
+    'bubbleRender.nativeScopesHint': '原生儲存只能觸達「全域 + 目前角色卡」兩個範圍；資料變動後點「重新統計」重新掃描。',
+    'bubbleRender.colCgCount': 'CG 圖',
     'bubbleRender.btnRescan': '重新掃描',
     'bubbleRender.scanDb': '正在掃描資料庫…',
     'bubbleRender.noDbData': '未發現原版資料庫資料。',
