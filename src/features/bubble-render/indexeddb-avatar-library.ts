@@ -256,6 +256,24 @@ export function createIndexedDbAvatarLibrary(
             ? [scope.charId, GLOBAL_CHAR_ID]
             : [GLOBAL_CHAR_ID];
 
+    /**
+     * 情绪表整表快照：只在 lookupKey 索引未命中时用到。
+     *
+     * 老库（v6 及更早创建的 BubbleDialogueAvatars）可能没有 lookupKey 索引——
+     * open 不带版本号意味着我们不会替宿主升级 schema，只能在读侧兜底。
+     * 原脚本在同位置也写了同样的兜底，说明这不是理论情况。
+     * 缓存整表，避免每条差分都 getAll 一次（真机 1800+ 条会直接卡死）。
+     */
+    let moodTableScan: Promise<RawRecord[]> | null = null;
+    const readMoodTable = (db: IDBDatabase | null) => {
+        if (!moodTableScan) moodTableScan = idbGetAll<RawRecord>(db, STORE_MOOD_AVATARS);
+        return moodTableScan;
+    };
+    /** 本实例写过情绪表后调用，避免读到旧快照 */
+    const invalidateMoodTable = () => {
+        moodTableScan = null;
+    };
+
     return {
         async isReady() {
             return (await ensureDb()) !== null;
@@ -270,6 +288,8 @@ export function createIndexedDbAvatarLibrary(
         },
         async getMoodAvatar(name, moodId) {
             const db = await ensureDb();
+            const wantedName = String(name ?? "").trim().toLowerCase();
+            const wantedMoodId = String(moodId ?? "");
             for (const charId of chain) {
                 const lookupKey = buildMoodKey(name, moodId, charId);
                 const rows = await idbGetAllByIndex<AvatarRecord>(
@@ -281,15 +301,27 @@ export function createIndexedDbAvatarLibrary(
                 // 同一 lookupKey 可能有多张候选图，取第一张带图的
                 const hit = rows.find((row) => row.imageBlob);
                 if (hit) return hit;
+
+                // 索引未命中：老库可能没有 lookupKey 索引（v6 及更早），
+                // 或索引里没有这条记录。退化为整表过滤（快照已缓存）。
+                const fallback = (await readMoodTable(db)).find((record) => (
+                    scopeOfRecord(record, "alias") === String(charId)
+                    && String(record.alias ?? "").trim().toLowerCase() === wantedName
+                    && String(record.moodId ?? "") === wantedMoodId
+                    && Boolean(record.imageBlob)
+                ));
+                if (fallback) return fallback as unknown as AvatarRecord;
             }
             return null;
         },
         async listMoodAvatars() {
             const db = await ensureDb();
             const all = await idbGetAll<AvatarRecord>(db, STORE_MOOD_AVATARS);
-            // 记录自带 charId；按当前范围过滤，避免把别的卡/全局混进来
+            // 归属判断必须与 listScopes / getScopeStats 完全一致（都走 scopeOfRecord）：
+            // charId 字段缺失、空串、非字符串时按 key 反推，否则会出现
+            // 「表格里算得到、迁移时却取不到」的口径分歧。
             const allowed = new Set(chain.map((id) => String(id)));
-            return all.filter((record) => allowed.has(String(record.charId ?? GLOBAL_CHAR_ID)));
+            return all.filter((record) => allowed.has(scopeOfRecord(record, "alias")));
         },
         async listAvatarNames() {
             const db = await ensureDb();
@@ -343,6 +375,7 @@ export function createIndexedDbAvatarLibrary(
                 updatedAt: Date.now(),
                 ...meta,
             });
+            invalidateMoodTable();
         },
         async deleteAvatar(name) {
             const db = await ensureDb();
@@ -350,6 +383,7 @@ export function createIndexedDbAvatarLibrary(
         },
         async deleteMoodAvatar(name, moodId) {
             const db = await ensureDb();
+            invalidateMoodTable();
             const primary = scope.mode === "character" && scope.charId ? scope.charId : GLOBAL_CHAR_ID;
             const lookupKey = buildMoodKey(name, moodId, primary);
             const rows = await idbGetAllByIndex<AvatarRecord>(
@@ -386,6 +420,7 @@ export function createIndexedDbAvatarLibrary(
         },
         async clear() {
             const db = await ensureDb();
+            invalidateMoodTable();
             for (const store of [STORE_AVATARS, STORE_MOOD_AVATARS, STORE_CONFIG]) {
                 await idbClear(db, store);
             }
@@ -393,7 +428,7 @@ export function createIndexedDbAvatarLibrary(
         async listMoodAvatarsPrimary() {
             const db = await ensureDb();
             const all = await idbGetAll<AvatarRecord>(db, STORE_MOOD_AVATARS);
-            return all.filter((record) => String(record.charId ?? GLOBAL_CHAR_ID) === primaryCharId);
+            return all.filter((record) => scopeOfRecord(record, "alias") === primaryCharId);
         },
         async getScopeStats() {
             const db = await ensureDb();
@@ -456,6 +491,7 @@ export function createIndexedDbAvatarLibrary(
         },
         async clearScope(charId) {
             const db = await ensureDb();
+            invalidateMoodTable();
             const target = String(charId || GLOBAL_CHAR_ID);
 
             for (const key of await idbGetAllKeys(db, STORE_AVATARS)) {
@@ -488,6 +524,7 @@ export function createIndexedDbAvatarLibrary(
         },
         async clearAll() {
             const db = await ensureDb();
+            invalidateMoodTable();
             // 整表 clear，不做范围判断——这样连归属不明的孤儿记录一起清掉。
             // 刻意不动 config：格式规则/情绪词/样式不属于「头像库」，重新导入也不需要它们。
             for (const store of [STORE_AVATARS, STORE_MOOD_AVATARS, STORE_CG_GROUPS, STORE_CG_IMAGES]) {

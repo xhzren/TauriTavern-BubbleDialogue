@@ -4716,7 +4716,9 @@ function lu(e = {
 	mode: "global",
 	charId: null
 }, t = {}) {
-	let n = null, r = () => (n ||= Zl(), n), i = e.mode === "character" && e.charId ? e.charId : el, a = t.primaryOnly ? [i] : e.mode === "character" && e.charId ? [e.charId, el] : [el];
+	let n = null, r = () => (n ||= Zl(), n), i = e.mode === "character" && e.charId ? e.charId : el, a = t.primaryOnly ? [i] : e.mode === "character" && e.charId ? [e.charId, el] : [el], o = null, s = (e) => (o ||= $l(e, ql), o), c = () => {
+		o = null;
+	};
 	return {
 		async isReady() {
 			return await r() !== null;
@@ -4730,16 +4732,18 @@ function lu(e = {
 			return null;
 		},
 		async getMoodAvatar(e, t) {
-			let n = await r();
+			let n = await r(), i = String(e ?? "").trim().toLowerCase(), o = String(t ?? "");
 			for (let r of a) {
-				let i = (await tu(n, ql, "lookupKey", ou(e, t, r))).find((e) => e.imageBlob);
-				if (i) return i;
+				let a = (await tu(n, ql, "lookupKey", ou(e, t, r))).find((e) => e.imageBlob);
+				if (a) return a;
+				let c = (await s(n)).find((e) => su(e, "alias") === String(r) && String(e.alias ?? "").trim().toLowerCase() === i && String(e.moodId ?? "") === o && !!e.imageBlob);
+				if (c) return c;
 			}
 			return null;
 		},
 		async listMoodAvatars() {
 			let e = await $l(await r(), ql), t = new Set(a.map((e) => String(e)));
-			return e.filter((e) => t.has(String(e.charId ?? "_global_")));
+			return e.filter((e) => t.has(su(e, "alias")));
 		},
 		async listAvatarNames() {
 			let t = await r(), n = e.mode === "character" && e.charId ? e.charId : el;
@@ -4768,11 +4772,11 @@ function lu(e = {
 			});
 		},
 		async putMoodAvatar(t, n, i, a = {}) {
-			let o = await r(), s = ou(t, n, e.charId), c = e.mode === "character" && e.charId ? e.charId : el;
+			let o = await r(), s = ou(t, n, e.charId), l = e.mode === "character" && e.charId ? e.charId : el;
 			await nu(o, ql, {
 				alias: Vl(t),
 				lookupKey: s,
-				charId: c,
+				charId: l,
 				id: s,
 				moodId: n,
 				imageBlob: i,
@@ -4782,13 +4786,15 @@ function lu(e = {
 				createdAt: Date.now(),
 				updatedAt: Date.now(),
 				...a
-			});
+			}), c();
 		},
 		async deleteAvatar(t) {
 			await ru(await r(), Kl, au(t, e.charId));
 		},
 		async deleteMoodAvatar(t, n) {
-			let i = await r(), a = await tu(i, ql, "lookupKey", ou(t, n, e.mode === "character" && e.charId ? e.charId : el));
+			let i = await r();
+			c();
+			let a = await tu(i, ql, "lookupKey", ou(t, n, e.mode === "character" && e.charId ? e.charId : el));
 			for (let e of a) {
 				let t = String(e.id ?? "");
 				t && await ru(i, ql, t);
@@ -4806,6 +4812,7 @@ function lu(e = {
 		},
 		async clear() {
 			let e = await r();
+			c();
 			for (let t of [
 				Kl,
 				ql,
@@ -4813,7 +4820,7 @@ function lu(e = {
 			]) await iu(e, t);
 		},
 		async listMoodAvatarsPrimary() {
-			return (await $l(await r(), ql)).filter((e) => String(e.charId ?? "_global_") === i);
+			return (await $l(await r(), ql)).filter((e) => su(e, "alias") === i);
 		},
 		async getScopeStats() {
 			let e = await r(), t = i, n = {
@@ -4856,7 +4863,9 @@ function lu(e = {
 			return [...t.values()].sort((e, t) => e.charId === "_global_" ? -1 : t.charId === "_global_" ? 1 : t.bytes - e.bytes);
 		},
 		async clearScope(e) {
-			let t = await r(), n = String(e || "_global_");
+			let t = await r();
+			c();
+			let n = String(e || "_global_");
 			for (let e of await eu(t, Kl)) zl(e) === n && await ru(t, Kl, e);
 			for (let e of await $l(t, ql)) if (su(e, "alias") === n) {
 				let n = String(e.id ?? "");
@@ -4876,6 +4885,7 @@ function lu(e = {
 		},
 		async clearAll() {
 			let e = await r();
+			c();
 			for (let t of [
 				Kl,
 				ql,
@@ -5591,7 +5601,7 @@ async function Ju(e) {
 				o.skipped += 1, d();
 				continue;
 			}
-			let a = await t.getMoodAvatar(r, i);
+			let a = e.imageBlob ? e : await t.getMoodAvatar(r, i);
 			if (!a?.imageBlob) {
 				o.skipped += 1, d();
 				continue;

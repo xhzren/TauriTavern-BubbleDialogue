@@ -116,8 +116,10 @@ export async function migrateLibrary(options: MigrationOptions): Promise<Migrati
                 tick();
                 continue;
             }
-            // 列表不预取二进制，必须按需取一次
-            const full = await source.getMoodAvatar(name, moodId);
+            // 列表已经带回二进制就直接用（IndexedDB 后端会带），
+            // 只有列表不带图的后端（原生存储）才需要按需回查一次。
+            // 少一次逐条回查，也避免「索引缺失的老库查不到」再次丢数据。
+            const full = record.imageBlob ? record : await source.getMoodAvatar(name, moodId);
             if (!full?.imageBlob) {
                 report.skipped += 1;
                 tick();
