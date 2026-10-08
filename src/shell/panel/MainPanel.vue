@@ -301,20 +301,12 @@ const setTab = (id: string) => {
         display: none;
     }
 
-    /* 标签条：隐藏滚动条、贴边吸附、加大触控高度 */
+    /* 标签条：换行铺开（页面数量会随扩展增加，横滑会把后面的标签藏起来），并加大触控高度 */
     .mobile-nav {
         display: flex;
+        flex-wrap: wrap;
         gap: 6px;
-        overflow-x: auto;
         padding: 8px 10px;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
-        scroll-snap-type: x proximity;
-        overscroll-behavior-x: contain;
-    }
-
-    .mobile-nav::-webkit-scrollbar {
-        display: none;
     }
 
     .mobile-tab {

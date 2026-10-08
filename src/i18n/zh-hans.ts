@@ -177,10 +177,7 @@ export const zhHans: Messages = {
     'bubbleRender.addWordPlaceholder': '添加词…',
     'bubbleRender.avatarCount': '头像数',
     'bubbleRender.btnExport': '导出 ZIP',
-    'bubbleRender.btnHydrate': '立即渲染',
     'bubbleRender.btnImport': '导入 ZIP',
-    'bubbleRender.btnRefresh': '刷新头像',
-    'bubbleRender.btnReinject': '重新注入提示词',
     'bubbleRender.btnResetFormat': '恢复默认格式',
     'bubbleRender.btnResetMoods': '恢复默认情绪词',
     'bubbleRender.btnResetStyle': '恢复默认',
@@ -268,6 +265,21 @@ export const zhHans: Messages = {
     'bubbleRender.yes': '是',
 
     'bubbleRender.ioScope': '导入 / 导出范围：{scope}',
+
+    // Logs feature
+    'logs.pageTitle': '日志',
+    'logs.pageDesc': '记录并查看扩展运行时日志',
+    'logs.start': '开启记录',
+    'logs.stop': '停止记录',
+    'logs.clear': '清空',
+    'logs.statusRecording': '记录中 · 已记录 {n} 条',
+    'logs.statusStopped': '已停止 · 保留 {n} 条',
+    'logs.empty': '还没有日志。点「开启记录」开始。',
+    'logs.hint': '开启时会同时打开宿主的控制台记录开关（与宿主开发者面板是同一个开关），停止时恢复原状态。',
+    'logs.sourceFrontend': '前端',
+    'logs.sourceBackend': '后端',
+    'logs.unavailable': '当前客户端没有提供日志接口。',
+
     // Common
     'common.loading': '加载中…',
     'common.loaded': '加载完成',

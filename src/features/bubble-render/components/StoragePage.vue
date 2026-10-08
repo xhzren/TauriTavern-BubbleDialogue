@@ -13,7 +13,8 @@ const t = i18n.t.bind(i18n);
 const runtime = props.controller.runtime;
 const state = computed(() => runtime.state);
 
-const activePanel = ref<'legacy' | 'native'>('legacy');
+/** 默认打开 TT 原生：日常用的是原生存储，原版 DB 只在迁移时用 */
+const activePanel = ref<'legacy' | 'native'>('native');
 
 // ---------------- 原版 DB 面板 ----------------
 
@@ -141,10 +142,10 @@ onMounted(() => {
 <template>
   <div class="bd-page">
     <nav class="bd-panels">
-      <button type="button" class="bd-panel-btn" :class="{ active: activePanel === 'legacy' }"
-              @click="activePanel = 'legacy'">{{ t('bubbleRender.panelLegacy') }}</button>
       <button type="button" class="bd-panel-btn" :class="{ active: activePanel === 'native' }"
               @click="activePanel = 'native'">{{ t('bubbleRender.panelNative') }}</button>
+      <button type="button" class="bd-panel-btn" :class="{ active: activePanel === 'legacy' }"
+              @click="activePanel = 'legacy'">{{ t('bubbleRender.panelLegacy') }}</button>
     </nav>
 
     <!-- ============ 原版 DB ============ -->
@@ -298,11 +299,6 @@ onMounted(() => {
           <div class="bd-stat"><span class="bd-stat-label">{{ t('bubbleRender.statReady') }}</span><span class="bd-stat-value">{{ state.ready ? t('bubbleRender.yes') : t('bubbleRender.no') }}</span></div>
           <div class="bd-stat"><span class="bd-stat-label">{{ t('bubbleRender.statBubbles') }}</span><span class="bd-stat-value">{{ state.bubbleCount }}</span></div>
           <div class="bd-stat"><span class="bd-stat-label">{{ t('bubbleRender.statInjected') }}</span><span class="bd-stat-value">{{ state.injected ? t('bubbleRender.yes') : t('bubbleRender.no') }}</span></div>
-        </div>
-        <div class="bd-actions-row">
-          <button type="button" class="bd-btn ghost" @click="runtime.hydrateNow()">{{ t('bubbleRender.btnHydrate') }}</button>
-          <button type="button" class="bd-btn ghost" @click="runtime.refreshAvatars()">{{ t('bubbleRender.btnRefresh') }}</button>
-          <button type="button" class="bd-btn ghost" @click="runtime.reinject()">{{ t('bubbleRender.btnReinject') }}</button>
         </div>
       </section>
     </template>

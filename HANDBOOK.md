@@ -333,14 +333,15 @@ mood/<序号>_<名字>_<moodId>.<ext>
 
 ## 6. 功能清单
 
-### 6.1 四个页面（左侧「对话气泡」分类下）
+### 6.1 五个页面（左侧「对话气泡」分类下）
 
 | 页面 | 模块 id | 内容 |
 |---|---|---|
 | 头像管理 | `bubble-avatar` | 列表 + 搜索 + 上传 + 删除；**每行三个行内操作**；**导入/导出**；右侧详情看情绪差分与 CG |
 | 正文美化 | `bubble-style` | 16 个滑杆 + 颜色 + 字体 + 形状 + Markdown 开关 |
 | 情绪配置 | `bubble-mood` | 格式规则文本编辑 + 情绪组增删改色 |
-| 存储 | `bubble-storage` | 原版 DB 面板 / TT 原生面板（统计 + 运行状态） |
+| 存储 | `bubble-storage` | **TT 原生面板在前（默认）/ 原版 DB 面板在后**；原生页 = 统计 + 各范围表 + 运行状态 |
+| 日志 | `bubble-logs` | 开启/停止记录宿主的前端 + 后端日志；记录态与宿主控制台开关联动 |
 
 ### 6.2 头像管理的行内操作
 
@@ -611,6 +612,9 @@ src/
 │   └── panel/MainPanel.vue         面板外壳（★ .feature-host 是滚动容器）
 └── features/
     ├── modules.ts / registry.ts / catalog.ts
+    ├── dev-logs/                   日志页（模块 id 仍是 bubble-logs）
+    │   ├── controller.ts           记录开关：订阅/退订 + 控制台开关恢复
+    │   └── LogsPage.vue            日志列表（时间 / 级别 / 来源 / 内容）
     └── bubble-render/
         ├── runtime.ts              ★ 共享运行时（约 1200 行，四个页面共用）
         ├── bubble-hydrator.ts      ★ hydration + 有界异步队列

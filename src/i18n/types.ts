@@ -214,9 +214,6 @@ export interface Messages {
     'bubbleRender.errNoName': string;
     'bubbleRender.addWordPlaceholder': string;
     'bubbleRender.avatarCount': string;
-    'bubbleRender.btnHydrate': string;
-    'bubbleRender.btnRefresh': string;
-    'bubbleRender.btnReinject': string;
     'bubbleRender.btnResetFormat': string;
     'bubbleRender.btnResetMoods': string;
     'bubbleRender.btnResetStyle': string;
@@ -267,6 +264,21 @@ export interface Messages {
     'bubbleRender.style_narrationWeight': string;
     'bubbleRender.style_thoughtGap': string;
     'bubbleRender.style_thoughtOffsetY': string;
+
+
+    // Logs feature
+    'logs.pageTitle': string;
+    'logs.pageDesc': string;
+    'logs.start': string;
+    'logs.stop': string;
+    'logs.clear': string;
+    'logs.statusRecording': string;
+    'logs.statusStopped': string;
+    'logs.empty': string;
+    'logs.hint': string;
+    'logs.sourceFrontend': string;
+    'logs.sourceBackend': string;
+    'logs.unavailable': string;
 
     // Common
     'common.loading': string;
