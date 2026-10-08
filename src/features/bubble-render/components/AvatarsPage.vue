@@ -876,8 +876,23 @@ function moodLabel(moodId: string): string {
     .bd-variant-col { max-height: none; overflow: visible; padding-right: 0; }
     .bd-variant { min-height: 56px; }
     .bd-variant-mood { font-size: 14px; }
-    .bd-preview { min-height: 200px; }
-    .bd-preview-img { max-height: 56vh; }
+
+    /* 预览图放到差分列表「上面」并吸顶：列表很长时往下滚也一直看得到大图。
+       吸顶生效的前提是祖先没有 overflow:hidden——详情视图里 .bd-col-right 已经是 visible。 */
+    .bd-preview {
+        order: -1;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        min-height: 140px;
+        max-height: 34vh;
+        /* 吸顶时要挡住下面滚过去的列表，不能用半透明底 */
+        background: var(--ttbd-bg-1, #171717);
+        /* 和下面滚过去的列表拉开层次 */
+        box-shadow: 0 8px 14px rgba(0, 0, 0, 0.35);
+    }
+
+    .bd-preview-img { max-height: 32vh; }
 
     .bd-cg-grid { grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 8px; }
     .bd-detail-empty { min-height: 120px; }

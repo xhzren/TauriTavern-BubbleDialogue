@@ -8656,7 +8656,7 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 			])
 		], 64)) : (q(), J("div", Xp, B(W(r)("bubbleRender.detailEmpty")), 1))])], 2));
 	}
-}), [["__scopeId", "data-v-d36175bc"]]), Om = { class: "bd-tab" }, km = { class: "bd-loading-row" }, Am = { class: "bd-sec" }, jm = { class: "bd-slider-head" }, Mm = { class: "bd-slider-val" }, Nm = [
+}), [["__scopeId", "data-v-00a5c258"]]), Om = { class: "bd-tab" }, km = { class: "bd-loading-row" }, Am = { class: "bd-sec" }, jm = { class: "bd-slider-head" }, Mm = { class: "bd-slider-val" }, Nm = [
 	"min",
 	"max",
 	"step",
