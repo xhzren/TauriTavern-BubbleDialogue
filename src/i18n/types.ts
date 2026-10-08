@@ -276,8 +276,6 @@ export interface Messages {
     'logs.statusStopped': string;
     'logs.empty': string;
     'logs.hint': string;
-    'logs.sourceFrontend': string;
-    'logs.sourceBackend': string;
     'logs.unavailable': string;
 
     // Common

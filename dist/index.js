@@ -6771,7 +6771,7 @@ function Nf(e) {
 				bytes: 0
 			};
 			for (let e of r) i.avatars += e.avatars, i.moodAvatars += e.moodAvatars, i.cgImages += e.cgImages, i.bytes += e.bytes;
-			n.nativeScopes = r, n.totalAvatars = i.avatars, n.totalMoodAvatars = i.moodAvatars, n.totalCgImages = i.cgImages, n.totalStorageBytes = i.bytes, C = !0, n.totalStatsStale = !1;
+			n.nativeScopes = r, n.totalAvatars = i.avatars, n.totalMoodAvatars = i.moodAvatars, n.totalCgImages = i.cgImages, n.totalStorageBytes = i.bytes, C = !0, n.totalStatsStale = !1, console.info(`[BubbleDialogue] 全库统计完成：范围 ${r.map((e) => e.charId).join(", ")}；头像 ${i.avatars}、差分 ${i.moodAvatars}、CG ${i.cgImages}`);
 		} catch (e) {
 			console.warn("[BubbleDialogue] total stats failed.", e), n.totalStatsError = !0;
 		} finally {
@@ -6890,7 +6890,7 @@ function Nf(e) {
 		state: n,
 		config: l,
 		async acquire() {
-			j += 1, !(j > 1) && (B(), n.ready = await a.isReady(), await l.load(), me(), I() || await L(), re(), _.apply(), f?.(), f = l.subscribe(() => {
+			j += 1, !(j > 1) && (B(), n.ready = await a.isReady(), await l.load(), me(), I() || await L(), re(), _.apply(), console.info(`[BubbleDialogue] 运行时已就绪：后端 ${n.backend}、当前范围 ${n.mode}、头像 ${n.avatarCount}`), f?.(), f = l.subscribe(() => {
 				d.apply();
 				let e = JSON.stringify(l.state.moodGroups);
 				e !== p && (p = e, me(), _.invalidate(), _.apply());
@@ -7088,7 +7088,7 @@ function Nf(e) {
 					};
 				}
 			});
-			return te(t), b(t), D(t), n.backend === "native" && await he(), n.totalStatsStale = !0, a;
+			return te(t), b(t), D(t), n.backend === "native" && await he(), n.totalStatsStale = !0, console.info(`[BubbleDialogue] 转换范围 ${t}：头像 ${a.avatars}、差分 ${a.moodAvatars}、跳过 ${a.skipped}、失败 ${a.failed}`), a;
 		},
 		async removeDbScope(e) {
 			await cu({
@@ -7143,7 +7143,7 @@ function Nf(e) {
 						total: t
 					};
 				}, r().charId);
-				return n.lastResult = `导入完成：头像 ${t.avatars}、差分 ${t.moodAvatars}、配色 ${t.colors}，跳过 ${t.skipped}`, te(), D(), await L(), n.totalStatsStale = !0, o.clearCache(), g.refresh(), g.hydrateAll(), t;
+				return n.lastResult = `导入完成：头像 ${t.avatars}、差分 ${t.moodAvatars}、配色 ${t.colors}，跳过 ${t.skipped}`, console.info(`[BubbleDialogue] 导入 ZIP：头像 ${t.avatars}、差分 ${t.moodAvatars}、配色 ${t.colors}、跳过 ${t.skipped}`), te(), D(), await L(), n.totalStatsStale = !0, o.clearCache(), g.refresh(), g.hydrateAll(), t;
 			} finally {
 				n.busy = !1, n.progress = null;
 			}
@@ -7407,16 +7407,14 @@ var If = {
 	"bubbleRender.yes": "Yes",
 	"bubbleRender.ioScope": "Import / export scope: {scope}",
 	"logs.pageTitle": "Logs",
-	"logs.pageDesc": "Record and inspect extension runtime logs",
+	"logs.pageDesc": "Record and inspect this extension's own logs",
 	"logs.start": "Start recording",
 	"logs.stop": "Stop recording",
 	"logs.clear": "Clear",
 	"logs.statusRecording": "Recording · {n} entries",
 	"logs.statusStopped": "Stopped · {n} entries kept",
 	"logs.empty": "No logs yet. Press \"Start recording\".",
-	"logs.hint": "Starting also turns on the host console capture switch (same switch as the host dev panel) and restores it when you stop.",
-	"logs.sourceFrontend": "front",
-	"logs.sourceBackend": "back",
+	"logs.hint": "Shows only this extension ([BubbleDialogue]). Starting also turns on the host console capture switch (same switch as the host dev panel) and restores it when you stop.",
 	"logs.unavailable": "The current client does not provide the log API.",
 	"common.loading": "Loading…",
 	"common.loaded": "Loaded",
@@ -7674,16 +7672,14 @@ var If = {
 	"bubbleRender.yes": "是",
 	"bubbleRender.ioScope": "导入 / 导出范围：{scope}",
 	"logs.pageTitle": "日志",
-	"logs.pageDesc": "记录并查看扩展运行时日志",
+	"logs.pageDesc": "记录并查看本扩展自己的日志",
 	"logs.start": "开启记录",
 	"logs.stop": "停止记录",
 	"logs.clear": "清空",
 	"logs.statusRecording": "记录中 · 已记录 {n} 条",
 	"logs.statusStopped": "已停止 · 保留 {n} 条",
 	"logs.empty": "还没有日志。点「开启记录」开始。",
-	"logs.hint": "开启时会同时打开宿主的控制台记录开关（与宿主开发者面板是同一个开关），停止时恢复原状态。",
-	"logs.sourceFrontend": "前端",
-	"logs.sourceBackend": "后端",
+	"logs.hint": "只显示本扩展（[BubbleDialogue]）的日志。开启时会同时打开宿主的控制台记录开关（与宿主开发者面板是同一个开关），停止时恢复原状态。",
 	"logs.unavailable": "当前客户端没有提供日志接口。",
 	"common.loading": "加载中…",
 	"common.loaded": "加载完成",
@@ -7941,16 +7937,14 @@ var If = {
 	"bubbleRender.yes": "是",
 	"bubbleRender.ioScope": "匯入 / 匯出範圍：{scope}",
 	"logs.pageTitle": "日誌",
-	"logs.pageDesc": "記錄並檢視擴充功能執行期日誌",
+	"logs.pageDesc": "記錄並檢視本擴充功能自己的日誌",
 	"logs.start": "開啟記錄",
 	"logs.stop": "停止記錄",
 	"logs.clear": "清空",
 	"logs.statusRecording": "記錄中 · 已記錄 {n} 條",
 	"logs.statusStopped": "已停止 · 保留 {n} 條",
 	"logs.empty": "還沒有日誌。點「開啟記錄」開始。",
-	"logs.hint": "開啟時會同時打開宿主的控制台記錄開關（與宿主開發者面板是同一個開關），停止時還原原狀態。",
-	"logs.sourceFrontend": "前端",
-	"logs.sourceBackend": "後端",
+	"logs.hint": "只顯示本擴充功能（[BubbleDialogue]）的日誌。開啟時會同時打開宿主的控制台記錄開關（與宿主開發者面板是同一個開關），停止時還原原狀態。",
 	"logs.unavailable": "目前用戶端沒有提供日誌介面。",
 	"common.loading": "載入中…",
 	"common.loaded": "載入完成",
@@ -9395,10 +9389,10 @@ var Kg = [
 }, e_ = {
 	key: 0,
 	class: "lg-empty"
-}, t_ = { class: "lg-time" }, n_ = { class: "lg-level" }, r_ = { class: "lg-source" }, i_ = { class: "lg-body" }, a_ = {
+}, t_ = { class: "lg-time" }, n_ = { class: "lg-level" }, r_ = { class: "lg-body" }, i_ = {
 	key: 0,
 	class: "lg-target"
-}, o_ = { class: "lg-message" }, s_ = /* @__PURE__ */ Us(/* @__PURE__ */ or({
+}, a_ = { class: "lg-message" }, o_ = /* @__PURE__ */ Us(/* @__PURE__ */ or({
 	__name: "LogsPage",
 	props: { controller: {} },
 	setup(e) {
@@ -9409,9 +9403,6 @@ var Kg = [
 		function c(e) {
 			let t = new Date(Number.isFinite(e) ? e : Date.now());
 			return `${s(t.getHours())}:${s(t.getMinutes())}:${s(t.getSeconds())}.${s(t.getMilliseconds(), 3)}`;
-		}
-		function l(e) {
-			return e.source === "frontend" ? r("logs.sourceFrontend") : r("logs.sourceBackend");
 		}
 		return On(() => i.value.entries.length, async () => {
 			if (!i.value.recording) return;
@@ -9453,110 +9444,95 @@ var Kg = [
 			}, [
 				Y("span", t_, B(c(e.timestampMs)), 1),
 				Y("span", n_, B(e.level), 1),
-				Y("span", r_, B(l(e)), 1),
-				Y("span", i_, [e.target ? (q(), J("span", a_, B(e.target), 1)) : Z("", !0), Y("span", o_, B(e.message), 1)])
+				Y("span", r_, [e.target && e.target !== "main" ? (q(), J("span", i_, B(e.target), 1)) : Z("", !0), Y("span", a_, B(e.message), 1)])
 			], 2))), 128))], 512)
 		]));
 	}
-}), [["__scopeId", "data-v-f978b61a"]]), c_ = 300, l_ = 50;
-function u_(e) {
+}), [["__scopeId", "data-v-c906dcce"]]), s_ = "[BubbleDialogue]", c_ = 300, l_ = 50;
+function u_(e, t) {
+	return String(e ?? "").includes(s_) ? !0 : String(t ?? "") === "3p:BubbleDialogue";
+}
+function d_(e) {
 	let t = String(e ?? "").toLowerCase();
 	return t === "debug" || t === "warn" || t === "error" ? t : "info";
 }
-function d_(e) {
+function f_(e) {
 	let t = /* @__PURE__ */ Dt({
 		recording: !1,
 		busy: !1,
 		error: null,
 		entries: []
-	}), n = null, r = null, i = null, a = /* @__PURE__ */ new Set(), o = (e) => {
-		if (a.has(e.key)) return;
-		a.add(e.key);
+	}), n = null, r = null, i = /* @__PURE__ */ new Set(), a = (e) => {
+		if (i.has(e.key)) return;
+		i.add(e.key);
 		let n = t.entries.concat(e);
-		if (t.entries = n.length > c_ ? n.slice(n.length - c_) : n, a.size > c_ * 2) {
-			a.clear();
-			for (let e of t.entries) a.add(e.key);
+		if (t.entries = n.length > c_ ? n.slice(n.length - c_) : n, i.size > c_ * 2) {
+			i.clear();
+			for (let e of t.entries) i.add(e.key);
 		}
-	}, s = (e) => {
-		o({
+	}, o = (e) => {
+		let t = String(e.message ?? ""), n = String(e.target ?? "main");
+		u_(t, n) && a({
 			key: `f:${e.id}`,
 			timestampMs: Number(e.timestampMs ?? Date.now()),
-			level: u_(e.level),
-			source: "frontend",
-			target: String(e.target ?? "main"),
-			message: String(e.message ?? "")
-		});
-	}, c = (e) => {
-		o({
-			key: `b:${e.id}`,
-			timestampMs: Number(e.timestampMs ?? Date.now()),
-			level: u_(e.level),
-			source: "backend",
-			target: String(e.target ?? ""),
-			message: String(e.message ?? "")
+			level: d_(e.level),
+			target: n,
+			message: t
 		});
 	};
-	async function l() {
-		let a = e.host.api.dev?.frontendLogs, o = n, s = r;
-		if (n = null, r = null, o) try {
-			await o();
+	async function s() {
+		let i = e.host.api.dev?.frontendLogs, a = n;
+		if (n = null, a) try {
+			await a();
 		} catch (e) {
 			console.warn("[BubbleDialogue] unsubscribe frontend logs failed.", e);
 		}
-		if (s) try {
-			await s();
-		} catch (e) {
-			console.warn("[BubbleDialogue] unsubscribe backend logs failed.", e);
-		}
-		if (a && i !== null) {
-			let e = i;
-			i = null;
+		if (i && r !== null) {
+			let e = r;
+			r = null;
 			try {
-				await a.setConsoleCaptureEnabled(e);
+				await i.setConsoleCaptureEnabled(e);
 			} catch (e) {
 				console.warn("[BubbleDialogue] restore console capture failed.", e);
 			}
 		}
 		t.recording = !1;
 	}
-	async function u() {
+	async function c() {
 		if (t.recording || t.busy) return;
-		let a = e.host.api.dev?.frontendLogs, o = e.host.api.dev?.backendLogs;
-		if (!a && !o) {
+		let i = e.host.api.dev?.frontendLogs;
+		if (!i) {
 			t.error = "host-api-unavailable";
 			return;
 		}
 		t.busy = !0, t.error = null;
 		try {
-			if (a) {
-				let e = await a.getConsoleCaptureEnabled();
-				e || (await a.setConsoleCaptureEnabled(!0), i = e);
-				for (let e of await a.list({ limit: l_ })) s(e);
-			}
-			if (o) for (let e of await o.tail({ limit: l_ })) c(e);
-			a && (n = await a.subscribe(s)), o && (r = await o.subscribe(c)), t.recording = !0;
+			let e = await i.getConsoleCaptureEnabled();
+			e || (await i.setConsoleCaptureEnabled(!0), r = e);
+			for (let e of await i.list({ limit: l_ })) o(e);
+			n = await i.subscribe(o), t.recording = !0;
 		} catch (e) {
-			t.error = e instanceof Error ? e.message : String(e), await l();
+			t.error = e instanceof Error ? e.message : String(e), await s();
 		} finally {
 			t.busy = !1;
 		}
 	}
 	return {
 		state: t,
-		start: u,
-		stop: l,
+		start: c,
+		stop: s,
 		clear() {
-			t.entries = [], a.clear();
+			t.entries = [], i.clear();
 		},
 		async activate() {},
 		async deactivate() {
-			await l();
+			await s();
 		}
 	};
 }
 //#endregion
 //#region src/features/dev-logs/module.ts
-var f_ = {
+var p_ = {
 	id: "bubble-logs",
 	area: "bubble-dialogue",
 	titleKey: "logs.pageTitle",
@@ -9564,21 +9540,21 @@ var f_ = {
 	order: 50,
 	capabilities: ["dev.frontendLogs", "dev.backendLogs"],
 	defaultEnabled: !0,
-	component: s_,
-	createController: (e) => d_(e)
-}, p_ = [...Kg, f_];
+	component: o_,
+	createController: (e) => f_(e)
+}, m_ = [...Kg, p_];
 //#endregion
 //#region src/features/catalog.ts
-function m_(e) {
+function h_(e) {
 	return e.slice().sort((e, t) => e.order - t.order);
 }
-function h_(e) {
-	return m_(p_).filter((t) => e.supportsAll(t.capabilities));
+function g_(e) {
+	return h_(m_).filter((t) => e.supportsAll(t.capabilities));
 }
 //#endregion
 //#region src/features/registry.ts
-function g_(e) {
-	let t = /* @__PURE__ */ Dt(h_(e.host).map((t) => ({
+function __(e) {
+	let t = /* @__PURE__ */ Dt(g_(e.host).map((t) => ({
 		id: t.id,
 		area: t.area,
 		titleKey: t.titleKey,
@@ -9629,7 +9605,7 @@ function g_(e) {
 }
 //#endregion
 //#region src/app/shell-store.ts
-function __(e, t) {
+function v_(e, t) {
 	let n = /* @__PURE__ */ Dt({
 		panelOpen: !1,
 		activeTab: e.state.activeTab
@@ -9656,8 +9632,8 @@ function __(e, t) {
 }
 //#endregion
 //#region src/app/settings-store.ts
-var v_ = "ttbd:settings";
-function y_() {
+var y_ = "ttbd:settings";
+function b_() {
 	return {
 		enabled: !0,
 		enabledFeatures: {},
@@ -9668,23 +9644,23 @@ function y_() {
 		customBubbleBgTransparent: !1
 	};
 }
-function b_() {
-	let e = localStorage.getItem(v_);
-	if (!e) return y_();
+function x_() {
+	let e = localStorage.getItem(y_);
+	if (!e) return b_();
 	try {
 		let t = JSON.parse(e);
 		return {
-			...y_(),
+			...b_(),
 			...t,
 			appearanceMode: t.appearanceMode === "day" ? "day" : oc,
 			customBubbleIcon: t.customBubbleIcon ?? null,
 			customBubbleBgTransparent: !!t.customBubbleBgTransparent
 		};
 	} catch {
-		return y_();
+		return b_();
 	}
 }
-function x_(e) {
+function S_(e) {
 	return {
 		enabled: e.enabled,
 		enabledFeatures: { ...e.enabledFeatures },
@@ -9695,9 +9671,9 @@ function x_(e) {
 		customBubbleBgTransparent: e.customBubbleBgTransparent
 	};
 }
-function S_() {
-	let e = /* @__PURE__ */ Dt(b_()), t = /* @__PURE__ */ new Set(), n = () => {
-		localStorage.setItem(v_, JSON.stringify(x_(e)));
+function C_() {
+	let e = /* @__PURE__ */ Dt(x_()), t = /* @__PURE__ */ new Set(), n = () => {
+		localStorage.setItem(y_, JSON.stringify(S_(e)));
 	}, r = () => {
 		n(), t.forEach((e) => e());
 	};
@@ -9736,8 +9712,8 @@ function S_() {
 }
 //#endregion
 //#region src/app/layout-store.ts
-var C_ = 768;
-function w_(e = 0, t = 0, n = 0, r = 0) {
+var w_ = 768;
+function T_(e = 0, t = 0, n = 0, r = 0) {
 	return {
 		top: Math.max(0, e),
 		right: Math.max(0, t),
@@ -9745,7 +9721,7 @@ function w_(e = 0, t = 0, n = 0, r = 0) {
 		left: Math.max(0, r)
 	};
 }
-function T_(e = 0, t = 0, n = 0, r = 0) {
+function E_(e = 0, t = 0, n = 0, r = 0) {
 	let i = Math.max(0, e), a = Math.max(0, t), o = Math.max(0, n), s = Math.max(0, r);
 	return {
 		left: i,
@@ -9756,29 +9732,29 @@ function T_(e = 0, t = 0, n = 0, r = 0) {
 		bottom: a + s
 	};
 }
-function E_(e, t, n, r, i) {
+function D_(e, t, n, r, i) {
 	e.left = Math.max(0, t), e.top = Math.max(0, n), e.width = Math.max(0, r), e.height = Math.max(0, i), e.right = e.left + e.width, e.bottom = e.top + e.height;
 }
-function D_(e, t) {
-	let n = t.safeInsets ?? w_();
+function O_(e, t) {
+	let n = t.safeInsets ?? T_();
 	e.safeInsets.top = n.top, e.safeInsets.right = n.right, e.safeInsets.bottom = n.bottom, e.safeInsets.left = n.left;
-	let r = t.viewport ?? T_();
-	E_(e.viewportFrame, r.left, r.top, r.width, r.height);
-	let i = t.safeFrame ?? T_();
-	E_(e.safeFrame, i.left, i.top, i.width, i.height), e.compact = e.safeFrame.width <= C_;
+	let r = t.viewport ?? E_();
+	D_(e.viewportFrame, r.left, r.top, r.width, r.height);
+	let i = t.safeFrame ?? E_();
+	D_(e.safeFrame, i.left, i.top, i.width, i.height), e.compact = e.safeFrame.width <= w_;
 }
-async function O_(e) {
+async function k_(e) {
 	let t = /* @__PURE__ */ Dt({
 		compact: !1,
-		safeInsets: w_(),
-		viewportFrame: T_(),
-		safeFrame: T_()
+		safeInsets: T_(),
+		viewportFrame: E_(),
+		safeFrame: E_()
 	}), n = null, r = !1, i = () => {
 		if (r) throw Error("Layout store is disposed.");
-		D_(t, e.snapshot());
+		O_(t, e.snapshot());
 	};
 	return i(), n = await e.subscribe((e) => {
-		r || D_(t, e);
+		r || O_(t, e);
 	}), {
 		state: t,
 		refresh: i,
@@ -9789,17 +9765,17 @@ async function O_(e) {
 }
 //#endregion
 //#region src/app/create-creator-app.ts
-async function k_(e, t = {}) {
-	let n = t.settings ?? S_(), r = t.i18n ?? Vf();
+async function A_(e, t = {}) {
+	let n = t.settings ?? C_(), r = t.i18n ?? Vf();
 	if (!e.api.layout) throw Error("Host layout API is unavailable.");
-	let i = await O_(e.api.layout), a = Es(), o = {
+	let i = await k_(e.api.layout), a = Es(), o = {
 		host: e,
 		settings: n,
-		shell: __(n, a),
+		shell: v_(n, a),
 		layout: i,
 		bubbleBus: a,
 		i18n: r
-	}, s = g_(o);
+	}, s = __(o);
 	return await s.activateEnabledFeatures(), {
 		...o,
 		registry: s
@@ -9807,22 +9783,22 @@ async function k_(e, t = {}) {
 }
 //#endregion
 //#region src/host/api.ts
-function A_() {
+function j_() {
 	return window.__TAURITAVERN__?.api ?? null;
 }
-async function j_() {
+async function M_() {
 	let e = window.__TAURITAVERN__?.ready ?? window.__TAURITAVERN_MAIN_READY__;
 	e && await e;
 }
 //#endregion
 //#region src/host/client.ts
-function M_(e) {
+function N_(e) {
 	let t = /* @__PURE__ */ new Set();
 	return e.layout && t.add("layout"), e.chat && t.add("chat"), e.dev?.frontendLogs && t.add("dev.frontendLogs"), e.dev?.backendLogs && t.add("dev.backendLogs"), e.dev?.llmApiLogs && t.add("dev.llmApiLogs"), e.worldInfo && t.add("worldInfo"), e.extension?.store && t.add("extension.store"), t;
 }
-function N_(e = A_()) {
+function P_(e = j_()) {
 	if (!e) throw Error("TauriTavern host API is unavailable.");
-	let t = M_(e);
+	let t = N_(e);
 	return {
 		api: e,
 		capabilities: t,
@@ -9844,7 +9820,7 @@ function N_(e = A_()) {
 }
 //#endregion
 //#region src/settings-page/ExtensionsPagePanel.vue?vue&type=script&setup=true&lang.ts
-var P_ = { class: "inline-drawer wide100p ttbd-settings-drawer" }, F_ = { class: "inline-drawer-content" }, I_ = ["data-ttbd-appearance"], L_ = /* @__PURE__ */ Us(/* @__PURE__ */ or({
+var F_ = { class: "inline-drawer wide100p ttbd-settings-drawer" }, I_ = { class: "inline-drawer-content" }, L_ = ["data-ttbd-appearance"], R_ = /* @__PURE__ */ Us(/* @__PURE__ */ or({
 	__name: "ExtensionsPagePanel",
 	props: {
 		settings: {},
@@ -9869,7 +9845,7 @@ var P_ = { class: "inline-drawer wide100p ttbd-settings-drawer" }, F_ = { class:
 		}, l = async ({ id: e, enabled: n }) => {
 			await t.setFeatureEnabled(e, n);
 		};
-		return (e, u) => (q(), J("div", P_, [u[1] ||= Y("div", { class: "inline-drawer-toggle inline-drawer-header" }, [Y("div", { class: "ttbd-settings-header" }, [Y("i", { class: "fa-solid fa-code" }), Y("b", null, "Bubble Dialogue")]), Y("div", { class: "inline-drawer-icon fa-solid fa-circle-chevron-down down" })], -1), Y("div", F_, [Y("div", {
+		return (e, u) => (q(), J("div", F_, [u[1] ||= Y("div", { class: "inline-drawer-toggle inline-drawer-header" }, [Y("div", { class: "ttbd-settings-header" }, [Y("i", { class: "fa-solid fa-code" }), Y("b", null, "Bubble Dialogue")]), Y("div", { class: "inline-drawer-icon fa-solid fa-circle-chevron-down down" })], -1), Y("div", I_, [Y("div", {
 			class: "ttbd-theme-root ttbd-settings-surface",
 			"data-ttbd-appearance": t.settings.state.appearanceMode
 		}, [X(jc, {
@@ -9895,32 +9871,32 @@ var P_ = { class: "inline-drawer wide100p ttbd-settings-drawer" }, F_ = { class:
 			"custom-bubble-bg-transparent",
 			"features",
 			"i18n"
-		])], 8, I_)])]));
+		])], 8, L_)])]));
 	}
-}), [["__scopeId", "data-v-629f97bf"]]), R_ = "tauritavern-bubble-dialogue-root", z_ = "tauritavern-bubble-dialogue-settings-root", B_ = "ttbd-theme-root", V_ = null, H_ = null, U_ = null, W_ = null, G_ = null, K_ = null, q_ = null, J_ = null, Y_ = [], X_ = null, Z_ = Promise.resolve();
-function Q_() {
+}), [["__scopeId", "data-v-629f97bf"]]), z_ = "tauritavern-bubble-dialogue-root", B_ = "tauritavern-bubble-dialogue-settings-root", V_ = "ttbd-theme-root", H_ = null, U_ = null, W_ = null, G_ = null, K_ = null, q_ = null, J_ = null, Y_ = null, X_ = [], Z_ = null, Q_ = Promise.resolve();
+function $_() {
 	return document.readyState === "loading" ? new Promise((e) => {
 		document.addEventListener("DOMContentLoaded", () => e(), { once: !0 });
 	}) : Promise.resolve();
 }
-function $_(e, t, n) {
+function ev(e, t, n) {
 	document.getElementById(e)?.remove();
 	let r = document.createElement("div");
 	return r.id = e, r.className = n, t.appendChild(r), r;
 }
-function ev() {
+function tv() {
 	return document.getElementById("extensions_settings2") ?? document.getElementById("extensions_settings");
 }
-function tv() {
-	!H_ || !q_ || (H_.dataset.ttbdAppearance = q_.state.appearanceMode);
+function nv() {
+	!U_ || !J_ || (U_.dataset.ttbdAppearance = J_.state.appearanceMode);
 }
-async function nv() {
-	if (V_ || !K_ || !q_ || !q_.state.enabled) return;
-	let e = await k_(K_, {
-		settings: q_,
-		i18n: J_
+async function rv() {
+	if (H_ || !q_ || !J_ || !J_.state.enabled) return;
+	let e = await A_(q_, {
+		settings: J_,
+		i18n: Y_
 	});
-	if (!q_.state.enabled) {
+	if (!J_.state.enabled) {
 		try {
 			await e.registry.deactivateAllFeatures();
 		} finally {
@@ -9928,72 +9904,72 @@ async function nv() {
 		}
 		return;
 	}
-	G_ = e, H_ = $_(R_, document.body, B_), tv(), V_ = bs(Kc), V_.provide(Cs, e), V_.provide(Hf, e.i18n), V_.mount(H_);
+	K_ = e, U_ = ev(z_, document.body, V_), nv(), H_ = bs(Kc), H_.provide(Cs, e), H_.provide(Hf, e.i18n), H_.mount(U_);
 }
-async function rv() {
-	let e = G_;
-	if (G_ = null, e) try {
+async function iv() {
+	let e = K_;
+	if (K_ = null, e) try {
 		await e.registry.deactivateAllFeatures();
 	} finally {
 		await e.layout.dispose();
 	}
-	V_?.unmount(), V_ = null, H_?.remove(), H_ = null;
+	H_?.unmount(), H_ = null, U_?.remove(), U_ = null;
 }
-async function iv() {
-	if (q_) {
-		if (q_.state.enabled) {
-			await nv(), tv();
+async function av() {
+	if (J_) {
+		if (J_.state.enabled) {
+			await rv(), nv();
 			return;
 		}
-		await rv();
+		await iv();
 	}
 }
-function av() {
-	return Z_ = Z_.catch((e) => {
-		console.error("[BubbleDialogue] Runtime lifecycle sync failed.", e);
-	}).then(() => iv()), Z_;
-}
 function ov() {
-	if (U_ || !q_) return;
-	let e = ev();
+	return Q_ = Q_.catch((e) => {
+		console.error("[BubbleDialogue] Runtime lifecycle sync failed.", e);
+	}).then(() => av()), Q_;
+}
+function sv() {
+	if (W_ || !J_) return;
+	let e = tv();
 	if (!e) {
 		console.warn("[BubbleDialogue] Extensions settings container is unavailable.");
 		return;
 	}
-	W_ = $_(z_, e, "extension_container");
-	let t = J_ ?? Vf();
-	U_ = bs(L_, {
-		settings: q_,
-		features: Y_,
+	G_ = ev(B_, e, "extension_container");
+	let t = Y_ ?? Vf();
+	W_ = bs(R_, {
+		settings: J_,
+		features: X_,
 		setFeatureEnabled: async (e, t) => {
-			if (G_) {
-				await G_.registry.setFeatureEnabled(e, t);
+			if (K_) {
+				await K_.registry.setFeatureEnabled(e, t);
 				return;
 			}
-			q_?.setFeatureEnabled(e, t);
+			J_?.setFeatureEnabled(e, t);
 		}
-	}), U_.provide(Hf, t), U_.mount(W_);
-}
-function sv() {
-	U_?.unmount(), U_ = null, W_?.remove(), W_ = null;
+	}), W_.provide(Hf, t), W_.mount(G_);
 }
 function cv() {
-	X_?.(), X_ = null, Z_.finally(() => {
-		rv(), sv();
+	W_?.unmount(), W_ = null, G_?.remove(), G_ = null;
+}
+function lv() {
+	Z_?.(), Z_ = null, Q_.finally(() => {
+		iv(), cv();
 	});
 }
-async function lv() {
-	await Q_(), await j_();
-	let e = A_();
+async function uv() {
+	await $_(), await M_();
+	let e = j_();
 	if (!e) {
 		console.error("[BubbleDialogue] Host API is unavailable.");
 		return;
 	}
-	K_ = N_(e), q_ = S_(), J_ = Vf(), Y_ = h_(K_), ov(), X_ = q_.subscribe(() => {
-		av();
-	}), await av(), window.addEventListener("pagehide", cv, { once: !0 });
+	q_ = P_(e), J_ = C_(), Y_ = Vf(), X_ = g_(q_), sv(), Z_ = J_.subscribe(() => {
+		ov();
+	}), await ov(), window.addEventListener("pagehide", lv, { once: !0 });
 }
-lv();
+uv();
 //#endregion
 
 //# sourceMappingURL=index.js.map

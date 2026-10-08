@@ -566,6 +566,9 @@ async function refreshAvatarStats(options: { force?: boolean } = {}) {
             state.totalStorageBytes = totals.bytes;
             totalStatsDone = true;
             state.totalStatsStale = false;
+            console.info(
+                `[BubbleDialogue] 全库统计完成：范围 ${scopes.map((row) => row.charId).join(", ")}；头像 ${totals.avatars}、差分 ${totals.moodAvatars}、CG ${totals.cgImages}`,
+            );
         } catch (error) {
             console.warn("[BubbleDialogue] total stats failed.", error);
             state.totalStatsError = true;
@@ -831,6 +834,9 @@ async function refreshAvatarStats(options: { force?: boolean } = {}) {
             // 开角色卡、切库范围、关开面板都不算「启用」。
             void requestTotalStatsOnce();
             injector.apply();
+            console.info(
+                `[BubbleDialogue] 运行时已就绪：后端 ${state.backend}、当前范围 ${state.mode}、头像 ${state.avatarCount}`,
+            );
             // 配置一变就重编译 CSS；load() 之后订阅，保证首次用的是已读到的配置
             unsubscribeStyle?.();
             unsubscribeStyle = config.subscribe(() => {
@@ -1123,6 +1129,9 @@ async function refreshAvatarStats(options: { force?: boolean } = {}) {
             }
             // 数据变了，但不自动重扫：全库统计只由启用时和用户手动刷新触发
             state.totalStatsStale = true;
+            console.info(
+                `[BubbleDialogue] 转换范围 ${charId}：头像 ${report.avatars}、差分 ${report.moodAvatars}、跳过 ${report.skipped}、失败 ${report.failed}`,
+            );
             return report;
         },
         async removeDbScope(charId) {
@@ -1202,6 +1211,9 @@ async function refreshAvatarStats(options: { force?: boolean } = {}) {
                     effectiveScope().charId,
                 );
                 state.lastResult = `导入完成：头像 ${report.avatars}、差分 ${report.moodAvatars}、配色 ${report.colors}，跳过 ${report.skipped}`;
+                console.info(
+                    `[BubbleDialogue] 导入 ZIP：头像 ${report.avatars}、差分 ${report.moodAvatars}、配色 ${report.colors}、跳过 ${report.skipped}`,
+                );
                 invalidateStatsCache();
                 invalidateCgGroups();
                 await refreshAvatarStats();   // 内部会重新预取配色

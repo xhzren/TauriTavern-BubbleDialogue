@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue';
 import { useI18n } from '../../i18n';
-import type { LogRecordEntry, LogsFeatureController } from './controller';
+import type { LogsFeatureController } from './controller';
 
 const props = defineProps<{ controller: LogsFeatureController }>();
 const i18n = useI18n();
@@ -24,10 +24,6 @@ function pad(value: number, width = 2): string {
 function formatTime(timestampMs: number): string {
     const date = new Date(Number.isFinite(timestampMs) ? timestampMs : Date.now());
     return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}.${pad(date.getMilliseconds(), 3)}`;
-}
-
-function sourceLabel(entry: LogRecordEntry): string {
-    return entry.source === 'frontend' ? t('logs.sourceFrontend') : t('logs.sourceBackend');
 }
 
 // 记录中始终跟到最新一行；停止后不再打扰用户看历史
@@ -65,9 +61,9 @@ watch(() => state.value.entries.length, async () => {
       <div v-for="entry in state.entries" :key="entry.key" class="lg-row" :class="entry.level">
         <span class="lg-time">{{ formatTime(entry.timestampMs) }}</span>
         <span class="lg-level">{{ entry.level }}</span>
-        <span class="lg-source">{{ sourceLabel(entry) }}</span>
         <span class="lg-body">
-          <span v-if="entry.target" class="lg-target">{{ entry.target }}</span>
+          <!-- 宿主目前把所有第三方 console 的 target 都填成 main，没有信息量就不显示 -->
+          <span v-if="entry.target && entry.target !== 'main'" class="lg-target">{{ entry.target }}</span>
           <span class="lg-message">{{ entry.message }}</span>
         </span>
       </div>
@@ -111,7 +107,7 @@ watch(() => state.value.entries.length, async () => {
 
 .lg-row {
     display: grid;
-    grid-template-columns: 92px 52px 44px minmax(0, 1fr);
+    grid-template-columns: 92px 52px minmax(0, 1fr);
     gap: 8px;
     align-items: start;
     padding: 6px 8px;
@@ -123,7 +119,6 @@ watch(() => state.value.entries.length, async () => {
 
 .lg-time { font-family: var(--ttbd-font-mono); opacity: 0.6; white-space: nowrap; }
 .lg-level { text-transform: uppercase; font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; opacity: 0.85; }
-.lg-source { font-size: 10.5px; opacity: 0.55; white-space: nowrap; }
 .lg-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .lg-target { font-size: 10.5px; opacity: 0.5; word-break: break-all; }
 .lg-message { white-space: pre-wrap; overflow-wrap: anywhere; }
@@ -140,7 +135,7 @@ watch(() => state.value.entries.length, async () => {
     .lg-hint { font-size: 12px; }
 
     .lg-row {
-        grid-template-columns: 86px 48px minmax(0, 1fr);
+        grid-template-columns: 84px 48px minmax(0, 1fr);
         gap: 6px 8px;
         padding: 8px;
     }

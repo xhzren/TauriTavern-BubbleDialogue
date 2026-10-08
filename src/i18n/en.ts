@@ -268,16 +268,14 @@ export const en: Messages = {
 
     // Logs feature
     'logs.pageTitle': 'Logs',
-    'logs.pageDesc': 'Record and inspect extension runtime logs',
+    'logs.pageDesc': 'Record and inspect this extension\'s own logs',
     'logs.start': 'Start recording',
     'logs.stop': 'Stop recording',
     'logs.clear': 'Clear',
     'logs.statusRecording': 'Recording · {n} entries',
     'logs.statusStopped': 'Stopped · {n} entries kept',
     'logs.empty': 'No logs yet. Press "Start recording".',
-    'logs.hint': 'Starting also turns on the host console capture switch (same switch as the host dev panel) and restores it when you stop.',
-    'logs.sourceFrontend': 'front',
-    'logs.sourceBackend': 'back',
+    'logs.hint': 'Shows only this extension ([BubbleDialogue]). Starting also turns on the host console capture switch (same switch as the host dev panel) and restores it when you stop.',
     'logs.unavailable': 'The current client does not provide the log API.',
 
     // Common

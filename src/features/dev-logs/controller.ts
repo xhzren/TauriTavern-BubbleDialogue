@@ -1,6 +1,6 @@
 import { reactive } from 'vue';
 import type { CreatorRuntimeContext } from '../../app/context';
-import type { BackendLogEntry, FrontendLogEntry, HostUnsubscribe } from '../../host/api';
+import type { FrontendLogEntry, HostUnsubscribe } from '../../host/api';
 import type { CreatorFeatureController } from '../types';
 
 /**
@@ -10,20 +10,26 @@ import type { CreatorFeatureController } from '../types';
  * MainPanel 只挂载当前页，切到别的页面组件就会被卸载。
  * 「开启记录」之后用户会去别的页面复现问题，记录必须继续，所以状态放在模块级控制器里。
  *
- * 日志来源是宿主提供的两个接口：
- * - dev.frontendLogs：前端 console 缓冲 + 订阅；需要宿主打开「控制台记录」开关才会入缓冲
- * - dev.backendLogs：后端 tracing 尾部 + 订阅（订阅时才开启事件流）
+ * 日志来源：宿主的 dev.frontendLogs（console 缓冲 + 订阅）。
+ * 需要宿主打开「控制台记录」开关才会入缓冲，开启记录时会替用户打开、停止时恢复原值。
+ *
+ * 只看本扩展自己的日志：
+ * 宿主的 detectCurrentLogTarget() 目前恒返回 'main'（所有第三方脚本的 console 都被
+ * 打成 main，截图里那些 QR助手 / dynamic-styles 就是这么来的），所以无法按 target 过滤；
+ * 本扩展所有 console 输出统一带 [BubbleDialogue] 前缀，用它过滤才准确。
+ * 后端 tracing 日志不属于本扩展，直接不订阅。
  */
 
-export type LogSource = 'frontend' | 'backend';
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
+/** 本扩展自己的日志前缀（所有 console 输出都用它，见 tests/logs-controller） */
+const OWN_LOG_PREFIX = '[BubbleDialogue]';
+
 export interface LogRecordEntry {
-    /** 去重键：来源 + 宿主给的 id */
+    /** 去重键：宿主给的 id */
     key: string;
     timestampMs: number;
     level: LogLevel;
-    source: LogSource;
     target: string;
     message: string;
 }
@@ -45,6 +51,14 @@ const MAX_ENTRIES = 300;
 /** 开启时先补多少条历史，避免面板一开始是空的 */
 const SEED_LIMIT = 50;
 
+/** 这条日志是不是本扩展打的 */
+export function isOwnLogEntry(message: unknown, target: unknown): boolean {
+    const text = String(message ?? '');
+    if (text.includes(OWN_LOG_PREFIX)) return true;
+    // 宿主以后若按扩展名打 target，也能认出来
+    return String(target ?? '') === '3p:BubbleDialogue';
+}
+
 function normalizeLevel(level: unknown): LogLevel {
     const value = String(level ?? '').toLowerCase();
     if (value === 'debug' || value === 'warn' || value === 'error') return value;
@@ -60,7 +74,6 @@ export function createLogsFeatureController(context: CreatorRuntimeContext): Log
     });
 
     let unsubscribeFrontend: HostUnsubscribe | null = null;
-    let unsubscribeBackend: HostUnsubscribe | null = null;
     /** 只有「我们替用户打开了控制台记录」时才记录原值，停止时恢复 */
     let consoleCaptureRestore: boolean | null = null;
     const seen = new Set<string>();
@@ -78,33 +91,23 @@ export function createLogsFeatureController(context: CreatorRuntimeContext): Log
     };
 
     const fromFrontend = (entry: FrontendLogEntry) => {
+        const message = String(entry.message ?? '');
+        const target = String(entry.target ?? 'main');
+        // 宿主的日志流是全局的：只留下本扩展自己的条目
+        if (!isOwnLogEntry(message, target)) return;
         push({
             key: `f:${entry.id}`,
             timestampMs: Number(entry.timestampMs ?? Date.now()),
             level: normalizeLevel(entry.level),
-            source: 'frontend',
-            target: String(entry.target ?? 'main'),
-            message: String(entry.message ?? ''),
-        });
-    };
-
-    const fromBackend = (entry: BackendLogEntry) => {
-        push({
-            key: `b:${entry.id}`,
-            timestampMs: Number(entry.timestampMs ?? Date.now()),
-            level: normalizeLevel(entry.level),
-            source: 'backend',
-            target: String(entry.target ?? ''),
-            message: String(entry.message ?? ''),
+            target,
+            message,
         });
     };
 
     async function stop(): Promise<void> {
         const frontend = context.host.api.dev?.frontendLogs;
         const stopFrontend = unsubscribeFrontend;
-        const stopBackend = unsubscribeBackend;
         unsubscribeFrontend = null;
-        unsubscribeBackend = null;
 
         // 退订失败也要继续恢复开关，否则会把用户的设置留在「开」的状态
         if (stopFrontend) {
@@ -112,13 +115,6 @@ export function createLogsFeatureController(context: CreatorRuntimeContext): Log
                 await stopFrontend();
             } catch (error) {
                 console.warn('[BubbleDialogue] unsubscribe frontend logs failed.', error);
-            }
-        }
-        if (stopBackend) {
-            try {
-                await stopBackend();
-            } catch (error) {
-                console.warn('[BubbleDialogue] unsubscribe backend logs failed.', error);
             }
         }
 
@@ -139,8 +135,7 @@ export function createLogsFeatureController(context: CreatorRuntimeContext): Log
         if (state.recording || state.busy) return;
 
         const frontend = context.host.api.dev?.frontendLogs;
-        const backend = context.host.api.dev?.backendLogs;
-        if (!frontend && !backend) {
+        if (!frontend) {
             state.error = 'host-api-unavailable';
             return;
         }
@@ -148,21 +143,16 @@ export function createLogsFeatureController(context: CreatorRuntimeContext): Log
         state.busy = true;
         state.error = null;
         try {
-            if (frontend) {
-                // 前端日志要宿主打开控制台记录才会进缓冲；原值记下来，停止时恢复
-                const enabled = await frontend.getConsoleCaptureEnabled();
-                if (!enabled) {
-                    await frontend.setConsoleCaptureEnabled(true);
-                    consoleCaptureRestore = enabled;
-                }
-                for (const entry of await frontend.list({ limit: SEED_LIMIT })) fromFrontend(entry);
+            // 前端日志要宿主打开控制台记录才会进缓冲；原值记下来，停止时恢复
+            const enabled = await frontend.getConsoleCaptureEnabled();
+            if (!enabled) {
+                await frontend.setConsoleCaptureEnabled(true);
+                consoleCaptureRestore = enabled;
             }
-            if (backend) {
-                for (const entry of await backend.tail({ limit: SEED_LIMIT })) fromBackend(entry);
-            }
+            // 历史条目同样过滤：只补本扩展自己的
+            for (const entry of await frontend.list({ limit: SEED_LIMIT })) fromFrontend(entry);
 
-            if (frontend) unsubscribeFrontend = await frontend.subscribe(fromFrontend);
-            if (backend) unsubscribeBackend = await backend.subscribe(fromBackend);
+            unsubscribeFrontend = await frontend.subscribe(fromFrontend);
 
             state.recording = true;
         } catch (error) {

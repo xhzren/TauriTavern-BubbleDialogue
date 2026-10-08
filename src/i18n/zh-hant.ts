@@ -268,16 +268,14 @@ export const zhHant: Messages = {
 
     // Logs feature
     'logs.pageTitle': '日誌',
-    'logs.pageDesc': '記錄並檢視擴充功能執行期日誌',
+    'logs.pageDesc': '記錄並檢視本擴充功能自己的日誌',
     'logs.start': '開啟記錄',
     'logs.stop': '停止記錄',
     'logs.clear': '清空',
     'logs.statusRecording': '記錄中 · 已記錄 {n} 條',
     'logs.statusStopped': '已停止 · 保留 {n} 條',
     'logs.empty': '還沒有日誌。點「開啟記錄」開始。',
-    'logs.hint': '開啟時會同時打開宿主的控制台記錄開關（與宿主開發者面板是同一個開關），停止時還原原狀態。',
-    'logs.sourceFrontend': '前端',
-    'logs.sourceBackend': '後端',
+    'logs.hint': '只顯示本擴充功能（[BubbleDialogue]）的日誌。開啟時會同時打開宿主的控制台記錄開關（與宿主開發者面板是同一個開關），停止時還原原狀態。',
     'logs.unavailable': '目前用戶端沒有提供日誌介面。',
 
     // Common
