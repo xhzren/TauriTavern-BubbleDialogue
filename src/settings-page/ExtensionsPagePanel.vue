@@ -51,8 +51,8 @@ const toggleFeature = async ({ id, enabled }: { id: string; enabled: boolean }) 
   <div class="inline-drawer wide100p ttbd-settings-drawer">
     <div class="inline-drawer-toggle inline-drawer-header">
       <div class="ttbd-settings-header">
-        <i class="fa-solid fa-code"></i>
-        <b>Bubble Dialogue</b>
+        <i class="fa-solid fa-comments"></i>
+        <b>{{ t('settings.title') }}</b>
       </div>
       <div class="inline-drawer-icon fa-solid fa-circle-chevron-down down"></div>
     </div>
@@ -63,6 +63,7 @@ const toggleFeature = async ({ id, enabled }: { id: string; enabled: boolean }) 
         :data-ttbd-appearance="props.settings.state.appearanceMode"
       >
         <CreatorSettingsPane
+          variant="compact"
           :title="t('settings.title')"
           :description="t('settings.description')"
           :extension-enabled="props.settings.state.enabled"

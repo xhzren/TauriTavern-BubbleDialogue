@@ -2,10 +2,10 @@ import type { Messages } from './types';
 
 export const en: Messages = {
     // Settings
-    'settings.title': 'Creator Tools',
-    'settings.description': 'Enable or disable the floating assistant and individual tool modules. Changes apply immediately.',
-    'settings.enableRuntime': 'Enable Floating Assistant',
-    'settings.enableRuntimeDesc': 'Show or hide the floating bubble and tool panel.',
+    'settings.title': '对话气泡ＴＴ二改版',
+    'settings.description': 'Turn the floating bubble on or off. Changes apply immediately.',
+    'settings.enableRuntime': 'Enable floating bubble',
+    'settings.enableRuntimeDesc': 'Show or hide the floating bubble.',
     'settings.appearance': 'Appearance',
     'settings.appearanceDesc': 'Switch the extension between its own night theme and warm white day theme.',
     'settings.appearanceNight': 'Night',
@@ -20,10 +20,10 @@ export const en: Messages = {
     'settings.transparentBg': 'Hide Theme Background',
     'settings.transparentBgDesc': 'When enabled, transparent images will not show the day/night theme background color.',
     'settings.uploadIcon': 'Upload Image',
-    'settings.removeIcon': 'Restore Default',
+    'settings.removeIcon': 'Reset to default icon',
 
     // Panel sidebar
-    'panel.sidebarTitle': 'Creator Tools',
+    'panel.sidebarTitle': '对话气泡ＴＴ二改版',
     'panel.globalSettings': 'Settings',
 
     // WorldInfo

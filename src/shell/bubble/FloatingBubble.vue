@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch, onMounted, onUnmounted } from 'vue';
 import { useCreatorApp } from '../../app/context';
+import { DEFAULT_BUBBLE_ICON } from '../../app/bubble-icon';
 import { BUBBLE_FEED_VISIBLE_MS } from './bubble-feed-bus';
 
 const { bubbleBus, layout, settings, shell } = useCreatorApp();
@@ -294,16 +295,15 @@ const onBubbleLeave = () => {
     scheduleDock();
 };
 
-const customIconStyle = computed(() => {
-    const icon = settings.state.customBubbleIcon;
-    if (!icon) return {};
-    return {
-        backgroundImage: `url(${icon})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-    };
-});
+/** 用户没自定义时用内置默认图标（对话气泡头像） */
+const effectiveIcon = computed(() => settings.state.customBubbleIcon ?? DEFAULT_BUBBLE_ICON);
+
+const customIconStyle = computed(() => ({
+    backgroundImage: `url(${effectiveIcon.value})`,
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+}));
 </script>
 
 <template>
@@ -341,7 +341,7 @@ const customIconStyle = computed(() => {
 
     <div
       class="bubble-btn"
-      :class="{ 'is-transparent': settings.state.customBubbleBgTransparent && settings.state.customBubbleIcon }"
+      :class="{ 'is-transparent': settings.state.customBubbleBgTransparent }"
       :style="customIconStyle"
       @pointerdown.stop.prevent="onPointerDown"
       @pointermove="onPointerMove"
@@ -349,7 +349,6 @@ const customIconStyle = computed(() => {
       @mouseenter="onBubbleEnter"
       @mouseleave="onBubbleLeave"
     >
-      <span class="bubble-code-icon" v-if="!settings.state.customBubbleIcon">&lt;/&gt;</span>
       <span v-if="unreadCount > 0" class="bubble-badge">{{ unreadCount }}</span>
     </div>
   </div>
@@ -569,14 +568,6 @@ const customIconStyle = computed(() => {
 .bubble-btn.is-transparent {
     background-color: transparent !important;
     box-shadow: none !important;
-}
-
-.bubble-code-icon {
-    font-family: var(--ttbd-font-mono);
-    font-size: 17px;
-    font-weight: 700;
-    letter-spacing: -0.08em;
-    transform: translateY(-1px);
 }
 
 .bubble-badge {

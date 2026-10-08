@@ -2,10 +2,10 @@ import type { Messages } from './types';
 
 export const zhHant: Messages = {
     // Settings
-    'settings.title': '創作者工具',
-    'settings.description': '啟用或關閉懸浮助手和各個工具模組。變更立即生效。',
-    'settings.enableRuntime': '啟用懸浮助手',
-    'settings.enableRuntimeDesc': '顯示或隱藏懸浮氣泡與工具面板。',
+    'settings.title': '對話氣泡ＴＴ二改版',
+    'settings.description': '啟用或關閉懸浮氣泡。變更立即生效。',
+    'settings.enableRuntime': '啟用懸浮氣泡',
+    'settings.enableRuntimeDesc': '顯示或隱藏懸浮氣泡。',
     'settings.appearance': '外觀',
     'settings.appearanceDesc': '切換擴充套件的夜間主題與日間主題。',
     'settings.appearanceNight': '夜間',
@@ -20,10 +20,10 @@ export const zhHant: Messages = {
     'settings.transparentBg': '隱藏主題底色',
     'settings.transparentBgDesc': '開啟後，透明圖片將不會透出日夜模式的主題底色。',
     'settings.uploadIcon': '上傳圖片',
-    'settings.removeIcon': '恢復預設',
+    'settings.removeIcon': '還原預設圖示',
 
     // Panel sidebar
-    'panel.sidebarTitle': '創作者工具',
+    'panel.sidebarTitle': '對話氣泡ＴＴ二改版',
     'panel.globalSettings': '設定',
 
     // WorldInfo

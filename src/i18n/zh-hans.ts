@@ -2,10 +2,10 @@ import type { Messages } from './types';
 
 export const zhHans: Messages = {
     // Settings
-    'settings.title': '创作者工具',
-    'settings.description': '启用或关闭悬浮助手和各个工具模块。更改立即生效。',
-    'settings.enableRuntime': '启用悬浮助手',
-    'settings.enableRuntimeDesc': '显示或隐藏悬浮气泡与工具面板。',
+    'settings.title': '对话气泡ＴＴ二改版',
+    'settings.description': '启用或关闭悬浮气泡。更改立即生效。',
+    'settings.enableRuntime': '启用悬浮气泡',
+    'settings.enableRuntimeDesc': '显示或隐藏悬浮气泡。',
     'settings.appearance': '外观',
     'settings.appearanceDesc': '切换扩展的夜间主题与日间主题。',
     'settings.appearanceNight': '夜间',
@@ -20,10 +20,10 @@ export const zhHans: Messages = {
     'settings.transparentBg': '隐藏主题底色',
     'settings.transparentBgDesc': '开启后，透明图片将不会透出日夜模式的主题底色。',
     'settings.uploadIcon': '上传图片',
-    'settings.removeIcon': '恢复默认',
+    'settings.removeIcon': '恢复默认图标',
 
     // Panel sidebar
-    'panel.sidebarTitle': '创作者工具',
+    'panel.sidebarTitle': '对话气泡ＴＴ二改版',
     'panel.globalSettings': '设置',
 
     // WorldInfo

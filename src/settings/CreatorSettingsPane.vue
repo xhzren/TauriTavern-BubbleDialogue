@@ -15,6 +15,11 @@ const props = defineProps<{
     customBubbleBgTransparent: boolean;
     features: CreatorSettingsFeatureItem[];
     i18n: I18nContext;
+    /**
+     * full   = 悬浮面板里的「设置」页（完整设置）
+     * compact = 宿主扩展列表里的抽屉（只留「是否启用悬浮气泡」）
+     */
+    variant?: 'full' | 'compact';
 }>();
 
 const emit = defineEmits<{
@@ -26,6 +31,7 @@ const emit = defineEmits<{
 }>();
 
 const t = computed(() => props.i18n.t.bind(props.i18n));
+const isCompact = computed(() => props.variant === 'compact');
 
 const areaOrder: FeatureArea[] = ['bubble-dialogue', 'character-tools', 'extension-dev', 'memory-dev'];
 const areaLabelKeys: Record<FeatureArea, keyof Messages> = {
@@ -120,7 +126,7 @@ const removeCustomIcon = () => {
 
 <template>
   <div class="settings-pane">
-    <div class="settings-header">
+    <div v-if="!isCompact" class="settings-header">
       <h2 class="settings-title">{{ props.title }}</h2>
       <p class="settings-description">{{ props.description }}</p>
     </div>
@@ -138,7 +144,7 @@ const removeCustomIcon = () => {
       />
     </label>
 
-    <section class="settings-group">
+    <section v-if="!isCompact" class="settings-group">
       <header class="settings-group-header">
         <h3>{{ t('settings.appearance') }}</h3>
       </header>
@@ -180,7 +186,7 @@ const removeCustomIcon = () => {
         </div>
       </div>
 
-      <label class="settings-card" v-if="props.customBubbleIcon">
+      <label class="settings-card">
         <div class="settings-card-copy">
           <strong>{{ t('settings.transparentBg') }}</strong>
           <span>{{ t('settings.transparentBgDesc') }}</span>
@@ -194,7 +200,7 @@ const removeCustomIcon = () => {
       </label>
     </section>
 
-    <div class="settings-groups">
+    <div v-if="!isCompact" class="settings-groups">
       <section v-for="group in groupedFeatures" :key="group.area" class="settings-group">
         <header class="settings-group-header">
           <h3>{{ group.label }}</h3>
@@ -219,7 +225,7 @@ const removeCustomIcon = () => {
     </div>
 
     <ImageCropper 
-      v-if="showCropper" 
+      v-if="!isCompact && showCropper" 
       :image-url="cropImageUrl" 
       :i18n="props.i18n" 
       :appearance-mode="props.appearanceMode"
