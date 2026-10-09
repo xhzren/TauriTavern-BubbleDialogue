@@ -10,10 +10,14 @@ const dom = new JSDOM("<!DOCTYPE html><body></body>");
 (globalThis as any).window = dom.window;
 (globalThis as any).MutationObserver = dom.window.MutationObserver;
 
-const CHAR_ID = "1921";
+/** 稳定身份 = avatar 文件名去掉 .png；与数组下标刻意不同，验证不依赖下标 */
+const CHAR_STEM = "银麒赎世";
+/** characters[characterId] 才是当前卡（与真实宿主一致） */
+const CHAR_INDEX = 0;
 const stContext = {
-    characterId: CHAR_ID,
+    characterId: String(CHAR_INDEX),
     name2: "测试角色",
+    characters: [{ avatar: `${CHAR_STEM}.png`, name: "测试角色" }],
     setExtensionPrompt: () => {},
     eventSource: { on: () => {}, off: () => {} },
     eventTypes: {},
@@ -21,7 +25,7 @@ const stContext = {
 (globalThis as any).window.SillyTavern = { getContext: () => stContext };
 
 const GLOBAL_NS = encodeStoreKey(["bubble", "global"]);
-const CHAR_NS = encodeStoreKey(["bubble", "char", CHAR_ID]);
+const CHAR_NS = encodeStoreKey(["bubble", "char", CHAR_STEM]);
 
 /** 造一个内存版原生 store：全局 2 头像 / 角色卡 1 头像 */
 function makeStore() {

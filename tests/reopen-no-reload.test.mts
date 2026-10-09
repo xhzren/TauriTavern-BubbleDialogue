@@ -10,11 +10,14 @@ const dom = new JSDOM('<!DOCTYPE html><body></body>');
 (globalThis as any).window = dom.window;
 (globalThis as any).MutationObserver = dom.window.MutationObserver;
 
-const CHAR_ID = '1921';
+/** 稳定身份 = avatar 文件名去掉 .png；数组下标只是取 characters 里的当前项 */
+const CHAR_STEM = '银麒赎世';
+const CHAR_INDEX = 0;
 (globalThis as any).window.SillyTavern = {
     getContext: () => ({
-        characterId: CHAR_ID,
+        characterId: String(CHAR_INDEX),
         name2: '测试角色',
+        characters: [{ avatar: `${CHAR_STEM}.png`, name: '测试角色' }],
         setExtensionPrompt: () => {},
         eventSource: { on: () => {}, off: () => {} },
         eventTypes: {},
@@ -22,7 +25,7 @@ const CHAR_ID = '1921';
 };
 
 const GLOBAL_NS = encodeStoreKey(['bubble', 'global']);
-const CHAR_NS = encodeStoreKey(['bubble', 'char', CHAR_ID]);
+const CHAR_NS = encodeStoreKey(['bubble', 'char', CHAR_STEM]);
 
 function makeStore() {
     const tables = new Map<string, Map<string, unknown>>();

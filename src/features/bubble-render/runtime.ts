@@ -4,6 +4,7 @@ import type { TauriTavernExtensionStoreApi } from "../../host/api";
 import type { AvatarRecord } from "./avatar-repository";
 import { createAvatarResolver, type AvatarResolver } from "./avatar-resolver";
 import { createBubbleStyleInjector } from "./style-injector";
+import { resolveCharacterIdentity } from "./char-identity";
 import { createAvatarZoom } from "./avatar-zoom";
 import { mapWithConcurrency } from "./async-utils";
 import { createBubbleHydrator } from "./bubble-hydrator";
@@ -144,18 +145,14 @@ export function splitMoodId(moodId: string): { mood: string; outfit: string; act
     };
 }
 
+/**
+ * 读取当前角色卡身份。
+ *
+ * 身份用「稳定 id」而不是 ST 的 characterId（数组下标）——细节与理由见 char-identity.ts。
+ * 存储命名空间 / 原版 DB 的 key / 导出 manifest 全部跟着这个 id 走。
+ */
 function readCharIdentity(): { id: string | null; name: string; hasCard: boolean } {
-    const ctx = getStContext();
-    const rawId = ctx?.characterId;
-    const id = rawId === undefined || rawId === null || rawId === "" ? null : String(rawId);
-    const rawName = typeof ctx?.name2 === "string" ? ctx.name2.trim() : "";
-    // 未打开角色卡时 name2 是 "SillyTavern System"，这不是真实角色
-    const hasCard = id !== null && rawName !== NO_CHARACTER_SENTINEL;
-    return {
-        id: hasCard ? id : null,
-        name: rawName || NO_CHARACTER_SENTINEL,
-        hasCard,
-    };
+    return resolveCharacterIdentity(getStContext(), NO_CHARACTER_SENTINEL);
 }
 
 /**

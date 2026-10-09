@@ -10,13 +10,17 @@ const dom = new JSDOM("<!DOCTYPE html><body></body>");
 (globalThis as any).window = dom.window;
 (globalThis as any).MutationObserver = dom.window.MutationObserver;
 
-const CHAR_A = "1921";
-const CHAR_B = "2017";
+/** 数组下标（会随增删卡而平移，不能当身份） */
+const CHAR_A = 0;
+const CHAR_B = 1;
+/** 稳定身份 = avatar 文件名去掉 .png */
+const CHAR_A_STEM = "银麒赎世";
+const CHAR_B_STEM = "林知意";
 const GLOBAL_NS = encodeStoreKey(["bubble", "global"]);
 const nsOf = (id: string) => encodeStoreKey(["bubble", "char", id]);
 
 /** 可变的假 ST 上下文：测试里要模拟「打开另一张角色卡的对话」 */
-let currentCharId = CHAR_A;
+let currentCharId: number = CHAR_A;
 const handlers = new Map<string, Array<(...a: unknown[]) => void>>();
 const eventSource = {
     on(event: string, handler: (...a: unknown[]) => void) {
@@ -36,6 +40,12 @@ const eventSource = {
     getContext: () => ({
         characterId: currentCharId,
         name2: "测试角色",
+        // 稳定身份来自 avatar 文件名，不是数组下标。
+        // characterId 仍用下标（模拟宿主），身份取 characters[下标].avatar。
+        characters: [
+            { avatar: `${CHAR_A_STEM}.png`, name: "甲卡" },
+            { avatar: `${CHAR_B_STEM}.png`, name: "乙卡" },
+        ],
         setExtensionPrompt: () => {},
         eventSource,
         eventTypes: {},
@@ -59,9 +69,9 @@ function makeStore(options: { gateNs?: string } = {}) {
     };
     seed(GLOBAL_NS, "avatars", "a", { name: "全局甲", fileSize: 100 });
     seed(GLOBAL_NS, "mood", "m", { name: "全局甲", fileSize: 300 });
-    seed(nsOf(CHAR_A), "avatars", "ca", { name: "甲卡头像", fileSize: 50 });
-    seed(nsOf(CHAR_A), "mood", "cm", { name: "甲卡头像", fileSize: 70 });
-    seed(nsOf(CHAR_B), "avatars", "cb", { name: "乙卡头像", fileSize: 60 });
+    seed(nsOf(CHAR_A_STEM), "avatars", "ca", { name: "甲卡头像", fileSize: 50 });
+    seed(nsOf(CHAR_A_STEM), "mood", "cm", { name: "甲卡头像", fileSize: 70 });
+    seed(nsOf(CHAR_B_STEM), "avatars", "cb", { name: "乙卡头像", fileSize: 60 });
 
     let gateOpen = false;
     let gateWaiters: Array<() => void> = [];
@@ -116,7 +126,9 @@ const settle = (ms = 80) => new Promise((r) => setTimeout(r, ms));
  * 只刷新当前范围统计（全局模式）不会碰角色卡 namespace，
  * 所以「角色卡 namespace 的读取次数」只由全库统计推动。
  */
-const charProbe = (store: any) => readsOf(store, nsOf(currentCharId));
+/** 身份按当前打开那张卡的文件名算（下标只用来取 characters 里的当前项） */
+const currentStem = () => (currentCharId === CHAR_B ? CHAR_B_STEM : CHAR_A_STEM);
+const charProbe = (store: any) => readsOf(store, nsOf(currentStem()));
 
 // ============================================================
 // 场景 1：启用时算一次；关开面板、开角色卡、切范围都不再重扫
@@ -190,7 +202,7 @@ const charProbe = (store: any) => readsOf(store, nsOf(currentCharId));
     await controlRuntime.release();
 
     // 实验组：把全库统计卡在角色卡的 mood 表上
-    const store = makeStore({ gateNs: nsOf(CHAR_A) });
+    const store = makeStore({ gateNs: nsOf(CHAR_A_STEM) });
     const runtime = getBubbleRuntime(makeContext(store));
 
     const first = runtime.acquire();

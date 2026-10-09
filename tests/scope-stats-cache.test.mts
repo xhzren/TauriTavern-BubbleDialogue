@@ -10,10 +10,13 @@ const dom = new JSDOM("<!DOCTYPE html><body></body>");
 (globalThis as any).window = dom.window;
 (globalThis as any).MutationObserver = dom.window.MutationObserver;
 
-const CHAR_ID = "1921";
+/** 稳定身份 = avatar 文件名去掉 .png；数组下标只是取 characters 里的当前项 */
+const CHAR_STEM = "银麒赎世";
+const CHAR_INDEX = 0;
 const stContext = {
-    characterId: CHAR_ID,
+    characterId: String(CHAR_INDEX),
     name2: "测试角色",
+    characters: [{ avatar: `${CHAR_STEM}.png`, name: "测试角色" }],
     setExtensionPrompt: () => {},
     eventSource: { on: () => {}, off: () => {} },
     eventTypes: {},
@@ -21,7 +24,7 @@ const stContext = {
 (globalThis as any).window.SillyTavern = { getContext: () => stContext };
 
 const GLOBAL_NS = encodeStoreKey(["bubble", "global"]);
-const CHAR_NS = encodeStoreKey(["bubble", "char", CHAR_ID]);
+const CHAR_NS = encodeStoreKey(["bubble", "char", CHAR_STEM]);
 
 /** 让 listKeys 真正按 namespace 返回内容（上面的占位版本返回空，这里补上） */
 function makeRealStore() {

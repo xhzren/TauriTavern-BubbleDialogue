@@ -14,10 +14,13 @@ const dom = new JSDOM("<!DOCTYPE html><html><head></head><body></body></html>");
 (globalThis as any).URL.createObjectURL = (b: any) => "blob:" + (b?.tag ?? "blob");
 (globalThis as any).URL.revokeObjectURL = () => {};
 
-const CHAR_ID = "1921";
+/** 稳定身份 = avatar 文件名去掉 .png（导出包的 charId 也会用它） */
+const CHAR_ID = "银麒赎世";
+const CHAR_INDEX = 0;
 (globalThis as any).window.SillyTavern = {
     getContext: () => ({
-        characterId: CHAR_ID, name2: "测试角色",
+        characterId: String(CHAR_INDEX), name2: "测试角色",
+        characters: [{ avatar: `${CHAR_ID}.png`, name: "测试角色" }],
         setExtensionPrompt: () => {},
         eventSource: { on: () => {}, off: () => {} },
         eventTypes: {},

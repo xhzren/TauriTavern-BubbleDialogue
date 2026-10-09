@@ -4382,9 +4382,23 @@ function wl(e) {
 	};
 }
 //#endregion
-//#region src/features/bubble-render/avatar-zoom.ts
-var Tl = "yq-avatar-zoom";
+//#region src/features/bubble-render/char-identity.ts
+var Tl = ".png";
 function El(e) {
+	return e && typeof e == "object" ? e : null;
+}
+function Dl(e, t) {
+	let n = typeof e?.name2 == "string" ? e.name2.trim() : "", r = e?.characterId, i = r != null && String(r).trim() !== "" ? Number(r) : NaN, a = e?.characters, o = Array.isArray(a) && Number.isInteger(i) && i >= 0 ? El(a[i]) : null, s = typeof o?.avatar == "string" ? o.avatar.trim() : "", c = s.toLowerCase().endsWith(Tl) ? s.slice(0, -4) : "", l = typeof o?.name == "string" ? o.name.trim() : "", u = c || l || (n && n !== t ? n : ""), d = !!u && n !== t;
+	return {
+		id: d ? u : null,
+		name: n || t,
+		hasCard: d
+	};
+}
+//#endregion
+//#region src/features/bubble-render/avatar-zoom.ts
+var Ol = "yq-avatar-zoom";
+function kl(e) {
 	let { documentRef: t } = e, n = null;
 	function r() {
 		try {
@@ -4395,7 +4409,7 @@ function El(e) {
 	}
 	function i() {
 		let e = r();
-		e && (e.getElementById(Tl)?.remove(), n &&= (e.removeEventListener("keydown", n), null));
+		e && (e.getElementById(Ol)?.remove(), n &&= (e.removeEventListener("keydown", n), null));
 	}
 	return {
 		show(e, t = "") {
@@ -4404,7 +4418,7 @@ function El(e) {
 			if (!a) return;
 			i();
 			let o = a.createElement("div");
-			o.id = Tl, o.className = "yq-avatar-zoom-overlay";
+			o.id = Ol, o.className = "yq-avatar-zoom-overlay";
 			let s = a.createElement("img");
 			s.src = e, s.alt = t, o.appendChild(s), o.addEventListener("click", i), n = (e) => {
 				e.key === "Escape" && i();
@@ -4417,7 +4431,7 @@ function El(e) {
 }
 //#endregion
 //#region src/features/bubble-render/async-utils.ts
-async function Dl(e, t, n) {
+async function Al(e, t, n) {
 	let r = Array(e.length);
 	if (e.length === 0) return r;
 	let i = 0, a = Math.max(1, Math.min(t, e.length)), o = Array.from({ length: a }, async () => {
@@ -4431,8 +4445,8 @@ async function Dl(e, t, n) {
 }
 //#endregion
 //#region src/features/bubble-render/bubble-hydrator.ts
-var Ol = ".yq-bubble, .custom-yq-bubble", kl = ".yq-bubble-avatar, .custom-yq-bubble-avatar", Al = ".yq-bubble-avatar[data-lazy-mood], .custom-yq-bubble-avatar[data-lazy-mood]", jl = ".yq-bubble-avatar:not([data-lazy-mood]), .custom-yq-bubble-avatar:not([data-lazy-mood])", Ml = ".yq-bubble-avatar-fallback, .custom-yq-bubble-avatar-fallback", Nl = ".yq-bubble-text, .custom-yq-bubble-text", Pl = "yqHydrated";
-function Fl(e) {
+var jl = ".yq-bubble, .custom-yq-bubble", Ml = ".yq-bubble-avatar, .custom-yq-bubble-avatar", Nl = ".yq-bubble-avatar[data-lazy-mood], .custom-yq-bubble-avatar[data-lazy-mood]", Pl = ".yq-bubble-avatar:not([data-lazy-mood]), .custom-yq-bubble-avatar:not([data-lazy-mood])", Fl = ".yq-bubble-avatar-fallback, .custom-yq-bubble-avatar-fallback", Il = ".yq-bubble-text, .custom-yq-bubble-text", Ll = "yqHydrated";
+function Rl(e) {
 	let { documentRef: t, resolveAvatar: n, resolveCachedAvatar: r, resolveMoodGroup: i, resolveTextColor: a, onZoom: o } = e, s = [], c = 0, l = /* @__PURE__ */ new WeakSet();
 	function u() {
 		for (; c < 8 && s.length > 0;) {
@@ -4460,7 +4474,7 @@ function Fl(e) {
 		e.classList.remove("yq-bubble-text-thought", "custom-yq-bubble-text-thought", "yq-bubble-text-dialogue", "custom-yq-bubble-text-dialogue"), r ? e.classList.add("yq-bubble-text-thought", "custom-yq-bubble-text-thought") : e.classList.add("yq-bubble-text-dialogue", "custom-yq-bubble-text-dialogue");
 	}
 	function h(e) {
-		let t = e.querySelector(Nl);
+		let t = e.querySelector(Il);
 		return {
 			name: e.getAttribute("data-name") ?? "",
 			mood: e.getAttribute("data-mood") ?? "",
@@ -4479,18 +4493,18 @@ function Fl(e) {
 	}
 	function g(e) {
 		if (e.dataset.yqHydrated) {
-			let t = e.querySelector(jl), n = e.querySelector(Al);
-			if (t && !n || !n && e.querySelector(Ml)) return;
+			let t = e.querySelector(Pl), n = e.querySelector(Nl);
+			if (t && !n || !n && e.querySelector(Fl)) return;
 		}
-		if (!(e.getAttribute("data-name") ?? "").trim() || !e.querySelector(Al)) return;
-		e.dataset[Pl] = "1";
+		if (!(e.getAttribute("data-name") ?? "").trim() || !e.querySelector(Nl)) return;
+		e.dataset[Ll] = "1";
 		let s = h(e), c = i(s.mood);
 		c && c.color && e.style.setProperty("--yq-mood-color", c.color);
 		let u = a?.(s.name) ?? null;
 		u ? e.style.setProperty("--yq-text-color", u) : e.style.removeProperty("--yq-text-color");
-		let g = e.querySelector(Nl);
+		let g = e.querySelector(Il);
 		g && m(g, p(g));
-		let _ = e.querySelector(Al);
+		let _ = e.querySelector(Nl);
 		if (!_) return;
 		let v = [
 			s.name,
@@ -4522,12 +4536,12 @@ function Fl(e) {
 	}
 	return {
 		hydrateAll() {
-			t().querySelectorAll(Ol).forEach(g);
+			t().querySelectorAll(jl).forEach(g);
 		},
 		refresh() {
-			t().querySelectorAll(Ol).forEach((e) => {
-				delete e.dataset[Pl], e.removeAttribute("data-yq-hydrated");
-				let t = e.querySelector(kl);
+			t().querySelectorAll(jl).forEach((e) => {
+				delete e.dataset[Ll], e.removeAttribute("data-yq-hydrated");
+				let t = e.querySelector(Ml);
 				t && t.tagName === "IMG" && !t.getAttribute("data-lazy-mood") && t.setAttribute("data-lazy-mood", e.getAttribute("data-mood") ?? "");
 			});
 		}
@@ -4535,54 +4549,54 @@ function Fl(e) {
 }
 //#endregion
 //#region src/features/bubble-render/key-format.ts
-function Il(e) {
+function zl(e) {
 	let t = e.indexOf("__");
 	return t >= 0 ? e.slice(0, t) : e;
 }
-function Ll(e, t) {
+function Bl(e, t) {
 	let n = String(e ?? "");
 	if (t != null) {
 		let e = String(t) + "__";
-		if (n.startsWith(e)) return Il(n.slice(e.length));
+		if (n.startsWith(e)) return zl(n.slice(e.length));
 	}
 	let r = $c + "__";
-	if (n.startsWith(r)) return Il(n.slice(r.length));
+	if (n.startsWith(r)) return zl(n.slice(r.length));
 	let i = n.indexOf("__");
-	return i >= 0 ? Il(n.slice(i + 2)) : n;
+	return i >= 0 ? zl(n.slice(i + 2)) : n;
 }
-function Rl(e) {
+function Vl(e) {
 	let t = String(e ?? "");
 	if (t.startsWith("_global___")) return $c;
 	let n = t.indexOf("__");
 	return n <= 0 ? $c : t.slice(0, n) || "_global_";
 }
-function zl(e, t) {
+function Hl(e, t) {
 	return String(e || "_global_") + "__" + t.trim().toLowerCase();
 }
-function Bl(e) {
+function Ul(e) {
 	return e.trim().toLowerCase();
 }
-function Vl(e, t, n) {
+function Wl(e, t, n) {
 	return String(e || "_global_") + "__" + t.trim().toLowerCase() + "__" + n;
 }
-function Hl(e, t) {
+function Gl(e, t) {
 	return "color_" + String(e || "_global_") + "__" + String(t ?? "").trim().toLowerCase();
 }
-function Ul(e, t) {
+function Kl(e, t) {
 	let n = String(t || "_global_") + "__";
 	return String(e ?? "").startsWith(n);
 }
 //#endregion
 //#region src/features/bubble-render/indexeddb-avatar-library.ts
-var Wl = "BubbleDialogueAvatars", Gl = "avatars", Kl = "mood_avatars", ql = "config", Jl = "cg_groups", Yl = "cg_images";
-function Xl() {
+var ql = "BubbleDialogueAvatars", Jl = "avatars", Yl = "mood_avatars", Xl = "config", Zl = "cg_groups", Ql = "cg_images";
+function $l() {
 	return new Promise((e) => {
 		try {
-			let t = indexedDB.open(Wl);
+			let t = indexedDB.open(ql);
 			t.onsuccess = () => {
 				let n = t.result;
 				try {
-					if (!n.objectStoreNames.contains(Gl) || !n.objectStoreNames.contains(Kl)) {
+					if (!n.objectStoreNames.contains(Jl) || !n.objectStoreNames.contains(Yl)) {
 						n.close(), e(null);
 						return;
 					}
@@ -4594,7 +4608,7 @@ function Xl() {
 		}
 	});
 }
-function Zl(e, t, n) {
+function eu(e, t, n) {
 	return e ? new Promise((r) => {
 		try {
 			if (!e.objectStoreNames.contains(t)) {
@@ -4608,7 +4622,7 @@ function Zl(e, t, n) {
 		}
 	}) : Promise.resolve(null);
 }
-function Ql(e, t) {
+function tu(e, t) {
 	return e ? new Promise((n) => {
 		try {
 			if (!e.objectStoreNames.contains(t)) {
@@ -4622,7 +4636,7 @@ function Ql(e, t) {
 		}
 	}) : Promise.resolve([]);
 }
-function $l(e, t) {
+function nu(e, t) {
 	return e ? new Promise((n) => {
 		try {
 			if (!e.objectStoreNames.contains(t)) {
@@ -4636,7 +4650,7 @@ function $l(e, t) {
 		}
 	}) : Promise.resolve([]);
 }
-function eu(e, t, n, r) {
+function ru(e, t, n, r) {
 	return e ? new Promise((i) => {
 		try {
 			if (!e.objectStoreNames.contains(t)) {
@@ -4655,7 +4669,7 @@ function eu(e, t, n, r) {
 		}
 	}) : Promise.resolve([]);
 }
-function tu(e, t, n) {
+function iu(e, t, n) {
 	return e ? new Promise((r) => {
 		try {
 			if (!e.objectStoreNames.contains(t)) {
@@ -4669,7 +4683,7 @@ function tu(e, t, n) {
 		}
 	}) : Promise.resolve();
 }
-function nu(e, t, n) {
+function au(e, t, n) {
 	return e ? new Promise((r) => {
 		try {
 			if (!e.objectStoreNames.contains(t)) {
@@ -4683,7 +4697,7 @@ function nu(e, t, n) {
 		}
 	}) : Promise.resolve();
 }
-function ru(e, t) {
+function ou(e, t) {
 	return e ? new Promise((n) => {
 		try {
 			if (!e.objectStoreNames.contains(t)) {
@@ -4697,27 +4711,27 @@ function ru(e, t) {
 		}
 	}) : Promise.resolve();
 }
-function iu(e, t) {
-	return zl(t, e);
+function su(e, t) {
+	return Hl(t, e);
 }
-function au(e, t, n) {
-	return Vl(n, e, t);
+function cu(e, t, n) {
+	return Wl(n, e, t);
 }
-function ou(e, t = "alias") {
+function lu(e, t = "alias") {
 	let n = e.charId;
-	return typeof n == "string" && n ? n : Rl(String(e[t] ?? e.lookupKey ?? e.id ?? ""));
+	return typeof n == "string" && n ? n : Vl(String(e[t] ?? e.lookupKey ?? e.id ?? ""));
 }
-function su(e) {
+function uu(e) {
 	let t = Number(e.fileSize ?? 0);
 	if (Number.isFinite(t) && t > 0) return t;
 	let n = e.imageBlob;
 	return n && typeof n.size == "number" ? n.size : 0;
 }
-function cu(e = {
+function du(e = {
 	mode: "global",
 	charId: null
 }, t = {}) {
-	let n = null, r = () => (n ||= Xl(), n), i = e.mode === "character" && e.charId ? e.charId : $c, a = t.primaryOnly ? [i] : e.mode === "character" && e.charId ? [e.charId, $c] : [$c], o = null, s = (e) => (o ||= Ql(e, Kl), o), c = () => {
+	let n = null, r = () => (n ||= $l(), n), i = e.mode === "character" && e.charId ? e.charId : $c, a = t.primaryOnly ? [i] : e.mode === "character" && e.charId ? [e.charId, $c] : [$c], o = null, s = (e) => (o ||= tu(e, Yl), o), c = () => {
 		o = null;
 	};
 	return {
@@ -4727,7 +4741,7 @@ function cu(e = {
 		async getAvatar(e) {
 			let t = await r();
 			for (let n of a) {
-				let r = await Zl(t, Gl, iu(e, n));
+				let r = await eu(t, Jl, su(e, n));
 				if (r) return r;
 			}
 			return null;
@@ -4735,33 +4749,33 @@ function cu(e = {
 		async getMoodAvatar(e, t) {
 			let n = await r(), i = String(e ?? "").trim().toLowerCase(), o = String(t ?? "");
 			for (let r of a) {
-				let a = (await eu(n, Kl, "lookupKey", au(e, t, r))).find((e) => e.imageBlob);
+				let a = (await ru(n, Yl, "lookupKey", cu(e, t, r))).find((e) => e.imageBlob);
 				if (a) return a;
-				let c = (await s(n)).find((e) => ou(e, "alias") === String(r) && String(e.alias ?? "").trim().toLowerCase() === i && String(e.moodId ?? "") === o && !!e.imageBlob);
+				let c = (await s(n)).find((e) => lu(e, "alias") === String(r) && String(e.alias ?? "").trim().toLowerCase() === i && String(e.moodId ?? "") === o && !!e.imageBlob);
 				if (c) return c;
 			}
 			return null;
 		},
 		async listMoodAvatars() {
-			let e = await Ql(await r(), Kl), t = new Set(a.map((e) => String(e)));
-			return e.filter((e) => t.has(ou(e, "alias")));
+			let e = await tu(await r(), Yl), t = new Set(a.map((e) => String(e)));
+			return e.filter((e) => t.has(lu(e, "alias")));
 		},
 		async listAvatarNames() {
 			let t = await r(), n = e.mode === "character" && e.charId ? e.charId : $c;
-			return (await $l(t, Gl)).filter((e) => Ul(e, n)).map((e) => Ll(e, n)).filter(Boolean);
+			return (await nu(t, Jl)).filter((e) => Kl(e, n)).map((e) => Bl(e, n)).filter(Boolean);
 		},
 		async getConfig(e) {
-			return Zl(await r(), ql, e);
+			return eu(await r(), Xl, e);
 		},
 		async setConfig(e, t) {
-			await tu(await r(), ql, {
+			await iu(await r(), Xl, {
 				key: e,
 				value: t
 			});
 		},
 		async putAvatar(t, n, i = {}) {
-			await tu(await r(), Gl, {
-				alias: iu(t, e.charId),
+			await iu(await r(), Jl, {
+				alias: su(t, e.charId),
 				charId: e.mode === "character" && e.charId ? e.charId : $c,
 				imageBlob: n,
 				mimeType: n.type || "image/webp",
@@ -4773,9 +4787,9 @@ function cu(e = {
 			});
 		},
 		async putMoodAvatar(t, n, i, a = {}) {
-			let o = await r(), s = au(t, n, e.charId), l = e.mode === "character" && e.charId ? e.charId : $c;
-			await tu(o, Kl, {
-				alias: Bl(t),
+			let o = await r(), s = cu(t, n, e.charId), l = e.mode === "character" && e.charId ? e.charId : $c;
+			await iu(o, Yl, {
+				alias: Ul(t),
 				lookupKey: s,
 				charId: l,
 				id: s,
@@ -4790,38 +4804,38 @@ function cu(e = {
 			}), c();
 		},
 		async deleteAvatar(t) {
-			await nu(await r(), Gl, iu(t, e.charId));
+			await au(await r(), Jl, su(t, e.charId));
 		},
 		async deleteMoodAvatar(t, n) {
 			let i = await r();
 			c();
-			let a = await eu(i, Kl, "lookupKey", au(t, n, e.mode === "character" && e.charId ? e.charId : $c));
+			let a = await ru(i, Yl, "lookupKey", cu(t, n, e.mode === "character" && e.charId ? e.charId : $c));
 			for (let e of a) {
 				let t = String(e.id ?? "");
-				t && await nu(i, Kl, t);
+				t && await au(i, Yl, t);
 			}
 		},
 		async listCgGroups() {
-			let e = await Ql(await r(), Jl), t = new Set(a.map((e) => String(e)));
+			let e = await tu(await r(), Zl), t = new Set(a.map((e) => String(e)));
 			return e.filter((e) => t.has(String(e.charId ?? "_global_")));
 		},
 		async listCgImages(e) {
-			return (await Ql(await r(), Yl)).filter((t) => String(t.group ?? "") === e).map(({ imageBlob: e, ...t }) => t).sort((e, t) => Number(e.index) - Number(t.index));
+			return (await tu(await r(), Ql)).filter((t) => String(t.group ?? "") === e).map(({ imageBlob: e, ...t }) => t).sort((e, t) => Number(e.index) - Number(t.index));
 		},
 		async getCgImageBlob(e, t) {
-			return (await Zl(await r(), Yl, `cg__${e}__${t}`))?.imageBlob ?? null;
+			return (await eu(await r(), Ql, `cg__${e}__${t}`))?.imageBlob ?? null;
 		},
 		async clear() {
 			let e = await r();
 			c();
 			for (let t of [
-				Gl,
-				Kl,
-				ql
-			]) await ru(e, t);
+				Jl,
+				Yl,
+				Xl
+			]) await ou(e, t);
 		},
 		async listMoodAvatarsPrimary() {
-			return (await Ql(await r(), Kl)).filter((e) => ou(e, "alias") === i);
+			return (await tu(await r(), Yl)).filter((e) => lu(e, "alias") === i);
 		},
 		async getScopeStats() {
 			let e = await r(), t = i, n = {
@@ -4829,8 +4843,8 @@ function cu(e = {
 				moodAvatars: 0,
 				bytes: 0
 			};
-			for (let r of await Ql(e, Gl)) ou(r, "alias") === t && (n.avatars += 1, n.bytes += su(r));
-			for (let r of await Ql(e, Kl)) ou(r, "alias") === t && (n.moodAvatars += 1, n.bytes += su(r));
+			for (let r of await tu(e, Jl)) lu(r, "alias") === t && (n.avatars += 1, n.bytes += uu(r));
+			for (let r of await tu(e, Yl)) lu(r, "alias") === t && (n.moodAvatars += 1, n.bytes += uu(r));
 			return n;
 		},
 		async listScopes() {
@@ -4844,22 +4858,22 @@ function cu(e = {
 					bytes: 0
 				}, t.set(e, n)), n;
 			};
-			for (let t of await Ql(e, Gl)) {
-				let e = n(ou(t, "alias"));
-				e.avatars += 1, e.bytes += su(t);
+			for (let t of await tu(e, Jl)) {
+				let e = n(lu(t, "alias"));
+				e.avatars += 1, e.bytes += uu(t);
 			}
-			for (let t of await Ql(e, Kl)) {
-				let e = n(ou(t, "alias"));
-				e.moodAvatars += 1, e.bytes += su(t);
+			for (let t of await tu(e, Yl)) {
+				let e = n(lu(t, "alias"));
+				e.moodAvatars += 1, e.bytes += uu(t);
 			}
 			let i = /* @__PURE__ */ new Map();
-			for (let t of await Ql(e, Jl)) {
+			for (let t of await tu(e, Zl)) {
 				let e = String(t.group ?? "");
-				e && i.set(e, ou(t, "id"));
+				e && i.set(e, lu(t, "id"));
 			}
-			for (let t of await Ql(e, Yl)) {
+			for (let t of await tu(e, Ql)) {
 				let e = n(i.get(String(t.group ?? "")) ?? "_global_");
-				e.cgImages += 1, e.bytes += su(t);
+				e.cgImages += 1, e.bytes += uu(t);
 			}
 			return [...t.values()].sort((e, t) => e.charId === "_global_" ? -1 : t.charId === "_global_" ? 1 : t.bytes - e.bytes);
 		},
@@ -4867,89 +4881,90 @@ function cu(e = {
 			let t = await r();
 			c();
 			let n = String(e || "_global_");
-			for (let e of await $l(t, Gl)) Rl(e) === n && await nu(t, Gl, e);
-			for (let e of await Ql(t, Kl)) if (ou(e, "alias") === n) {
+			for (let e of await nu(t, Jl)) Vl(e) === n && await au(t, Jl, e);
+			for (let e of await tu(t, Yl)) if (lu(e, "alias") === n) {
 				let n = String(e.id ?? "");
-				n && await nu(t, Kl, n);
+				n && await au(t, Yl, n);
 			}
 			let i = /* @__PURE__ */ new Set();
-			for (let e of await Ql(t, Jl)) if (ou(e, "id") === n) {
+			for (let e of await tu(t, Zl)) if (lu(e, "id") === n) {
 				let n = String(e.group ?? "");
 				n && i.add(n);
 				let r = String(e.id ?? "");
-				r && await nu(t, Jl, r);
+				r && await au(t, Zl, r);
 			}
-			for (let e of await Ql(t, Yl)) if (i.has(String(e.group ?? ""))) {
+			for (let e of await tu(t, Ql)) if (i.has(String(e.group ?? ""))) {
 				let n = String(e.id ?? "");
-				n && await nu(t, Yl, n);
+				n && await au(t, Ql, n);
 			}
 		},
 		async clearAll() {
 			let e = await r();
 			c();
 			for (let t of [
-				Gl,
-				Kl,
 				Jl,
-				Yl
-			]) await ru(e, t);
+				Yl,
+				Zl,
+				Ql
+			]) await ou(e, t);
 		}
 	};
 }
 //#endregion
 //#region src/features/bubble-render/store-key.ts
-var lu = /^[A-Za-z0-9_.-]+$/;
-function uu(e) {
-	return e.length > 0 && lu.test(e) && e !== "." && e !== ".." && !e.startsWith(".");
+var fu = /^[A-Za-z0-9_.-]+$/;
+function pu(e) {
+	return e.length > 0 && fu.test(e) && e !== "." && e !== ".." && !e.startsWith(".");
 }
-function du(e) {
-	if (uu(e)) return e;
+var mu = "-x-";
+function hu(e) {
+	if (pu(e) && !(e.startsWith("x") || e.includes(mu))) return e;
 	let t = new TextEncoder().encode(e), n = "";
 	for (let e of t) n += e.toString(16).padStart(2, "0");
 	return `x${n}`;
 }
-function fu(e) {
-	return e.map(du).join("-x-");
+function gu(e) {
+	return e.map(hu).join(mu);
 }
-function pu(e, t) {
+function _u(e, t) {
 	let n = t.replace(/^\./, "");
-	return !n || !lu.test(n) ? e : `${e}.${n}`;
+	return !n || !fu.test(n) ? e : `${e}.${n}`;
 }
 //#endregion
 //#region src/features/bubble-render/storage-types.ts
-var mu = {
+var vu = {
 	mode: "global",
 	charId: null
-}, hu = "bubble-character", gu = "7.1-zip", _u = "bubble", vu = "avatars", yu = "mood", bu = "config", xu = "cg_groups", Su = "cg_images", Cu = "webp", wu = 16;
-function Tu(e) {
-	return e.mode === "character" && e.charId ? fu([
-		_u,
+}, yu = "bubble-character", bu = "7.1-zip", xu = "bubble", Su = "avatars", Cu = "mood", wu = "config", Tu = "cg_groups", Eu = "cg_images", Du = "webp", Ou = 16;
+function ku(e) {
+	return e.mode === "character" && e.charId ? gu([
+		xu,
 		"char",
 		e.charId
-	]) : fu([_u, "global"]);
+	]) : gu([xu, "global"]);
 }
-function Eu(e, t) {
-	return pu(fu([e]), t || Cu);
+function Au(e, t) {
+	return _u(gu([e]), t || Du);
 }
-function Du(e, t, n) {
-	return pu(fu([e, t]), n || Cu);
+function ju(e, t, n) {
+	return _u(gu([e, t]), n || Du);
 }
-function Ou(e, t) {
-	return pu(fu([e, String(t)]), "webp");
+function Mu(e, t) {
+	return _u(gu([e, String(t)]), "webp");
 }
-function ku(e) {
+function Nu(e) {
 	let t = String(e ?? "").toLowerCase();
-	return t.includes("png") ? "png" : t.includes("jpeg") || t.includes("jpg") ? "jpg" : t.includes("gif") ? "gif" : t.includes("avif") ? "avif" : Cu;
+	return t.includes("png") ? "png" : t.includes("jpeg") || t.includes("jpg") ? "jpg" : t.includes("gif") ? "gif" : t.includes("avif") ? "avif" : Du;
 }
-function Au(e) {
+function Pu(e) {
 	let t = /\.(webp|png|jpg|jpeg|gif|avif)$/i.exec(String(e ?? ""));
 	return t ? t[1].toLowerCase() : void 0;
 }
-function ju(e, t) {
+function Fu(e, t) {
 	return e + "::" + t;
 }
-async function Mu(e, t, n, r) {
-	let i = ju(n, r), a = e.get(i);
+async function Iu(e, t, n, r) {
+	let i = Fu(n, r), a = e.get(i);
 	if (a) return a;
 	let o = [];
 	try {
@@ -4963,7 +4978,7 @@ async function Mu(e, t, n, r) {
 	let s = new Set(o);
 	return e.set(i, s), s;
 }
-async function Nu(e, t, n, r) {
+async function Lu(e, t, n, r) {
 	try {
 		let i = await e.tryGetJson({
 			namespace: t,
@@ -4974,16 +4989,16 @@ async function Nu(e, t, n, r) {
 	} catch {}
 	return null;
 }
-function Pu(e, t = mu) {
-	let n = Tu(t), r = Tu(mu), i = /* @__PURE__ */ new Map(), a = t.mode === "character" ? [n, r] : [n];
+function Ru(e, t = vu) {
+	let n = ku(t), r = ku(vu), i = /* @__PURE__ */ new Map(), a = t.mode === "character" ? [n, r] : [n];
 	async function o(t, n) {
-		let r = await Nu(e, t, vu, fu([n]));
+		let r = await Lu(e, t, Su, gu([n]));
 		if (!r) return null;
 		try {
 			let i = await e.getBlob({
 				namespace: t,
-				table: vu,
-				key: Eu(n, Au(r.fileName) ?? ku(r.mimeType))
+				table: Su,
+				key: Au(n, Pu(r.fileName) ?? Nu(r.mimeType))
 			});
 			return {
 				...r,
@@ -4994,13 +5009,13 @@ function Pu(e, t = mu) {
 		}
 	}
 	async function s(t, n, r) {
-		let i = await Nu(e, t, yu, fu([n, r]));
+		let i = await Lu(e, t, Cu, gu([n, r]));
 		if (!i) return null;
 		try {
 			let a = await e.getBlob({
 				namespace: t,
-				table: yu,
-				key: Du(n, r, Au(i.fileName) ?? ku(i.mimeType))
+				table: Cu,
+				key: ju(n, r, Pu(i.fileName) ?? Nu(i.mimeType))
 			});
 			return {
 				...i,
@@ -5031,10 +5046,10 @@ function Pu(e, t = mu) {
 		async listMoodAvatars() {
 			let t = [];
 			for (let n of a) try {
-				let r = await Dl(await e.listKeys({
+				let r = await Al(await e.listKeys({
 					namespace: n,
-					table: yu
-				}), wu, (t) => Nu(e, n, yu, t));
+					table: Cu
+				}), Ou, (t) => Lu(e, n, Cu, t));
 				for (let e of r) e && t.push(e);
 			} catch {}
 			return t;
@@ -5042,10 +5057,10 @@ function Pu(e, t = mu) {
 		async listAvatarNames() {
 			let t = [];
 			try {
-				let r = await Dl(await e.listKeys({
+				let r = await Al(await e.listKeys({
 					namespace: n,
-					table: vu
-				}), wu, (t) => Nu(e, n, vu, t));
+					table: Su
+				}), Ou, (t) => Lu(e, n, Su, t));
 				for (let e of r) {
 					let n = String(e?.name ?? e?.alias ?? "");
 					n && t.push(n);
@@ -5055,7 +5070,7 @@ function Pu(e, t = mu) {
 		},
 		async getConfig(t) {
 			for (let n of a) {
-				let r = await Nu(e, n, bu, fu([t]));
+				let r = await Lu(e, n, wu, gu([t]));
 				if (r !== null) return r;
 			}
 			return null;
@@ -5063,21 +5078,21 @@ function Pu(e, t = mu) {
 		async setConfig(t, r) {
 			await e.setJson({
 				namespace: n,
-				table: bu,
-				key: fu([t]),
+				table: wu,
+				key: gu([t]),
 				value: r ?? null
 			});
 		},
 		async putAvatar(t, r, a = {}) {
-			let o = fu([t]), s = ku(r.type);
+			let o = gu([t]), s = Nu(r.type);
 			await e.setBlob({
 				namespace: n,
-				table: vu,
-				key: Eu(t, s),
+				table: Su,
+				key: Au(t, s),
 				data: r
-			}), i.delete(ju(n, vu)), await e.setJson({
+			}), i.delete(Fu(n, Su)), await e.setJson({
 				namespace: n,
-				table: vu,
+				table: Su,
 				key: o,
 				value: {
 					alias: t,
@@ -5092,15 +5107,15 @@ function Pu(e, t = mu) {
 			});
 		},
 		async putMoodAvatar(t, r, a, o = {}) {
-			let s = fu([t, r]), c = ku(a.type);
+			let s = gu([t, r]), c = Nu(a.type);
 			await e.setBlob({
 				namespace: n,
-				table: yu,
-				key: Du(t, r, c),
+				table: Cu,
+				key: ju(t, r, c),
 				data: a
-			}), i.delete(ju(n, yu)), await e.setJson({
+			}), i.delete(Fu(n, Cu)), await e.setJson({
 				namespace: n,
-				table: yu,
+				table: Cu,
 				key: s,
 				value: {
 					alias: t,
@@ -5117,30 +5132,30 @@ function Pu(e, t = mu) {
 			});
 		},
 		async deleteAvatar(t) {
-			let r = fu([t]), a = await Nu(e, n, vu, r);
+			let r = gu([t]), a = await Lu(e, n, Su, r);
 			a && await e.deleteJson({
 				namespace: n,
-				table: vu,
+				table: Su,
 				key: r
 			});
-			let o = Eu(t, Au(a?.fileName) ?? ku(a?.mimeType)), s = await Mu(i, e, n, vu);
+			let o = Au(t, Pu(a?.fileName) ?? Nu(a?.mimeType)), s = await Iu(i, e, n, Su);
 			s.has(o) && (await e.deleteBlob({
 				namespace: n,
-				table: vu,
+				table: Su,
 				key: o
 			}), s.delete(o));
 		},
 		async deleteMoodAvatar(t, r) {
-			let a = fu([t, r]), o = await Nu(e, n, yu, a);
+			let a = gu([t, r]), o = await Lu(e, n, Cu, a);
 			o && await e.deleteJson({
 				namespace: n,
-				table: yu,
+				table: Cu,
 				key: a
 			});
-			let s = Du(t, r, Au(o?.fileName) ?? ku(o?.mimeType)), c = await Mu(i, e, n, yu);
+			let s = ju(t, r, Pu(o?.fileName) ?? Nu(o?.mimeType)), c = await Iu(i, e, n, Cu);
 			c.has(s) && (await e.deleteBlob({
 				namespace: n,
-				table: yu,
+				table: Cu,
 				key: s
 			}), c.delete(s));
 		},
@@ -5149,10 +5164,10 @@ function Pu(e, t = mu) {
 			for (let n of a) try {
 				let r = await e.listKeys({
 					namespace: n,
-					table: xu
+					table: Tu
 				});
 				for (let i of r) {
-					let r = await Nu(e, n, xu, i);
+					let r = await Lu(e, n, Tu, i);
 					r && t.push(r);
 				}
 			} catch {}
@@ -5163,10 +5178,10 @@ function Pu(e, t = mu) {
 			for (let r of a) try {
 				let i = await e.listKeys({
 					namespace: r,
-					table: Su
+					table: Eu
 				});
 				for (let a of i) {
-					let i = await Nu(e, r, Su, a);
+					let i = await Lu(e, r, Eu, a);
 					i && String(i.group) === t && n.push(i);
 				}
 			} catch {}
@@ -5176,8 +5191,8 @@ function Pu(e, t = mu) {
 			for (let r of a) try {
 				return await e.getBlob({
 					namespace: r,
-					table: Su,
-					key: Ou(t, n)
+					table: Eu,
+					key: Mu(t, n)
 				});
 			} catch {}
 			return null;
@@ -5185,10 +5200,10 @@ function Pu(e, t = mu) {
 		async listMoodAvatarsPrimary() {
 			let t = [];
 			try {
-				let r = await Dl(await e.listKeys({
+				let r = await Al(await e.listKeys({
 					namespace: n,
-					table: yu
-				}), wu, (t) => Nu(e, n, yu, t));
+					table: Cu
+				}), Ou, (t) => Lu(e, n, Cu, t));
 				for (let e of r) e && t.push(e);
 			} catch {}
 			return t;
@@ -5200,17 +5215,17 @@ function Pu(e, t = mu) {
 				bytes: 0
 			};
 			for (let r of [
-				vu,
-				yu,
-				Su
+				Su,
+				Cu,
+				Eu
 			]) try {
-				let i = await Dl(await e.listKeys({
+				let i = await Al(await e.listKeys({
 					namespace: n,
 					table: r
-				}), wu, (t) => Nu(e, n, r, t));
+				}), Ou, (t) => Lu(e, n, r, t));
 				for (let e of i) {
 					let n = Number(e?.fileSize ?? 0);
-					Number.isFinite(n) && (t.bytes += n), r === vu ? t.avatars += 1 : r === yu && (t.moodAvatars += 1);
+					Number.isFinite(n) && (t.bytes += n), r === Su ? t.avatars += 1 : r === Cu && (t.moodAvatars += 1);
 				}
 			} catch {}
 			return t;
@@ -5229,17 +5244,17 @@ function Pu(e, t = mu) {
 				};
 				try {
 					for (let n of [
-						vu,
-						yu,
-						Su
+						Su,
+						Cu,
+						Eu
 					]) {
-						let i = await Dl(await e.listKeys({
+						let i = await Al(await e.listKeys({
 							namespace: t,
 							table: n
-						}), wu, (r) => Nu(e, t, n, r));
+						}), Ou, (r) => Lu(e, t, n, r));
 						for (let e of i) {
 							let t = Number(e?.fileSize ?? 0);
-							Number.isFinite(t) && (r.bytes += t), n === vu ? r.avatars += 1 : n === yu ? r.moodAvatars += 1 : r.cgImages += 1;
+							Number.isFinite(t) && (r.bytes += t), n === Su ? r.avatars += 1 : n === Cu ? r.moodAvatars += 1 : r.cgImages += 1;
 						}
 					}
 				} catch {}
@@ -5252,10 +5267,10 @@ function Pu(e, t = mu) {
 			if (!o) return;
 			let s = new Set(await e.listTables({ namespace: o }));
 			for (let t of [
-				vu,
-				yu,
-				xu,
-				Su
+				Su,
+				Cu,
+				Tu,
+				Eu
 			]) if (s.has(t)) try {
 				await e.deleteTable({
 					namespace: o,
@@ -5265,10 +5280,10 @@ function Pu(e, t = mu) {
 		},
 		async clearAll() {
 			for (let t of new Set([n, r])) for (let n of [
-				vu,
-				yu,
-				xu,
-				Su
+				Su,
+				Cu,
+				Tu,
+				Eu
 			]) try {
 				await e.deleteTable({
 					namespace: t,
@@ -5278,9 +5293,9 @@ function Pu(e, t = mu) {
 		},
 		async clear() {
 			for (let t of [
-				vu,
-				yu,
-				bu
+				Su,
+				Cu,
+				wu
 			]) try {
 				await e.deleteTable({
 					namespace: n,
@@ -5292,7 +5307,7 @@ function Pu(e, t = mu) {
 }
 //#endregion
 //#region src/features/bubble-render/mood-resolver.ts
-function Fu(e) {
+function zu(e) {
 	let t = /* @__PURE__ */ new Map();
 	for (let n of e) {
 		t.set(n.id, n), t.set(n.label, n);
@@ -5308,7 +5323,7 @@ function Fu(e) {
 		return t.get("mood-calm") ?? null;
 	};
 }
-function Iu() {
+function Bu() {
 	let e = new Map(Jc.map((e) => [e.id, e])), t = new Map(Jc.map((e) => [e.label, e]));
 	return function(n) {
 		let r = String(n ?? "").trim();
@@ -5317,10 +5332,10 @@ function Iu() {
 }
 //#endregion
 //#region src/features/bubble-render/prompt-injector.ts
-function Lu(e) {
+function Vu(e) {
 	return e.map((e) => e.label + "组：" + e.words.join("、")).join("\n").trimEnd();
 }
-function Ru(e) {
+function Hu(e) {
 	let { setExtensionPrompt: t, id: n = "bubble-dialogue-format", readFormatRule: r, readMoodGroups: i, readMoodTemplate: a } = e, o = null;
 	async function s() {
 		if (o) return o;
@@ -5347,7 +5362,7 @@ function Ru(e) {
 		}
 		n ||= Zc;
 		let s;
-		return s = t && t.length ? n.replace(/\{\{mood_groups\}\}/g, Lu(t)) : n, o = e + "\n\n" + s, o;
+		return s = t && t.length ? n.replace(/\{\{mood_groups\}\}/g, Vu(t)) : n, o = e + "\n\n" + s, o;
 	}
 	return {
 		apply() {
@@ -5371,7 +5386,7 @@ function Ru(e) {
 }
 //#endregion
 //#region src/features/bubble-render/config-store.ts
-function zu(e) {
+function Uu(e) {
 	let t = () => Yc.map((e) => ({
 		...e,
 		words: [...e.words]
@@ -5385,11 +5400,11 @@ function zu(e) {
 	})).filter((e) => e.id && e.label);
 	return n.length ? n : t();
 }
-function Bu(e) {
+function Wu(e) {
 	let t = /* @__PURE__ */ Dt({
 		formatRule: Xc,
 		moodTemplate: Zc,
-		moodGroups: zu(null),
+		moodGroups: Uu(null),
 		style: { ...Qc },
 		loaded: !1
 	}), n = /* @__PURE__ */ new Set(), r = () => {
@@ -5409,9 +5424,9 @@ function Bu(e) {
 		typeof o == "string" && o.trim() && (t.moodTemplate = o);
 		let s = await i(n, "mood_config");
 		if (typeof s == "string" && s.trim()) try {
-			t.moodGroups = zu(JSON.parse(s).groups);
+			t.moodGroups = Uu(JSON.parse(s).groups);
 		} catch (e) {
-			console.warn("[BubbleDialogue] mood_config is not valid JSON; using defaults.", e), t.moodGroups = zu(null);
+			console.warn("[BubbleDialogue] mood_config is not valid JSON; using defaults.", e), t.moodGroups = Uu(null);
 		}
 		let c = { ...Qc }, l = Object.keys(Qc), u = await Promise.all(l.map((e) => i(n, e)));
 		l.forEach((e, t) => {
@@ -5507,7 +5522,7 @@ function Bu(e) {
 }
 //#endregion
 //#region src/features/bubble-render/host-bridge.ts
-function Vu() {
+function Gu() {
 	try {
 		let e = window.SillyTavern?.getContext;
 		return typeof e == "function" ? e() ?? null : null;
@@ -5515,14 +5530,14 @@ function Vu() {
 		return null;
 	}
 }
-function Hu() {
-	return Vu()?.eventSource ?? null;
+function Ku() {
+	return Gu()?.eventSource ?? null;
 }
-function Uu() {
-	return Vu()?.eventTypes ?? null;
+function qu() {
+	return Gu()?.eventTypes ?? null;
 }
-function Wu(e, t) {
-	let n = Hu();
+function Ju(e, t) {
+	let n = Ku();
 	if (!n) return () => {};
 	try {
 		return n.on(e, t), () => {
@@ -5534,19 +5549,19 @@ function Wu(e, t) {
 		return () => {};
 	}
 }
-function Gu(e, t) {
-	let n = Uu()?.[e];
+function Yu(e, t) {
+	let n = qu()?.[e];
 	return typeof n == "string" && n ? n : t;
 }
 //#endregion
 //#region src/features/bubble-render/migration.ts
-var Ku = [
+var Xu = [
 	"format_rule",
 	"mood_config",
 	"mood_prompt_template"
 ];
-async function qu(e) {
-	let { source: t, target: n, scope: r, configKeys: i = Ku, onProgress: a } = e, o = {
+async function Zu(e) {
+	let { source: t, target: n, scope: r, configKeys: i = Xu, onProgress: a } = e, o = {
 		avatars: 0,
 		moodAvatars: 0,
 		configs: 0,
@@ -5593,7 +5608,7 @@ async function qu(e) {
 	}
 	for (let e of c) {
 		try {
-			let r = Ju(String(e.alias ?? "")), i = String(e.moodId ?? "");
+			let r = Qu(String(e.alias ?? "")), i = String(e.moodId ?? "");
 			if (!r || !i) {
 				o.skipped += 1, d();
 				continue;
@@ -5621,13 +5636,13 @@ async function qu(e) {
 	}
 	return o;
 }
-function Ju(e) {
-	return Ll(e, null);
+function Qu(e) {
+	return Bl(e, null);
 }
 //#endregion
 //#region node_modules/fflate/esm/browser.js
-var Yu = {}, Xu = (function(e, t, n, r, i) {
-	var a = new Worker(Yu[t] || (Yu[t] = URL.createObjectURL(new Blob([e + ";addEventListener(\"error\",function(e){e=e.error;postMessage({$e$:[e.message,e.code,e.stack]})})"], { type: "text/javascript" }))));
+var $u = {}, ed = (function(e, t, n, r, i) {
+	var a = new Worker($u[t] || ($u[t] = URL.createObjectURL(new Blob([e + ";addEventListener(\"error\",function(e){e=e.error;postMessage({$e$:[e.message,e.code,e.stack]})})"], { type: "text/javascript" }))));
 	return a.onmessage = function(e) {
 		var t = e.data, n = t.$e$;
 		if (n) {
@@ -5635,7 +5650,7 @@ var Yu = {}, Xu = (function(e, t, n, r, i) {
 			r.code = n[1], r.stack = n[2], i(r, null);
 		} else i(null, t);
 	}, a.postMessage(n, r), a;
-}), $ = Uint8Array, Zu = Uint16Array, Qu = Int32Array, $u = new $([
+}), $ = Uint8Array, td = Uint16Array, nd = Int32Array, rd = new $([
 	0,
 	0,
 	0,
@@ -5668,7 +5683,7 @@ var Yu = {}, Xu = (function(e, t, n, r, i) {
 	0,
 	0,
 	0
-]), ed = new $([
+]), id = new $([
 	0,
 	0,
 	0,
@@ -5701,7 +5716,7 @@ var Yu = {}, Xu = (function(e, t, n, r, i) {
 	13,
 	0,
 	0
-]), td = new $([
+]), ad = new $([
 	16,
 	17,
 	18,
@@ -5721,49 +5736,49 @@ var Yu = {}, Xu = (function(e, t, n, r, i) {
 	14,
 	1,
 	15
-]), nd = function(e, t) {
-	for (var n = new Zu(31), r = 0; r < 31; ++r) n[r] = t += 1 << e[r - 1];
-	for (var i = new Qu(n[30]), r = 1; r < 30; ++r) for (var a = n[r]; a < n[r + 1]; ++a) i[a] = a - n[r] << 5 | r;
+]), od = function(e, t) {
+	for (var n = new td(31), r = 0; r < 31; ++r) n[r] = t += 1 << e[r - 1];
+	for (var i = new nd(n[30]), r = 1; r < 30; ++r) for (var a = n[r]; a < n[r + 1]; ++a) i[a] = a - n[r] << 5 | r;
 	return {
 		b: n,
 		r: i
 	};
-}, rd = nd($u, 2), id = rd.b, ad = rd.r;
-id[28] = 258, ad[258] = 28;
-for (var od = nd(ed, 0), sd = od.b, cd = od.r, ld = new Zu(32768), ud = 0; ud < 32768; ++ud) {
-	var dd = (ud & 43690) >> 1 | (ud & 21845) << 1;
-	dd = (dd & 52428) >> 2 | (dd & 13107) << 2, dd = (dd & 61680) >> 4 | (dd & 3855) << 4, ld[ud] = ((dd & 65280) >> 8 | (dd & 255) << 8) >> 1;
+}, sd = od(rd, 2), cd = sd.b, ld = sd.r;
+cd[28] = 258, ld[258] = 28;
+for (var ud = od(id, 0), dd = ud.b, fd = ud.r, pd = new td(32768), md = 0; md < 32768; ++md) {
+	var hd = (md & 43690) >> 1 | (md & 21845) << 1;
+	hd = (hd & 52428) >> 2 | (hd & 13107) << 2, hd = (hd & 61680) >> 4 | (hd & 3855) << 4, pd[md] = ((hd & 65280) >> 8 | (hd & 255) << 8) >> 1;
 }
-for (var fd = (function(e, t, n) {
-	for (var r = e.length, i = 0, a = new Zu(t); i < r; ++i) e[i] && ++a[e[i] - 1];
-	var o = new Zu(t);
+for (var gd = (function(e, t, n) {
+	for (var r = e.length, i = 0, a = new td(t); i < r; ++i) e[i] && ++a[e[i] - 1];
+	var o = new td(t);
 	for (i = 1; i < t; ++i) o[i] = o[i - 1] + a[i - 1] << 1;
 	var s;
 	if (n) {
-		s = new Zu(1 << t);
+		s = new td(1 << t);
 		var c = 15 - t;
-		for (i = 0; i < r; ++i) if (e[i]) for (var l = i << 4 | e[i], u = t - e[i], d = o[e[i] - 1]++ << u, f = d | (1 << u) - 1; d <= f; ++d) s[ld[d] >> c] = l;
-	} else for (s = new Zu(r), i = 0; i < r; ++i) e[i] && (s[i] = ld[o[e[i] - 1]++] >> 15 - e[i]);
+		for (i = 0; i < r; ++i) if (e[i]) for (var l = i << 4 | e[i], u = t - e[i], d = o[e[i] - 1]++ << u, f = d | (1 << u) - 1; d <= f; ++d) s[pd[d] >> c] = l;
+	} else for (s = new td(r), i = 0; i < r; ++i) e[i] && (s[i] = pd[o[e[i] - 1]++] >> 15 - e[i]);
 	return s;
-}), pd = new $(288), ud = 0; ud < 144; ++ud) pd[ud] = 8;
-for (var ud = 144; ud < 256; ++ud) pd[ud] = 9;
-for (var ud = 256; ud < 280; ++ud) pd[ud] = 7;
-for (var ud = 280; ud < 288; ++ud) pd[ud] = 8;
-for (var md = new $(32), ud = 0; ud < 32; ++ud) md[ud] = 5;
-var hd = /* @__PURE__ */ fd(pd, 9, 0), gd = /* @__PURE__ */ fd(pd, 9, 1), _d = /* @__PURE__ */ fd(md, 5, 0), vd = /* @__PURE__ */ fd(md, 5, 1), yd = function(e) {
+}), _d = new $(288), md = 0; md < 144; ++md) _d[md] = 8;
+for (var md = 144; md < 256; ++md) _d[md] = 9;
+for (var md = 256; md < 280; ++md) _d[md] = 7;
+for (var md = 280; md < 288; ++md) _d[md] = 8;
+for (var vd = new $(32), md = 0; md < 32; ++md) vd[md] = 5;
+var yd = /* @__PURE__ */ gd(_d, 9, 0), bd = /* @__PURE__ */ gd(_d, 9, 1), xd = /* @__PURE__ */ gd(vd, 5, 0), Sd = /* @__PURE__ */ gd(vd, 5, 1), Cd = function(e) {
 	for (var t = e[0], n = 1; n < e.length; ++n) e[n] > t && (t = e[n]);
 	return t;
-}, bd = function(e, t, n) {
+}, wd = function(e, t, n) {
 	var r = t / 8 | 0;
 	return (e[r] | e[r + 1] << 8) >> (t & 7) & n;
-}, xd = function(e, t) {
+}, Td = function(e, t) {
 	var n = t / 8 | 0;
 	return (e[n] | e[n + 1] << 8 | e[n + 2] << 16) >> (t & 7);
-}, Sd = function(e) {
+}, Ed = function(e) {
 	return (e + 7) / 8 | 0;
-}, Cd = function(e, t, n) {
+}, Dd = function(e, t, n) {
 	return (t == null || t < 0) && (t = 0), (n == null || n > e.length) && (n = e.length), new $(e.subarray(t, n));
-}, wd = [
+}, Od = [
 	"unexpected EOF",
 	"invalid block type",
 	"invalid length/literal",
@@ -5778,11 +5793,11 @@ var hd = /* @__PURE__ */ fd(pd, 9, 0), gd = /* @__PURE__ */ fd(pd, 9, 1), _d = /
 	"filename too long",
 	"stream finishing",
 	"invalid zip data"
-], Td = function(e, t, n) {
-	var r = Error(t || wd[e]);
-	if (r.code = e, Error.captureStackTrace && Error.captureStackTrace(r, Td), !n) throw r;
+], kd = function(e, t, n) {
+	var r = Error(t || Od[e]);
+	if (r.code = e, Error.captureStackTrace && Error.captureStackTrace(r, kd), !n) throw r;
 	return r;
-}, Ed = function(e, t, n, r) {
+}, Ad = function(e, t, n, r) {
 	var i = e.length, a = r ? r.length : 0;
 	if (!i || t.f && !t.l) return n || new $(0);
 	var o = !n, s = o || t.i != 2, c = t.i;
@@ -5796,96 +5811,96 @@ var hd = /* @__PURE__ */ fd(pd, 9, 0), gd = /* @__PURE__ */ fd(pd, 9, 1), _d = /
 	}, u = t.f || 0, d = t.p || 0, f = t.b || 0, p = t.l, m = t.d, h = t.m, g = t.n, _ = i * 8;
 	do {
 		if (!p) {
-			u = bd(e, d, 1);
-			var v = bd(e, d + 1, 3);
+			u = wd(e, d, 1);
+			var v = wd(e, d + 1, 3);
 			if (d += 3, !v) {
-				var y = Sd(d) + 4, b = e[y - 4] | e[y - 3] << 8, x = y + b;
+				var y = Ed(d) + 4, b = e[y - 4] | e[y - 3] << 8, x = y + b;
 				if (x > i) {
-					c && Td(0);
+					c && kd(0);
 					break;
 				}
 				s && l(f + b), n.set(e.subarray(y, x), f), t.b = f += b, t.p = d = x * 8, t.f = u;
 				continue;
-			} else if (v == 1) p = gd, m = vd, h = 9, g = 5;
+			} else if (v == 1) p = bd, m = Sd, h = 9, g = 5;
 			else if (v == 2) {
-				var S = bd(e, d, 31) + 257, C = bd(e, d + 10, 15) + 4, w = S + bd(e, d + 5, 31) + 1;
+				var S = wd(e, d, 31) + 257, C = wd(e, d + 10, 15) + 4, w = S + wd(e, d + 5, 31) + 1;
 				d += 14;
-				for (var T = new $(w), E = new $(19), D = 0; D < C; ++D) E[td[D]] = bd(e, d + D * 3, 7);
+				for (var T = new $(w), E = new $(19), D = 0; D < C; ++D) E[ad[D]] = wd(e, d + D * 3, 7);
 				d += C * 3;
-				for (var O = yd(E), ee = (1 << O) - 1, k = fd(E, O, 1), D = 0; D < w;) {
-					var A = k[bd(e, d, ee)];
+				for (var O = Cd(E), ee = (1 << O) - 1, k = gd(E, O, 1), D = 0; D < w;) {
+					var A = k[wd(e, d, ee)];
 					d += A & 15;
 					var y = A >> 4;
 					if (y < 16) T[D++] = y;
 					else {
 						var j = 0, M = 0;
-						for (y == 16 ? (M = 3 + bd(e, d, 3), d += 2, j = T[D - 1]) : y == 17 ? (M = 3 + bd(e, d, 7), d += 3) : y == 18 && (M = 11 + bd(e, d, 127), d += 7); M--;) T[D++] = j;
+						for (y == 16 ? (M = 3 + wd(e, d, 3), d += 2, j = T[D - 1]) : y == 17 ? (M = 3 + wd(e, d, 7), d += 3) : y == 18 && (M = 11 + wd(e, d, 127), d += 7); M--;) T[D++] = j;
 					}
 				}
 				var N = T.subarray(0, S), P = T.subarray(S);
-				h = yd(N), g = yd(P), p = fd(N, h, 1), m = fd(P, g, 1);
-			} else Td(1);
+				h = Cd(N), g = Cd(P), p = gd(N, h, 1), m = gd(P, g, 1);
+			} else kd(1);
 			if (d > _) {
-				c && Td(0);
+				c && kd(0);
 				break;
 			}
 		}
 		s && l(f + 131072);
 		for (var te = (1 << h) - 1, F = (1 << g) - 1, ne = d;; ne = d) {
-			var j = p[xd(e, d) & te], I = j >> 4;
+			var j = p[Td(e, d) & te], I = j >> 4;
 			if (d += j & 15, d > _) {
-				c && Td(0);
+				c && kd(0);
 				break;
 			}
-			if (j || Td(2), I < 256) n[f++] = I;
+			if (j || kd(2), I < 256) n[f++] = I;
 			else if (I == 256) {
 				ne = d, p = null;
 				break;
 			} else {
 				var L = I - 254;
 				if (I > 264) {
-					var D = I - 257, R = $u[D];
-					L = bd(e, d, (1 << R) - 1) + id[D], d += R;
+					var D = I - 257, R = rd[D];
+					L = wd(e, d, (1 << R) - 1) + cd[D], d += R;
 				}
-				var re = m[xd(e, d) & F], ie = re >> 4;
-				re || Td(3), d += re & 15;
-				var P = sd[ie];
+				var re = m[Td(e, d) & F], ie = re >> 4;
+				re || kd(3), d += re & 15;
+				var P = dd[ie];
 				if (ie > 3) {
-					var R = ed[ie];
-					P += xd(e, d) & (1 << R) - 1, d += R;
+					var R = id[ie];
+					P += Td(e, d) & (1 << R) - 1, d += R;
 				}
 				if (d > _) {
-					c && Td(0);
+					c && kd(0);
 					break;
 				}
 				s && l(f + 131072);
 				var ae = f + L;
 				if (f < P) {
 					var z = a - P, oe = Math.min(P, ae);
-					for (z + f < 0 && Td(3); f < oe; ++f) n[f] = r[z + f];
+					for (z + f < 0 && kd(3); f < oe; ++f) n[f] = r[z + f];
 				}
 				for (; f < ae; ++f) n[f] = n[f - P];
 			}
 		}
 		t.l = p, t.p = ne, t.b = f, t.f = u, p && (u = 1, t.m = h, t.d = m, t.n = g);
 	} while (!u);
-	return f != n.length && o ? Cd(n, 0, f) : n.subarray(0, f);
-}, Dd = function(e, t, n) {
+	return f != n.length && o ? Dd(n, 0, f) : n.subarray(0, f);
+}, jd = function(e, t, n) {
 	n <<= t & 7;
 	var r = t / 8 | 0;
 	e[r] |= n, e[r + 1] |= n >> 8;
-}, Od = function(e, t, n) {
+}, Md = function(e, t, n) {
 	n <<= t & 7;
 	var r = t / 8 | 0;
 	e[r] |= n, e[r + 1] |= n >> 8, e[r + 2] |= n >> 16;
-}, kd = function(e, t) {
+}, Nd = function(e, t) {
 	for (var n = [], r = 0; r < e.length; ++r) e[r] && n.push({
 		s: r,
 		f: e[r]
 	});
 	var i = n.length, a = n.slice();
 	if (!i) return {
-		t: Id,
+		t: Bd,
 		l: 0
 	};
 	if (i == 1) {
@@ -5914,7 +5929,7 @@ var hd = /* @__PURE__ */ fd(pd, 9, 0), gd = /* @__PURE__ */ fd(pd, 9, 1), _d = /
 		r: c
 	};
 	for (var f = a[0].s, r = 1; r < i; ++r) a[r].s > f && (f = a[r].s);
-	var p = new Zu(f + 1), m = Ad(n[u - 1], p, 0);
+	var p = new td(f + 1), m = Pd(n[u - 1], p, 0);
 	if (m > t) {
 		var r = 0, h = 0, g = m - t, _ = 1 << g;
 		for (a.sort(function(e, t) {
@@ -5938,11 +5953,11 @@ var hd = /* @__PURE__ */ fd(pd, 9, 0), gd = /* @__PURE__ */ fd(pd, 9, 1), _d = /
 		t: new $(p),
 		l: m
 	};
-}, Ad = function(e, t, n) {
-	return e.s == -1 ? Math.max(Ad(e.l, t, n + 1), Ad(e.r, t, n + 1)) : t[e.s] = n;
-}, jd = function(e) {
+}, Pd = function(e, t, n) {
+	return e.s == -1 ? Math.max(Pd(e.l, t, n + 1), Pd(e.r, t, n + 1)) : t[e.s] = n;
+}, Fd = function(e) {
 	for (var t = e.length; t && !e[--t];);
-	for (var n = new Zu(++t), r = 0, i = e[0], a = 1, o = function(e) {
+	for (var n = new td(++t), r = 0, i = e[0], a = 1, o = function(e) {
 		n[r++] = e;
 	}, s = 1; s <= t; ++s) if (e[s] == i && s != t) ++a;
 	else {
@@ -5960,44 +5975,44 @@ var hd = /* @__PURE__ */ fd(pd, 9, 0), gd = /* @__PURE__ */ fd(pd, 9, 1), _d = /
 		c: n.subarray(0, r),
 		n: t
 	};
-}, Md = function(e, t) {
+}, Id = function(e, t) {
 	for (var n = 0, r = 0; r < t.length; ++r) n += e[r] * t[r];
 	return n;
-}, Nd = function(e, t, n) {
-	var r = n.length, i = Sd(t + 2);
+}, Ld = function(e, t, n) {
+	var r = n.length, i = Ed(t + 2);
 	e[i] = r & 255, e[i + 1] = r >> 8, e[i + 2] = e[i] ^ 255, e[i + 3] = e[i + 1] ^ 255;
 	for (var a = 0; a < r; ++a) e[i + a + 4] = n[a];
 	return (i + 4 + r) * 8;
-}, Pd = function(e, t, n, r, i, a, o, s, c, l, u) {
-	Dd(t, u++, n), ++i[256];
-	for (var d = kd(i, 15), f = d.t, p = d.l, m = kd(a, 15), h = m.t, g = m.l, _ = jd(f), v = _.c, y = _.n, b = jd(h), x = b.c, S = b.n, C = new Zu(19), w = 0; w < v.length; ++w) ++C[v[w] & 31];
+}, Rd = function(e, t, n, r, i, a, o, s, c, l, u) {
+	jd(t, u++, n), ++i[256];
+	for (var d = Nd(i, 15), f = d.t, p = d.l, m = Nd(a, 15), h = m.t, g = m.l, _ = Fd(f), v = _.c, y = _.n, b = Fd(h), x = b.c, S = b.n, C = new td(19), w = 0; w < v.length; ++w) ++C[v[w] & 31];
 	for (var w = 0; w < x.length; ++w) ++C[x[w] & 31];
-	for (var T = kd(C, 7), E = T.t, D = T.l, O = 19; O > 4 && !E[td[O - 1]]; --O);
-	var ee = l + 5 << 3, k = Md(i, pd) + Md(a, md) + o, A = Md(i, f) + Md(a, h) + o + 14 + 3 * O + Md(C, E) + 2 * C[16] + 3 * C[17] + 7 * C[18];
-	if (c >= 0 && ee <= k && ee <= A) return Nd(t, u, e.subarray(c, c + l));
+	for (var T = Nd(C, 7), E = T.t, D = T.l, O = 19; O > 4 && !E[ad[O - 1]]; --O);
+	var ee = l + 5 << 3, k = Id(i, _d) + Id(a, vd) + o, A = Id(i, f) + Id(a, h) + o + 14 + 3 * O + Id(C, E) + 2 * C[16] + 3 * C[17] + 7 * C[18];
+	if (c >= 0 && ee <= k && ee <= A) return Ld(t, u, e.subarray(c, c + l));
 	var j, M, N, P;
-	if (Dd(t, u, 1 + (A < k)), u += 2, A < k) {
-		j = fd(f, p, 0), M = f, N = fd(h, g, 0), P = h;
-		var te = fd(E, D, 0);
-		Dd(t, u, y - 257), Dd(t, u + 5, S - 1), Dd(t, u + 10, O - 4), u += 14;
-		for (var w = 0; w < O; ++w) Dd(t, u + 3 * w, E[td[w]]);
+	if (jd(t, u, 1 + (A < k)), u += 2, A < k) {
+		j = gd(f, p, 0), M = f, N = gd(h, g, 0), P = h;
+		var te = gd(E, D, 0);
+		jd(t, u, y - 257), jd(t, u + 5, S - 1), jd(t, u + 10, O - 4), u += 14;
+		for (var w = 0; w < O; ++w) jd(t, u + 3 * w, E[ad[w]]);
 		u += 3 * O;
 		for (var F = [v, x], ne = 0; ne < 2; ++ne) for (var I = F[ne], w = 0; w < I.length; ++w) {
 			var L = I[w] & 31;
-			Dd(t, u, te[L]), u += E[L], L > 15 && (Dd(t, u, I[w] >> 5 & 127), u += I[w] >> 12);
+			jd(t, u, te[L]), u += E[L], L > 15 && (jd(t, u, I[w] >> 5 & 127), u += I[w] >> 12);
 		}
-	} else j = hd, M = pd, N = _d, P = md;
+	} else j = yd, M = _d, N = xd, P = vd;
 	for (var w = 0; w < s; ++w) {
 		var R = r[w];
 		if (R > 255) {
 			var L = R >> 18 & 31;
-			Od(t, u, j[L + 257]), u += M[L + 257], L > 7 && (Dd(t, u, R >> 23 & 31), u += $u[L]);
+			Md(t, u, j[L + 257]), u += M[L + 257], L > 7 && (jd(t, u, R >> 23 & 31), u += rd[L]);
 			var re = R & 31;
-			Od(t, u, N[re]), u += P[re], re > 3 && (Od(t, u, R >> 5 & 8191), u += ed[re]);
-		} else Od(t, u, j[R]), u += M[R];
+			Md(t, u, N[re]), u += P[re], re > 3 && (Md(t, u, R >> 5 & 8191), u += id[re]);
+		} else Md(t, u, j[R]), u += M[R];
 	}
-	return Od(t, u, j[256]), u + M[256];
-}, Fd = /* @__PURE__ */ new Qu([
+	return Md(t, u, j[256]), u + M[256];
+}, zd = /* @__PURE__ */ new nd([
 	65540,
 	131080,
 	131088,
@@ -6007,18 +6022,18 @@ var hd = /* @__PURE__ */ fd(pd, 9, 0), gd = /* @__PURE__ */ fd(pd, 9, 1), _d = /
 	1048832,
 	2114560,
 	2117632
-]), Id = /* @__PURE__ */ new $(0), Ld = function(e, t, n, r, i, a) {
+]), Bd = /* @__PURE__ */ new $(0), Vd = function(e, t, n, r, i, a) {
 	var o = a.z || e.length, s = new $(r + o + 5 * (1 + Math.ceil(o / 7e3)) + i), c = s.subarray(r, s.length - i), l = a.l, u = (a.r || 0) & 7;
 	if (t) {
 		u && (c[0] = a.r >> 3);
-		for (var d = Fd[t - 1], f = d >> 13, p = d & 8191, m = (1 << n) - 1, h = a.p || new Zu(32768), g = a.h || new Zu(m + 1), _ = Math.ceil(n / 3), v = 2 * _, y = function(t) {
+		for (var d = zd[t - 1], f = d >> 13, p = d & 8191, m = (1 << n) - 1, h = a.p || new td(32768), g = a.h || new td(m + 1), _ = Math.ceil(n / 3), v = 2 * _, y = function(t) {
 			return (e[t] ^ e[t + 1] << _ ^ e[t + 2] << v) & m;
-		}, b = new Qu(25e3), x = new Zu(288), S = new Zu(32), C = 0, w = 0, T = a.i || 0, E = 0, D = a.w || 0, O = 0; T + 2 < o; ++T) {
+		}, b = new nd(25e3), x = new td(288), S = new td(32), C = 0, w = 0, T = a.i || 0, E = 0, D = a.w || 0, O = 0; T + 2 < o; ++T) {
 			var ee = y(T), k = T & 32767, A = g[ee];
 			if (h[k] = A, g[ee] = k, D <= T) {
 				var j = o - T;
 				if ((C > 7e3 || E > 24576) && (j > 423 || !l)) {
-					u = Pd(e, c, 0, b, x, S, w, E, O, T - O, u), E = C = w = 0, O = T;
+					u = Rd(e, c, 0, b, x, S, w, E, O, T - O, u), E = C = w = 0, O = T;
 					for (var M = 0; M < 286; ++M) x[M] = 0;
 					for (var M = 0; M < 30; ++M) S[M] = 0;
 				}
@@ -6037,51 +6052,51 @@ var hd = /* @__PURE__ */ fd(pd, 9, 0), gd = /* @__PURE__ */ fd(pd, 9, 1), _d = /
 					k = A, A = h[k], F += k - A & 32767;
 				}
 				if (P) {
-					b[E++] = 268435456 | ad[N] << 18 | cd[P];
-					var oe = ad[N] & 31, se = cd[P] & 31;
-					w += $u[oe] + ed[se], ++x[257 + oe], ++S[se], D = T + N, ++C;
+					b[E++] = 268435456 | ld[N] << 18 | fd[P];
+					var oe = ld[N] & 31, se = fd[P] & 31;
+					w += rd[oe] + id[se], ++x[257 + oe], ++S[se], D = T + N, ++C;
 				} else b[E++] = e[T], ++x[e[T]];
 			}
 		}
 		for (T = Math.max(T, D); T < o; ++T) b[E++] = e[T], ++x[e[T]];
-		u = Pd(e, c, l, b, x, S, w, E, O, T - O, u), l || (a.r = u & 7 | c[u / 8 | 0] << 3, u -= 7, a.h = g, a.p = h, a.i = T, a.w = D);
+		u = Rd(e, c, l, b, x, S, w, E, O, T - O, u), l || (a.r = u & 7 | c[u / 8 | 0] << 3, u -= 7, a.h = g, a.p = h, a.i = T, a.w = D);
 	} else {
 		for (var T = a.w || 0; T < o + l; T += 65535) {
 			var ce = T + 65535;
-			ce >= o && (c[u / 8 | 0] = l, ce = o), u = Nd(c, u + 1, e.subarray(T, ce));
+			ce >= o && (c[u / 8 | 0] = l, ce = o), u = Ld(c, u + 1, e.subarray(T, ce));
 		}
 		a.i = o;
 	}
-	return Cd(s, 0, r + Sd(u) + i);
-}, Rd = /* @__PURE__ */ (function() {
+	return Dd(s, 0, r + Ed(u) + i);
+}, Hd = /* @__PURE__ */ (function() {
 	for (var e = new Int32Array(256), t = 0; t < 256; ++t) {
 		for (var n = t, r = 9; --r;) n = (n & 1 && -306674912) ^ n >>> 1;
 		e[t] = n;
 	}
 	return e;
-})(), zd = function() {
+})(), Ud = function() {
 	var e = -1;
 	return {
 		p: function(t) {
-			for (var n = e, r = 0; r < t.length; ++r) n = Rd[n & 255 ^ t[r]] ^ n >>> 8;
+			for (var n = e, r = 0; r < t.length; ++r) n = Hd[n & 255 ^ t[r]] ^ n >>> 8;
 			e = n;
 		},
 		d: function() {
 			return ~e;
 		}
 	};
-}, Bd = function(e, t, n, r, i) {
+}, Wd = function(e, t, n, r, i) {
 	if (!i && (i = { l: 1 }, t.dictionary)) {
 		var a = t.dictionary.subarray(-32768), o = new $(a.length + e.length);
 		o.set(a), o.set(e, a.length), e = o, i.w = a.length;
 	}
-	return Ld(e, t.level == null ? 6 : t.level, t.mem == null ? i.l ? Math.ceil(Math.max(8, Math.min(13, Math.log(e.length))) * 1.5) : 20 : 12 + t.mem, n, r, i);
-}, Vd = function(e, t) {
+	return Vd(e, t.level == null ? 6 : t.level, t.mem == null ? i.l ? Math.ceil(Math.max(8, Math.min(13, Math.log(e.length))) * 1.5) : 20 : 12 + t.mem, n, r, i);
+}, Gd = function(e, t) {
 	var n = {};
 	for (var r in e) n[r] = e[r];
 	for (var r in t) n[r] = t[r];
 	return n;
-}, Hd = function(e, t, n) {
+}, Kd = function(e, t, n) {
 	for (var r = e(), i = e.toString(), a = i.slice(i.indexOf("[") + 1, i.lastIndexOf("]")).replace(/\s+/g, "").split(","), o = 0; o < r.length; ++o) {
 		var s = r[o], c = a[o];
 		if (typeof s == "function") {
@@ -6095,143 +6110,143 @@ var hd = /* @__PURE__ */ fd(pd, 9, 0), gd = /* @__PURE__ */ fd(pd, 9, 1), _d = /
 		} else n[c] = s;
 	}
 	return t;
-}, Ud = [], Wd = function(e) {
+}, qd = [], Jd = function(e) {
 	var t = [];
 	for (var n in e) e[n].buffer && t.push((e[n] = new e[n].constructor(e[n])).buffer);
 	return t;
-}, Gd = function(e, t, n, r) {
-	if (!Ud[n]) {
-		for (var i = "", a = {}, o = e.length - 1, s = 0; s < o; ++s) i = Hd(e[s], i, a);
-		Ud[n] = {
-			c: Hd(e[o], i, a),
+}, Yd = function(e, t, n, r) {
+	if (!qd[n]) {
+		for (var i = "", a = {}, o = e.length - 1, s = 0; s < o; ++s) i = Kd(e[s], i, a);
+		qd[n] = {
+			c: Kd(e[o], i, a),
 			e: a
 		};
 	}
-	var c = Vd({}, Ud[n].e);
-	return Xu(Ud[n].c + ";onmessage=function(e){for(var k in e.data)self[k]=e.data[k];onmessage=" + t.toString() + "}", n, c, Wd(c), r);
-}, Kd = function() {
+	var c = Gd({}, qd[n].e);
+	return ed(qd[n].c + ";onmessage=function(e){for(var k in e.data)self[k]=e.data[k];onmessage=" + t.toString() + "}", n, c, Jd(c), r);
+}, Xd = function() {
 	return [
 		$,
-		Zu,
-		Qu,
-		$u,
-		ed,
 		td,
+		nd,
+		rd,
 		id,
-		sd,
-		gd,
-		vd,
-		ld,
-		wd,
-		fd,
-		yd,
-		bd,
-		xd,
-		Sd,
-		Cd,
-		Td,
-		Ed,
-		af,
-		Jd,
-		Yd
-	];
-}, qd = function() {
-	return [
-		$,
-		Zu,
-		Qu,
-		$u,
-		ed,
-		td,
 		ad,
 		cd,
-		hd,
+		dd,
+		bd,
+		Sd,
 		pd,
-		_d,
-		md,
-		ld,
-		Fd,
-		Id,
-		fd,
-		Dd,
 		Od,
+		gd,
+		Cd,
+		wd,
+		Td,
+		Ed,
+		Dd,
 		kd,
 		Ad,
+		lf,
+		Qd,
+		$d
+	];
+}, Zd = function() {
+	return [
+		$,
+		td,
+		nd,
+		rd,
+		id,
+		ad,
+		ld,
+		fd,
+		yd,
+		_d,
+		xd,
+		vd,
+		pd,
+		zd,
+		Bd,
+		gd,
 		jd,
 		Md,
 		Nd,
 		Pd,
-		Sd,
-		Cd,
+		Fd,
+		Id,
 		Ld,
-		Bd,
-		nf,
-		Jd
+		Rd,
+		Ed,
+		Dd,
+		Vd,
+		Wd,
+		sf,
+		Qd
 	];
-}, Jd = function(e) {
+}, Qd = function(e) {
 	return postMessage(e, [e.buffer]);
-}, Yd = function(e) {
+}, $d = function(e) {
 	return e && {
 		out: e.size && new $(e.size),
 		dictionary: e.dictionary
 	};
-}, Xd = function(e, t, n, r, i, a) {
-	var o = Gd(n, r, i, function(e, t) {
+}, ef = function(e, t, n, r, i, a) {
+	var o = Yd(n, r, i, function(e, t) {
 		o.terminate(), a(e, t);
 	});
 	return o.postMessage([e, t], t.consume ? [e.buffer] : []), function() {
 		o.terminate();
 	};
-}, Zd = function(e, t) {
+}, tf = function(e, t) {
 	return e[t] | e[t + 1] << 8;
-}, Qd = function(e, t) {
+}, nf = function(e, t) {
 	return (e[t] | e[t + 1] << 8 | e[t + 2] << 16 | e[t + 3] << 24) >>> 0;
-}, $d = function(e, t) {
-	return Qd(e, t) + Qd(e, t + 4) * 4294967296;
-}, ef = function(e, t, n) {
+}, rf = function(e, t) {
+	return nf(e, t) + nf(e, t + 4) * 4294967296;
+}, af = function(e, t, n) {
 	for (; n; ++t) e[t] = n, n >>>= 8;
 };
-function tf(e, t, n) {
-	return n || (n = t, t = {}), typeof n != "function" && Td(7), Xd(e, t, [qd], function(e) {
-		return Jd(nf(e.data[0], e.data[1]));
+function of(e, t, n) {
+	return n || (n = t, t = {}), typeof n != "function" && kd(7), ef(e, t, [Zd], function(e) {
+		return Qd(sf(e.data[0], e.data[1]));
 	}, 0, n);
 }
-function nf(e, t) {
-	return Bd(e, t || {}, 0, 0);
+function sf(e, t) {
+	return Wd(e, t || {}, 0, 0);
 }
-function rf(e, t, n) {
-	return n || (n = t, t = {}), typeof n != "function" && Td(7), Xd(e, t, [Kd], function(e) {
-		return Jd(af(e.data[0], Yd(e.data[1])));
+function cf(e, t, n) {
+	return n || (n = t, t = {}), typeof n != "function" && kd(7), ef(e, t, [Xd], function(e) {
+		return Qd(lf(e.data[0], $d(e.data[1])));
 	}, 1, n);
 }
-function af(e, t) {
-	return Ed(e, { i: 2 }, t && t.out, t && t.dictionary);
+function lf(e, t) {
+	return Ad(e, { i: 2 }, t && t.out, t && t.dictionary);
 }
-var of = function(e, t, n, r) {
+var uf = function(e, t, n, r) {
 	for (var i in e) {
 		var a = e[i], o = t + i, s = r;
-		Array.isArray(a) && (s = Vd(r, a[1]), a = a[0]), ArrayBuffer.isView(a) ? n[o] = [a, s] : (n[o += "/"] = [new $(0), s], of(a, o, n, r));
+		Array.isArray(a) && (s = Gd(r, a[1]), a = a[0]), ArrayBuffer.isView(a) ? n[o] = [a, s] : (n[o += "/"] = [new $(0), s], uf(a, o, n, r));
 	}
-}, sf = typeof TextEncoder < "u" && /* @__PURE__ */ new TextEncoder(), cf = typeof TextDecoder < "u" && /* @__PURE__ */ new TextDecoder();
+}, df = typeof TextEncoder < "u" && /* @__PURE__ */ new TextEncoder(), ff = typeof TextDecoder < "u" && /* @__PURE__ */ new TextDecoder();
 try {
-	cf.decode(Id, { stream: !0 });
+	ff.decode(Bd, { stream: !0 });
 } catch {}
-var lf = function(e) {
+var pf = function(e) {
 	for (var t = "", n = 0;;) {
 		var r = e[n++], i = (r > 127) + (r > 223) + (r > 239);
 		if (n + i > e.length) return {
 			s: t,
-			r: Cd(e, n - 1)
+			r: Dd(e, n - 1)
 		};
 		i ? i == 3 ? (r = ((r & 15) << 18 | (e[n++] & 63) << 12 | (e[n++] & 63) << 6 | e[n++] & 63) - 65536, t += String.fromCharCode(55296 | r >> 10, 56320 | r & 1023)) : i & 1 ? t += String.fromCharCode((r & 31) << 6 | e[n++] & 63) : t += String.fromCharCode((r & 15) << 12 | (e[n++] & 63) << 6 | e[n++] & 63) : t += String.fromCharCode(r);
 	}
 };
-function uf(e, t) {
+function mf(e, t) {
 	if (t) {
 		for (var n = new $(e.length), r = 0; r < e.length; ++r) n[r] = e.charCodeAt(r);
 		return n;
 	}
-	if (sf) return sf.encode(e);
+	if (df) return df.encode(e);
 	for (var i = e.length, a = new $(e.length + (e.length >> 1)), o = 0, s = function(e) {
 		a[o++] = e;
 	}, r = 0; r < i; ++r) {
@@ -6242,40 +6257,40 @@ function uf(e, t) {
 		var l = e.charCodeAt(r);
 		l < 128 || t ? s(l) : l < 2048 ? (s(192 | l >> 6), s(128 | l & 63)) : l > 55295 && l < 57344 ? (l = 65536 + (l & 1047552) | e.charCodeAt(++r) & 1023, s(240 | l >> 18), s(128 | l >> 12 & 63), s(128 | l >> 6 & 63), s(128 | l & 63)) : (s(224 | l >> 12), s(128 | l >> 6 & 63), s(128 | l & 63));
 	}
-	return Cd(a, 0, o);
+	return Dd(a, 0, o);
 }
-function df(e, t) {
+function hf(e, t) {
 	if (t) {
 		for (var n = "", r = 0; r < e.length; r += 16384) n += String.fromCharCode.apply(null, e.subarray(r, r + 16384));
 		return n;
-	} else if (cf) return cf.decode(e);
+	} else if (ff) return ff.decode(e);
 	else {
-		var i = lf(e), a = i.s, n = i.r;
-		return n.length && Td(8), a;
+		var i = pf(e), a = i.s, n = i.r;
+		return n.length && kd(8), a;
 	}
 }
-var ff = function(e, t) {
-	return t + 30 + Zd(e, t + 26) + Zd(e, t + 28);
-}, pf = function(e, t, n) {
-	var r = Zd(e, t + 28), i = Zd(e, t + 30), a = df(e.subarray(t + 46, t + 46 + r), !(Zd(e, t + 8) & 2048)), o = t + 46 + r, s = mf(e, o, i, n, Qd(e, t + 20), Qd(e, t + 24), Qd(e, t + 42)), c = s[0], l = s[1], u = s[2];
+var gf = function(e, t) {
+	return t + 30 + tf(e, t + 26) + tf(e, t + 28);
+}, _f = function(e, t, n) {
+	var r = tf(e, t + 28), i = tf(e, t + 30), a = hf(e.subarray(t + 46, t + 46 + r), !(tf(e, t + 8) & 2048)), o = t + 46 + r, s = vf(e, o, i, n, nf(e, t + 20), nf(e, t + 24), nf(e, t + 42)), c = s[0], l = s[1], u = s[2];
 	return [
-		Zd(e, t + 10),
+		tf(e, t + 10),
 		c,
 		l,
 		a,
-		o + i + Zd(e, t + 32),
+		o + i + tf(e, t + 32),
 		u
 	];
-}, mf = function(e, t, n, r, i, a, o) {
+}, vf = function(e, t, n, r, i, a, o) {
 	var s = i == 4294967295, c = a == 4294967295, l = o == 4294967295, u = t + n, d = s + c + l;
 	if (r && d) {
-		for (; t + 4 < u; t += 4 + Zd(e, t + 2)) if (Zd(e, t) == 1) return [
-			s ? $d(e, t + 4 + 8 * c) : i,
-			c ? $d(e, t + 4) : a,
-			l ? $d(e, t + 4 + 8 * (c + s)) : o,
+		for (; t + 4 < u; t += 4 + tf(e, t + 2)) if (tf(e, t) == 1) return [
+			s ? rf(e, t + 4 + 8 * c) : i,
+			c ? rf(e, t + 4) : a,
+			l ? rf(e, t + 4 + 8 * (c + s)) : o,
 			1
 		];
-		r < 2 && Td(13);
+		r < 2 && kd(13);
 	}
 	return [
 		i,
@@ -6283,37 +6298,37 @@ var ff = function(e, t) {
 		o,
 		0
 	];
-}, hf = function(e) {
+}, yf = function(e) {
 	var t = 0;
 	if (e) for (var n in e) {
 		var r = e[n].length;
-		r > 65535 && Td(9), t += r + 4;
+		r > 65535 && kd(9), t += r + 4;
 	}
 	return t;
-}, gf = function(e, t, n, r, i, a, o, s) {
-	var c = r.length, l = n.extra, u = s && s.length, d = hf(l);
-	ef(e, t, o == null ? 67324752 : 33639248), t += 4, o != null && (e[t++] = 20, e[t++] = n.os), e[t] = 20, t += 2, e[t++] = n.flag << 1 | (a < 0 && 8), e[t++] = i && 8, e[t++] = n.compression & 255, e[t++] = n.compression >> 8;
+}, bf = function(e, t, n, r, i, a, o, s) {
+	var c = r.length, l = n.extra, u = s && s.length, d = yf(l);
+	af(e, t, o == null ? 67324752 : 33639248), t += 4, o != null && (e[t++] = 20, e[t++] = n.os), e[t] = 20, t += 2, e[t++] = n.flag << 1 | (a < 0 && 8), e[t++] = i && 8, e[t++] = n.compression & 255, e[t++] = n.compression >> 8;
 	var f = new Date(n.mtime == null ? Date.now() : n.mtime), p = f.getFullYear() - 1980;
-	if ((p < 0 || p > 119) && Td(10), ef(e, t, p << 25 | f.getMonth() + 1 << 21 | f.getDate() << 16 | f.getHours() << 11 | f.getMinutes() << 5 | f.getSeconds() >> 1), t += 4, a != -1 && (ef(e, t, n.crc), ef(e, t + 4, a < 0 ? -a - 2 : a), ef(e, t + 8, n.size)), ef(e, t + 12, c), ef(e, t + 14, d), t += 16, o != null && (ef(e, t, u), ef(e, t + 6, n.attrs), ef(e, t + 10, o), t += 14), e.set(r, t), t += c, d) for (var m in l) {
+	if ((p < 0 || p > 119) && kd(10), af(e, t, p << 25 | f.getMonth() + 1 << 21 | f.getDate() << 16 | f.getHours() << 11 | f.getMinutes() << 5 | f.getSeconds() >> 1), t += 4, a != -1 && (af(e, t, n.crc), af(e, t + 4, a < 0 ? -a - 2 : a), af(e, t + 8, n.size)), af(e, t + 12, c), af(e, t + 14, d), t += 16, o != null && (af(e, t, u), af(e, t + 6, n.attrs), af(e, t + 10, o), t += 14), e.set(r, t), t += c, d) for (var m in l) {
 		var h = l[m], g = h.length;
-		ef(e, t, +m), ef(e, t + 2, g), e.set(h, t + 4), t += 4 + g;
+		af(e, t, +m), af(e, t + 2, g), e.set(h, t + 4), t += 4 + g;
 	}
 	return u && (e.set(s, t), t += u), t;
-}, _f = function(e, t, n, r, i) {
-	ef(e, t, 101010256), ef(e, t + 8, n), ef(e, t + 10, n), ef(e, t + 12, r), ef(e, t + 16, i);
+}, xf = function(e, t, n, r, i) {
+	af(e, t, 101010256), af(e, t + 8, n), af(e, t + 10, n), af(e, t + 12, r), af(e, t + 16, i);
 };
-function vf(e, t, n) {
-	n || (n = t, t = {}), typeof n != "function" && Td(7);
+function Sf(e, t, n) {
+	n || (n = t, t = {}), typeof n != "function" && kd(7);
 	var r = {};
-	of(e, "", r, t);
+	uf(e, "", r, t);
 	var i = Object.keys(r), a = i.length, o = 0, s = 0, c = a, l = Array(a), u = [], d = function() {
 		for (var e = 0; e < u.length; ++e) u[e]();
 	}, f = function(e, t) {
-		yf(function() {
+		Cf(function() {
 			n(e, t);
 		});
 	};
-	yf(function() {
+	Cf(function() {
 		f = n;
 	});
 	var p = function() {
@@ -6323,24 +6338,24 @@ function vf(e, t, n) {
 			var i = l[r];
 			try {
 				var a = i.c.length;
-				gf(e, s, i, i.f, i.u, a);
-				var u = 30 + i.f.length + hf(i.extra), d = s + u;
-				e.set(i.c, d), gf(e, o, i, i.f, i.u, a, s, i.m), o += 16 + u + (i.m ? i.m.length : 0), s = d + a;
+				bf(e, s, i, i.f, i.u, a);
+				var u = 30 + i.f.length + yf(i.extra), d = s + u;
+				e.set(i.c, d), bf(e, o, i, i.f, i.u, a, s, i.m), o += 16 + u + (i.m ? i.m.length : 0), s = d + a;
 			} catch (e) {
 				return f(e, null);
 			}
 		}
-		_f(e, o, l.length, n, t), f(null, e);
+		xf(e, o, l.length, n, t), f(null, e);
 	};
 	a || p();
 	for (var m = function(e) {
-		var t = i[e], n = r[t], c = n[0], m = n[1], h = zd(), g = c.length;
+		var t = i[e], n = r[t], c = n[0], m = n[1], h = Ud(), g = c.length;
 		h.p(c);
-		var _ = uf(t), v = _.length, y = m.comment, b = y && uf(y), x = b && b.length, S = hf(m.extra), C = m.level == 0 ? 0 : 8, w = function(n, r) {
+		var _ = mf(t), v = _.length, y = m.comment, b = y && mf(y), x = b && b.length, S = yf(m.extra), C = m.level == 0 ? 0 : 8, w = function(n, r) {
 			if (n) d(), f(n, null);
 			else {
 				var i = r.length;
-				l[e] = Vd(m, {
+				l[e] = Gd(m, {
 					size: g,
 					crc: h.d(),
 					c: r,
@@ -6351,41 +6366,41 @@ function vf(e, t, n) {
 				}), o += 30 + v + S + i, s += 76 + 2 * (v + S) + (x || 0) + i, --a || p();
 			}
 		};
-		if (v > 65535 && w(Td(11, 0, 1), null), !C) w(null, c);
+		if (v > 65535 && w(kd(11, 0, 1), null), !C) w(null, c);
 		else if (g < 16e4) try {
-			w(null, nf(c, m));
+			w(null, sf(c, m));
 		} catch (e) {
 			w(e, null);
 		}
-		else u.push(tf(c, m, w));
+		else u.push(of(c, m, w));
 	}, h = 0; h < c; ++h) m(h);
 	return d;
 }
-var yf = typeof queueMicrotask == "function" ? queueMicrotask : typeof setTimeout == "function" ? setTimeout : function(e) {
+var Cf = typeof queueMicrotask == "function" ? queueMicrotask : typeof setTimeout == "function" ? setTimeout : function(e) {
 	e();
 };
-function bf(e, t, n) {
-	n || (n = t, t = {}), typeof n != "function" && Td(7);
+function wf(e, t, n) {
+	n || (n = t, t = {}), typeof n != "function" && kd(7);
 	var r = [], i = function() {
 		for (var e = 0; e < r.length; ++e) r[e]();
 	}, a = {}, o = function(e, t) {
-		yf(function() {
+		Cf(function() {
 			n(e, t);
 		});
 	};
-	yf(function() {
+	Cf(function() {
 		o = n;
 	});
-	for (var s = e.length - 22; Qd(e, s) != 101010256; --s) if (!s || e.length - s > 65558) return o(Td(13, 0, 1), null), i;
-	var c = Zd(e, s + 8);
+	for (var s = e.length - 22; nf(e, s) != 101010256; --s) if (!s || e.length - s > 65558) return o(kd(13, 0, 1), null), i;
+	var c = tf(e, s + 8);
 	if (c) {
-		var l = c, u = Qd(e, s + 16), d = Qd(e, s - 20) == 117853008;
+		var l = c, u = nf(e, s + 16), d = nf(e, s - 20) == 117853008;
 		if (d) {
-			var f = Qd(e, s - 12);
-			d = Qd(e, f) == 101075792, d && (l = c = Qd(e, f + 32), u = Qd(e, f + 48));
+			var f = nf(e, s - 12);
+			d = nf(e, f) == 101075792, d && (l = c = nf(e, f + 32), u = nf(e, f + 48));
 		}
 		for (var p = t && t.filter, m = function(t) {
-			var n = pf(e, u, d), s = n[0], l = n[1], f = n[2], m = n[3], h = n[4], g = n[5], _ = ff(e, g);
+			var n = _f(e, u, d), s = n[0], l = n[1], f = n[2], m = n[3], h = n[4], g = n[5], _ = gf(e, g);
 			u = h;
 			var v = function(e, t) {
 				e ? (i(), o(e, null)) : (t && (a[m] = t), --c || o(null, a));
@@ -6395,16 +6410,16 @@ function bf(e, t, n) {
 				size: l,
 				originalSize: f,
 				compression: s
-			})) if (!s) v(null, Cd(e, _, _ + l));
+			})) if (!s) v(null, Dd(e, _, _ + l));
 			else if (s == 8) {
 				var y = e.subarray(_, _ + l);
 				if (f < 524288 || l > .8 * f) try {
-					v(null, af(y, { out: new $(f) }));
+					v(null, lf(y, { out: new $(f) }));
 				} catch (e) {
 					v(e, null);
 				}
-				else r.push(rf(y, { size: f }, v));
-			} else v(Td(14, "unknown compression type " + s, 1), null);
+				else r.push(cf(y, { size: f }, v));
+			} else v(kd(14, "unknown compression type " + s, 1), null);
 			else v(null, null);
 		}, h = 0; h < l; ++h) m(h);
 	} else o(null, {});
@@ -6412,20 +6427,20 @@ function bf(e, t, n) {
 }
 //#endregion
 //#region src/features/bubble-render/import-export.ts
-var xf = /[\\/:*?"<>|]/g;
-function Sf(e) {
+var Tf = /[\\/:*?"<>|]/g;
+function Ef(e) {
 	return e.buffer.slice(e.byteOffset, e.byteOffset + e.byteLength);
 }
-function Cf(e) {
-	return String(e ?? "").replace(xf, "_").trim() || "unnamed";
+function Df(e) {
+	return String(e ?? "").replace(Tf, "_").trim() || "unnamed";
 }
-function wf(e, t) {
+function Of(e, t) {
 	let n = /\.(webp|png|jpg|jpeg|gif|avif)$/i.exec(String(t ?? ""));
 	if (n) return n[1].toLowerCase();
 	let r = String(e ?? "").toLowerCase();
 	return r.includes("png") ? "png" : r.includes("jpeg") || r.includes("jpg") ? "jpg" : r.includes("gif") ? "gif" : r.includes("avif") ? "avif" : "webp";
 }
-async function Tf(e) {
+async function kf(e) {
 	let { library: t, charId: n, charName: r, colors: i = {}, onProgress: a } = e, o = await t.listAvatarNames(), s = await t.listMoodAvatars(), c = [], l = [], u = {}, d = o.length + s.length, f = 0, p = () => {
 		f += 1, a && f % 20 == 0 && a(f, d);
 	};
@@ -6435,11 +6450,11 @@ async function Tf(e) {
 			p();
 			continue;
 		}
-		let i = wf(r.mimeType, r.fileName), a = `avatars/${e}_${Cf(n)}.${i}`;
+		let i = Of(r.mimeType, r.fileName), a = `avatars/${e}_${Df(n)}.${i}`;
 		u[a] = new Uint8Array(await r.imageBlob.arrayBuffer()), c.push({
 			name: n,
 			mimeType: r.mimeType || `image/${i}`,
-			fileName: `${Cf(n)}.${i}`,
+			fileName: `${Df(n)}.${i}`,
 			fileSize: r.imageBlob.size,
 			width: r.width,
 			height: r.height,
@@ -6460,12 +6475,12 @@ async function Tf(e) {
 			p();
 			continue;
 		}
-		let o = wf(a.mimeType, a.fileName), c = `mood/${e}_${Cf(r)}_${i}.${o}`;
+		let o = Of(a.mimeType, a.fileName), c = `mood/${e}_${Df(r)}_${i}.${o}`;
 		u[c] = new Uint8Array(await a.imageBlob.arrayBuffer()), l.push({
 			name: r,
 			moodId: i,
 			mimeType: a.mimeType || `image/${o}`,
-			fileName: `${Cf(r)}_${i}.${o}`,
+			fileName: `${Df(r)}_${i}.${o}`,
 			fileSize: a.imageBlob.size,
 			width: a.width,
 			height: a.height,
@@ -6476,8 +6491,8 @@ async function Tf(e) {
 		}), p(), e % 50 == 49 && await Promise.resolve();
 	}
 	let m = {
-		type: hu,
-		version: gu,
+		type: yu,
+		version: bu,
 		exportedAt: (/* @__PURE__ */ new Date()).toISOString(),
 		charId: n,
 		charName: r,
@@ -6485,22 +6500,22 @@ async function Tf(e) {
 		moodAvatars: l,
 		colors: i
 	};
-	return u["manifest.json"] = uf(JSON.stringify(m, null, 2)), new Promise((e, t) => {
-		vf(u, { level: 0 }, (n, r) => {
+	return u["manifest.json"] = mf(JSON.stringify(m, null, 2)), new Promise((e, t) => {
+		Sf(u, { level: 0 }, (n, r) => {
 			n ? t(n) : e(r);
 		});
 	});
 }
-async function Ef(e, t, n, r = null) {
+async function Af(e, t, n, r = null) {
 	let i = await new Promise((e, n) => {
-		bf(t, (t, r) => {
+		wf(t, (t, r) => {
 			t ? n(t) : e(r);
 		});
 	}), a = i["manifest.json"];
 	if (!a) throw Error("压缩包缺少 manifest.json，不是本扩展的头像包");
 	let o;
 	try {
-		o = JSON.parse(df(a));
+		o = JSON.parse(hf(a));
 	} catch {
 		throw Error("manifest.json 解析失败");
 	}
@@ -6521,7 +6536,7 @@ async function Ef(e, t, n, r = null) {
 			s.skipped += 1;
 			continue;
 		}
-		let a = new Blob([Sf(r)], { type: t.mimeType || "image/webp" });
+		let a = new Blob([Ef(r)], { type: t.mimeType || "image/webp" });
 		await e.putAvatar(t.name, a, {
 			fileName: t.fileName,
 			mimeType: t.mimeType,
@@ -6540,7 +6555,7 @@ async function Ef(e, t, n, r = null) {
 			s.skipped += 1;
 			continue;
 		}
-		let a = new Blob([Sf(r)], { type: t.mimeType || "image/webp" });
+		let a = new Blob([Ef(r)], { type: t.mimeType || "image/webp" });
 		await e.putMoodAvatar(t.name, t.moodId, a, {
 			fileName: t.fileName,
 			mimeType: t.mimeType,
@@ -6549,13 +6564,13 @@ async function Ef(e, t, n, r = null) {
 			sourceUrl: t.imageUrl
 		}), s.moodAvatars += 1, l += 1, n && l % 20 == 0 && n(l, c), l % 50 == 0 && await Promise.resolve();
 	}
-	for (let [t, n] of Object.entries(o.colors ?? {})) n && (await e.setConfig(Hl(r, t), n), s.colors += 1);
+	for (let [t, n] of Object.entries(o.colors ?? {})) n && (await e.setConfig(Gl(r, t), n), s.colors += 1);
 	return s;
 }
 //#endregion
 //#region src/features/bubble-render/runtime.ts
-var Df = 8, Of = 450, kf = 80;
-function Af(e) {
+var jf = 8, Mf = 450, Nf = 80, Pf = "SillyTavern System";
+function Ff(e) {
 	let t = String(e ?? "").split("__");
 	return {
 		mood: t[0] ?? "",
@@ -6563,27 +6578,22 @@ function Af(e) {
 		act: t[2] ?? ""
 	};
 }
-function jf() {
-	let e = Vu(), t = e?.characterId, n = t == null || t === "" ? null : String(t), r = typeof e?.name2 == "string" ? e.name2.trim() : "", i = n !== null && r !== "SillyTavern System";
-	return {
-		id: i ? n : null,
-		name: r || "SillyTavern System",
-		hasCard: i
-	};
+function If() {
+	return Dl(Gu(), Pf);
 }
-async function Mf(e, t) {
+async function Lf(e, t) {
 	let n = t ? {
 		mode: "character",
 		charId: t
-	} : mu;
+	} : vu;
 	try {
-		return (await Pu(e, n).listScopes()).sort((e, t) => Number(t.charId === $c) - Number(e.charId === $c));
+		return (await Ru(e, n).listScopes()).sort((e, t) => Number(t.charId === $c) - Number(e.charId === $c));
 	} catch (e) {
 		return console.warn("[BubbleDialogue] native scope stats failed.", e), [];
 	}
 }
-function Nf(e) {
-	let t = jf(), n = /* @__PURE__ */ Dt({
+function Rf(e) {
+	let t = If(), n = /* @__PURE__ */ Dt({
 		ready: !1,
 		backend: "native",
 		mode: "global",
@@ -6620,17 +6630,17 @@ function Nf(e) {
 			charId: e === "character" ? n.charId : null
 		};
 	}
-	let i = !1, a, o = ll({}), s = Iu();
+	let i = !1, a, o = ll({}), s = Bu();
 	function c() {
 		let t = r();
 		if (n.backend === "native") {
 			let n = e.host.api.extension?.store;
-			return i = !!n, n ? Pu(n, t) : (console.warn("[BubbleDialogue] native store unavailable, reading legacy library as fallback."), cu(t));
+			return i = !!n, n ? Ru(n, t) : (console.warn("[BubbleDialogue] native store unavailable, reading legacy library as fallback."), du(t));
 		}
-		return i = !!e.host.api.extension?.store, cu(t);
+		return i = !!e.host.api.extension?.store, du(t);
 	}
 	a = c(), n.nativeAvailable = i;
-	let l = Bu(() => ({
+	let l = Wu(() => ({
 		getConfig: (e) => a.getConfig(e),
 		setConfig: (e, t) => a.setConfig(e, t)
 	}));
@@ -6647,16 +6657,16 @@ function Nf(e) {
 	let d = wl({
 		documentRef: () => document,
 		readStyle: () => l.state.style
-	}), f = null, p = "", m = "", h = El({ documentRef: () => document }), g = Fl({
+	}), f = null, p = "", m = "", h = kl({ documentRef: () => document }), g = Rl({
 		documentRef: () => document,
 		resolveAvatar: (e) => o.resolve(e),
 		resolveCachedAvatar: (e) => o.resolveCached(e),
 		resolveMoodGroup: (e) => s(e),
 		resolveTextColor: (e) => String(l.state.style.style_textColorMode ?? "global") === "character" ? oe.get(se(e)) ?? null : null,
 		onZoom: (e, t) => h.show(e, t)
-	}), _ = Ru({
+	}), _ = Hu({
 		setExtensionPrompt: (e, t, r, i, a, o) => {
-			let s = Vu();
+			let s = Gu();
 			if (!s || typeof s.setExtensionPrompt != "function") {
 				console.warn("[BubbleDialogue] setExtensionPrompt is unavailable.");
 				return;
@@ -6765,7 +6775,7 @@ function Nf(e) {
 				n.totalStatsError = !0;
 				return;
 			}
-			let r = await Mf(t, n.charId), i = {
+			let r = await Lf(t, n.charId), i = {
 				avatars: 0,
 				moodAvatars: 0,
 				cgImages: 0,
@@ -6802,7 +6812,7 @@ function Nf(e) {
 			try {
 				b();
 				let t = await a.listMoodAvatars(), r = [...new Set(t.filter((t) => String(t.alias ?? "") === e).map((e) => String(e.moodId ?? "")).filter(Boolean))], i = 0;
-				await Dl(r, Df, async (t) => {
+				await Al(r, jf, async (t) => {
 					try {
 						await a.deleteMoodAvatar(e, t);
 					} catch (n) {
@@ -6824,24 +6834,24 @@ function Nf(e) {
 		}
 	}
 	async function le(e) {
-		let t = await ce(Hl(n.charId, e));
+		let t = await ce(Gl(n.charId, e));
 		if (t) return t;
 		if (n.charId) {
-			let t = await ce(Hl($c, e));
+			let t = await ce(Gl($c, e));
 			if (t) return t;
 		}
 		return null;
 	}
 	async function ue(e) {
 		let t = [...new Set(e.map(se).filter(Boolean))];
-		oe.clear(), await Dl(t, Df, async (e) => {
+		oe.clear(), await Al(t, jf, async (e) => {
 			let t = await le(e);
 			t && oe.set(e, t);
 		}), n.avatarColors = Object.fromEntries(oe);
 	}
 	function de() {
 		k !== null && window.clearTimeout(k);
-		let e = n.generationActive ? Of : kf;
+		let e = n.generationActive ? Mf : Nf;
 		k = window.setTimeout(() => {
 			k = null, g.hydrateAll(), n.bubbleCount = document.querySelectorAll(".yq-bubble, .custom-yq-bubble").length;
 		}, e);
@@ -6859,30 +6869,30 @@ function Nf(e) {
 		}
 	}
 	function B() {
-		let e = jf();
+		let e = If();
 		n.hasCharacterCard = e.hasCard, n.charId = e.id, n.charName = e.name;
 	}
 	function pe() {
-		let e = Gu("CHARACTER_MESSAGE_RENDERED", "character_message_rendered"), t = Gu("USER_MESSAGE_RENDERED", "user_message_rendered"), r = Gu("CHAT_CHANGED", "chat_changed"), i = Gu("GENERATION_STARTED", "generation_started"), a = Gu("GENERATION_ENDED", "generation_ended"), o = Gu("GENERATION_STOPPED", "generation_stopped"), s = Gu("GENERATION_AFTER_COMMANDS", "generation_after_commands");
+		let e = Yu("CHARACTER_MESSAGE_RENDERED", "character_message_rendered"), t = Yu("USER_MESSAGE_RENDERED", "user_message_rendered"), r = Yu("CHAT_CHANGED", "chat_changed"), i = Yu("GENERATION_STARTED", "generation_started"), a = Yu("GENERATION_ENDED", "generation_ended"), o = Yu("GENERATION_STOPPED", "generation_stopped"), s = Yu("GENERATION_AFTER_COMMANDS", "generation_after_commands");
 		for (let n of [
 			e,
 			t,
 			r
-		]) A.push(Wu(n, () => de()));
-		A.push(Wu(i, () => {
+		]) A.push(Ju(n, () => de()));
+		A.push(Ju(i, () => {
 			n.generationActive = !0;
 		}));
-		for (let e of [a, o]) A.push(Wu(e, () => {
+		for (let e of [a, o]) A.push(Ju(e, () => {
 			n.generationActive = !1, de();
 		}));
-		A.push(Wu(s, () => _.apply())), A.push(Wu(r, () => {
+		A.push(Ju(s, () => _.apply())), A.push(Ju(r, () => {
 			let e = n.charId;
 			B(), e !== n.charId && he();
 		}));
 	}
 	function me() {
 		let e = l.state.moodGroups;
-		s = e && e.length ? Fu(e) : Iu();
+		s = e && e.length ? zu(e) : Bu();
 	}
 	async function he() {
 		a = c(), n.nativeAvailable = i, o = u(), n.ready = await a.isReady(), await l.load(), me(), await L(), d.apply(), o.clearCache(), g.refresh(), g.hydrateAll();
@@ -6938,7 +6948,7 @@ function Nf(e) {
 					sourceUrl: i.sourceUrl
 				});
 				let t = await a.listMoodAvatars(), o = [...new Set(t.filter((t) => String(t.alias ?? t.name ?? "") === e).map((e) => String(e.moodId ?? "")).filter(Boolean))], s = 0;
-				if (await Dl(o, Df, async (t) => {
+				if (await Al(o, jf, async (t) => {
 					try {
 						let n = await a.getMoodAvatar(e, t);
 						if (!n?.imageBlob) return;
@@ -6953,8 +6963,8 @@ function Nf(e) {
 						s += 1, console.warn(`[BubbleDialogue] rename mood avatar failed: ${e} → ${r} / ${t}`, n);
 					}
 				}), s) throw Error(`有 ${s} 条差分复制失败，已中止（原头像未改动）`);
-				let c = await ce(Hl(n.charId, e));
-				c && (await a.setConfig(Hl(n.charId, r), c), await a.setConfig(Hl(n.charId, e), null)), await z(e), n.lastResult = `已重命名「${e}」→「${r}」`;
+				let c = await ce(Gl(n.charId, e));
+				c && (await a.setConfig(Gl(n.charId, r), c), await a.setConfig(Gl(n.charId, e), null)), await z(e), n.lastResult = `已重命名「${e}」→「${r}」`;
 			} finally {
 				n.busy = !1;
 			}
@@ -6962,7 +6972,7 @@ function Nf(e) {
 		async setAvatarColor(e, t) {
 			let r = se(e);
 			try {
-				await a.setConfig(Hl(n.charId, e), t), t ? oe.set(r, t) : oe.delete(r), n.avatarColors = Object.fromEntries(oe), g.refresh(), g.hydrateAll(), n.lastResult = t ? `已设置「${e}」的正文颜色（需把「正文美化 → 文字颜色」切到「按角色」才生效）` : `已清除「${e}」的正文颜色`;
+				await a.setConfig(Gl(n.charId, e), t), t ? oe.set(r, t) : oe.delete(r), n.avatarColors = Object.fromEntries(oe), g.refresh(), g.hydrateAll(), n.lastResult = t ? `已设置「${e}」的正文颜色（需把「正文美化 → 文字颜色」切到「按角色」才生效）` : `已清除「${e}」的正文颜色`;
 			} catch (e) {
 				n.lastResult = `设置颜色失败：${e instanceof Error ? e.message : String(e)}`;
 			}
@@ -6979,7 +6989,7 @@ function Nf(e) {
 		async getAvatarVariants(e) {
 			try {
 				return (await S()).filter((t) => String(t.alias ?? "") === e).map((e) => {
-					let t = String(e.moodId ?? ""), n = Af(t), r = null;
+					let t = String(e.moodId ?? ""), n = Ff(t), r = null;
 					if (e.imageBlob) try {
 						r = URL.createObjectURL(e.imageBlob);
 					} catch {
@@ -7040,7 +7050,7 @@ function Nf(e) {
 				total: 0
 			};
 			try {
-				let e = r(), t = await Tf({
+				let e = r(), t = await kf({
 					library: a,
 					charId: e.charId ?? "_global_",
 					charName: e.mode === "character" ? n.charName || "未命名" : "全局",
@@ -7058,7 +7068,7 @@ function Nf(e) {
 			}
 		},
 		async listDbScopes() {
-			let e = cu({
+			let e = du({
 				mode: "global",
 				charId: null
 			});
@@ -7077,9 +7087,9 @@ function Nf(e) {
 			} : {
 				mode: "character",
 				charId: t
-			}, a = await qu({
-				source: cu(i, { primaryOnly: !0 }),
-				target: Pu(r, i),
+			}, a = await Zu({
+				source: du(i, { primaryOnly: !0 }),
+				target: Ru(r, i),
 				scope: i,
 				configKeys: t === "_global_" ? void 0 : [],
 				onProgress: (e, t) => {
@@ -7092,7 +7102,7 @@ function Nf(e) {
 			return te(t), b(t), D(t), n.backend === "native" && await he(), n.totalStatsStale = !0, console.info(`[BubbleDialogue] 转换范围 ${t}：头像 ${a.avatars}、差分 ${a.moodAvatars}、跳过 ${a.skipped}、失败 ${a.failed}`), a;
 		},
 		async removeDbScope(e) {
-			await cu({
+			await du({
 				mode: "global",
 				charId: null
 			}).clearScope(e), o.clearCache();
@@ -7116,7 +7126,7 @@ function Nf(e) {
 		async removeNativeScope(t) {
 			let r = e.host.api.extension?.store;
 			if (!r) throw Error("宿主不支持原生扩展存储，无法删除");
-			await Pu(r, t === "_global_" ? mu : {
+			await Ru(r, t === "_global_" ? vu : {
 				mode: "character",
 				charId: t
 			}).clearScope(t), te(t), b(t), D(t), o.clearCache(), n.backend === "native" && await he(), g.refresh(), g.hydrateAll();
@@ -7138,7 +7148,7 @@ function Nf(e) {
 				total: 0
 			};
 			try {
-				let t = await Ef(a, e, (e, t) => {
+				let t = await Af(a, e, (e, t) => {
 					n.progress = {
 						done: e,
 						total: t
@@ -7151,14 +7161,14 @@ function Nf(e) {
 		}
 	};
 }
-var Pf = /* @__PURE__ */ new WeakMap();
-function Ff(e) {
-	let t = Pf.get(e);
-	return t || (t = Nf(e), Pf.set(e, t)), t;
+var zf = /* @__PURE__ */ new WeakMap();
+function Bf(e) {
+	let t = zf.get(e);
+	return t || (t = Rf(e), zf.set(e, t)), t;
 }
 //#endregion
 //#region src/i18n/en.ts
-var If = {
+var Vf = {
 	"settings.title": "对话气泡ＴＴ二改版",
 	"settings.description": "Turn the floating bubble on or off. Changes apply immediately.",
 	"settings.enableRuntime": "Enable floating bubble",
@@ -7423,7 +7433,7 @@ var If = {
 	"common.close": "Close",
 	"common.apply": "Apply",
 	"common.unknownModel": "Unknown"
-}, Lf = {
+}, Hf = {
 	"settings.title": "对话气泡ＴＴ二改版",
 	"settings.description": "启用或关闭悬浮气泡。更改立即生效。",
 	"settings.enableRuntime": "启用悬浮气泡",
@@ -7688,7 +7698,7 @@ var If = {
 	"common.close": "关闭",
 	"common.apply": "应用",
 	"common.unknownModel": "未知"
-}, Rf = {
+}, Uf = {
 	"settings.title": "對話氣泡ＴＴ二改版",
 	"settings.description": "啟用或關閉懸浮氣泡。變更立即生效。",
 	"settings.enableRuntime": "啟用懸浮氣泡",
@@ -7953,17 +7963,17 @@ var If = {
 	"common.close": "關閉",
 	"common.apply": "套用",
 	"common.unknownModel": "未知"
-}, zf = {
-	en: If,
-	"zh-Hans": Lf,
-	"zh-Hant": Rf
+}, Wf = {
+	en: Vf,
+	"zh-Hans": Hf,
+	"zh-Hant": Uf
 };
-function Bf() {
+function Gf() {
 	let e = navigator.language;
 	return e.startsWith("zh") ? /^zh-(TW|HK|MO)/i.test(e) ? "zh-Hant" : "zh-Hans" : "en";
 }
-function Vf(e = Bf()) {
-	let t = zf[e];
+function Kf(e = Gf()) {
+	let t = Wf[e];
 	return {
 		locale: e,
 		t(e, n) {
@@ -7973,14 +7983,14 @@ function Vf(e = Bf()) {
 		}
 	};
 }
-var Hf = Symbol("i18n");
-function Uf() {
-	let e = Tn(Hf);
+var qf = Symbol("i18n");
+function Jf() {
+	let e = Tn(qf);
 	if (!e) throw Error("I18n context is unavailable.");
 	return e;
 }
-var Wf = 1024;
-async function Gf(e) {
+var Yf = 1024;
+async function Xf(e) {
 	if (typeof createImageBitmap == "function") return await createImageBitmap(e);
 	let t = URL.createObjectURL(e);
 	try {
@@ -7992,11 +8002,11 @@ async function Gf(e) {
 		URL.revokeObjectURL(t);
 	}
 }
-async function Kf(e, t) {
+async function Zf(e, t) {
 	if (e.size > 2097152 * 4) throw Error(`图片过大（${(e.size / 1024 / 1024).toFixed(1)}MB），请先自行压缩`);
-	let n = await Gf(e), r = "width" in n ? n.width : 0, i = "height" in n ? n.height : 0, a = Math.max(r, i) > Wf;
+	let n = await Xf(e), r = "width" in n ? n.width : 0, i = "height" in n ? n.height : 0, a = Math.max(r, i) > Yf;
 	if (!t.enabled && !a) return e;
-	let o = a ? Wf / Math.max(r, i) : 1, s = Math.max(1, Math.round(r * o)), c = Math.max(1, Math.round(i * o)), l = document.createElement("canvas");
+	let o = a ? Yf / Math.max(r, i) : 1, s = Math.max(1, Math.round(r * o)), c = Math.max(1, Math.round(i * o)), l = document.createElement("canvas");
 	l.width = s, l.height = c;
 	let u = l.getContext("2d");
 	if (!u) return e;
@@ -8006,12 +8016,12 @@ async function Kf(e, t) {
 	});
 	return f && f.size < e.size ? f : e;
 }
-function qf(e) {
+function Qf(e) {
 	return String(e ?? "").replace(/\.[^.]+$/, "").trim() || "未命名";
 }
 //#endregion
 //#region src/components/LoadingHint.vue?vue&type=script&setup=true&lang.ts
-var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */ or({
+var $f = { class: "ttbd-loading-text" }, ep = /* @__PURE__ */ Us(/* @__PURE__ */ or({
 	__name: "LoadingHint",
 	props: {
 		loading: { type: Boolean },
@@ -8044,67 +8054,67 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 		}, [r[0] ||= Y("span", {
 			class: "ttbd-spinner",
 			"aria-hidden": "true"
-		}, null, -1), Y("span", Jf, B(n.value === "loading" ? e.loadingText : e.doneText), 1)], 2));
+		}, null, -1), Y("span", $f, B(n.value === "loading" ? e.loadingText : e.doneText), 1)], 2));
 	}
-}), [["__scopeId", "data-v-1d7f42f8"]]), Xf = { class: "bd-col-left" }, Zf = { class: "bd-row" }, Qf = { class: "bd-label" }, $f = { class: "bd-value" }, ep = {
+}), [["__scopeId", "data-v-1d7f42f8"]]), tp = { class: "bd-col-left" }, np = { class: "bd-row" }, rp = { class: "bd-label" }, ip = { class: "bd-value" }, ap = {
 	key: 0,
 	class: "bd-tag"
-}, tp = { class: "bd-loading-row" }, np = ["disabled"], rp = { class: "bd-stats-row" }, ip = { class: "bd-stat" }, ap = { class: "bd-stat-label" }, op = { class: "bd-stat-value" }, sp = { class: "bd-stat" }, cp = { class: "bd-stat-label" }, lp = { class: "bd-stat-value" }, up = { class: "bd-stat" }, dp = { class: "bd-stat-label" }, fp = { class: "bd-stat-value" }, pp = { class: "bd-field" }, mp = { class: "bd-field-label" }, hp = { class: "bd-mode-row" }, gp = { class: "bd-segmented" }, _p = ["disabled"], vp = ["disabled", "title"], yp = ["disabled", "title"], bp = ["disabled", "title"], xp = { class: "bd-io-hint" }, Sp = {
+}, op = { class: "bd-loading-row" }, sp = ["disabled"], cp = { class: "bd-stats-row" }, lp = { class: "bd-stat" }, up = { class: "bd-stat-label" }, dp = { class: "bd-stat-value" }, fp = { class: "bd-stat" }, pp = { class: "bd-stat-label" }, mp = { class: "bd-stat-value" }, hp = { class: "bd-stat" }, gp = { class: "bd-stat-label" }, _p = { class: "bd-stat-value" }, vp = { class: "bd-field" }, yp = { class: "bd-field-label" }, bp = { class: "bd-mode-row" }, xp = { class: "bd-segmented" }, Sp = ["disabled"], Cp = ["disabled", "title"], wp = ["disabled", "title"], Tp = ["disabled", "title"], Ep = { class: "bd-io-hint" }, Dp = {
 	key: 0,
 	class: "bd-loading-row"
-}, Cp = {
+}, Op = {
 	key: 0,
 	class: "bd-progress"
-}, wp = {
+}, kp = {
 	key: 1,
 	class: "bd-result"
-}, Tp = { class: "bd-drop-main" }, Ep = { class: "bd-drop-sub" }, Dp = {
+}, Ap = { class: "bd-drop-main" }, jp = { class: "bd-drop-sub" }, Mp = {
 	key: 1,
 	class: "bd-pending"
-}, Op = ["src"], kp = { class: "bd-pending-body" }, Ap = ["placeholder"], jp = { class: "bd-pending-actions" }, Mp = ["disabled"], Np = {
+}, Np = ["src"], Pp = { class: "bd-pending-body" }, Fp = ["placeholder"], Ip = { class: "bd-pending-actions" }, Lp = ["disabled"], Rp = {
 	key: 2,
 	class: "bd-error"
-}, Pp = ["placeholder"], Fp = { class: "bd-loading-row" }, Ip = {
+}, zp = ["placeholder"], Bp = { class: "bd-loading-row" }, Vp = {
 	key: 3,
 	class: "bd-empty"
-}, Lp = {
+}, Hp = {
 	key: 4,
 	class: "bd-list"
-}, Rp = ["onClick"], zp = { class: "bd-item-main" }, Bp = ["src"], Vp = {
+}, Up = ["onClick"], Wp = { class: "bd-item-main" }, Gp = ["src"], Kp = {
 	key: 1,
 	class: "bd-thumb-fallback"
-}, Hp = ["onKeydown", "onBlur"], Up = {
+}, qp = ["onKeydown", "onBlur"], Jp = {
 	key: 3,
 	class: "bd-item-name"
-}, Wp = { class: "bd-item-actions" }, Gp = ["title", "onClick"], Kp = ["title", "onClick"], qp = ["title", "onClick"], Jp = ["title", "onClick"], Yp = { class: "bd-col-right" }, Xp = {
+}, Yp = { class: "bd-item-actions" }, Xp = ["title", "onClick"], Zp = ["title", "onClick"], Qp = ["title", "onClick"], $p = ["title", "onClick"], em = { class: "bd-col-right" }, tm = {
 	key: 0,
 	class: "bd-detail-empty"
-}, Zp = { class: "bd-detail-head" }, Qp = { class: "bd-detail-meta" }, $p = { class: "bd-loading-row" }, em = { class: "bd-variants-block" }, tm = { class: "bd-sec" }, nm = { class: "bd-variants-layout" }, rm = { class: "bd-variant-col" }, im = {
+}, nm = { class: "bd-detail-head" }, rm = { class: "bd-detail-meta" }, im = { class: "bd-loading-row" }, am = { class: "bd-variants-block" }, om = { class: "bd-sec" }, sm = { class: "bd-variants-layout" }, cm = { class: "bd-variant-col" }, lm = {
 	key: 0,
 	class: "bd-detail-empty small"
-}, am = {
+}, um = {
 	key: 1,
 	class: "bd-detail-empty small"
-}, om = {
+}, dm = {
 	key: 2,
 	class: "bd-variants"
-}, sm = ["onClick"], cm = ["src"], lm = {
+}, fm = ["onClick"], pm = ["src"], mm = {
 	key: 1,
 	class: "bd-variant-fallback"
-}, um = { class: "bd-variant-info" }, dm = { class: "bd-variant-mood" }, fm = { class: "bd-variant-tags" }, pm = { class: "bd-preview" }, mm = ["src"], hm = {
+}, hm = { class: "bd-variant-info" }, gm = { class: "bd-variant-mood" }, _m = { class: "bd-variant-tags" }, vm = { class: "bd-preview" }, ym = ["src"], bm = {
 	key: 1,
 	class: "bd-preview-hint"
-}, gm = { class: "bd-sec" }, _m = { class: "bd-loading-row" }, vm = {
+}, xm = { class: "bd-sec" }, Sm = { class: "bd-loading-row" }, Cm = {
 	key: 0,
 	class: "bd-detail-empty small"
-}, ym = {
+}, wm = {
 	key: 1,
 	class: "bd-cg-groups"
-}, bm = { class: "bd-cg-head" }, xm = { class: "bd-cg-name" }, Sm = { class: "bd-cg-count" }, Cm = { class: "bd-cg-grid" }, wm = ["src"], Tm = 12, Em = 6, Dm = /* @__PURE__ */ Us(/* @__PURE__ */ or({
+}, Tm = { class: "bd-cg-head" }, Em = { class: "bd-cg-name" }, Dm = { class: "bd-cg-count" }, Om = { class: "bd-cg-grid" }, km = ["src"], Am = 12, jm = 6, Mm = /* @__PURE__ */ Us(/* @__PURE__ */ or({
 	__name: "AvatarsPage",
 	props: { controller: {} },
 	setup(e) {
-		let t = e, n = Uf(), r = n.t.bind(n), i = t.controller.runtime, a = Q(() => i.state), o = Q(() => a.value.busy), s = Q(() => a.value.hasCharacterCard), c = Q(() => s.value ? a.value.mode : "global"), l = Q(() => c.value === "global" ? r("bubbleRender.scopeGlobal") : a.value.charName), u = Q(() => c.value === "global" ? "global" : String(a.value.charId ?? "global")), d = /* @__PURE__ */ U(""), f = Q(() => a.value.avatarNames), p = Q(() => {
+		let t = e, n = Jf(), r = n.t.bind(n), i = t.controller.runtime, a = Q(() => i.state), o = Q(() => a.value.busy), s = Q(() => a.value.hasCharacterCard), c = Q(() => s.value ? a.value.mode : "global"), l = Q(() => c.value === "global" ? r("bubbleRender.scopeGlobal") : a.value.charName), u = Q(() => c.value === "global" ? "global" : String(a.value.charId ?? "global")), d = /* @__PURE__ */ U(""), f = Q(() => a.value.avatarNames), p = Q(() => {
 			let e = d.value.trim().toLowerCase();
 			return e ? f.value.filter((t) => t.toLowerCase().includes(e)) : f.value;
 		}), m = /* @__PURE__ */ U(null), h = /* @__PURE__ */ U(null), g = /* @__PURE__ */ U(!1), _ = /* @__PURE__ */ U([]), v = /* @__PURE__ */ U({}), y = /* @__PURE__ */ new Set(), b = /* @__PURE__ */ U({}), x = /* @__PURE__ */ U(!1), S = /* @__PURE__ */ U(!1);
@@ -8146,7 +8156,7 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 		}, { immediate: !0 });
 		let D = Q(() => _.value.find((e) => e.moodId === h.value)?.previewUrl ?? null);
 		async function O(e) {
-			let t = e.filter((e) => !e.previewUrl), n = 0, r = Array.from({ length: Math.min(Em, t.length) }, async () => {
+			let t = e.filter((e) => !e.previewUrl), n = 0, r = Array.from({ length: Math.min(jm, t.length) }, async () => {
 				for (; n < t.length;) {
 					let e = t[n];
 					n += 1;
@@ -8194,7 +8204,7 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 			for (let t of j.value) e[t.group] = await i.listCgImages(t.group);
 			M.value = e;
 			let t = [];
-			for (let n of j.value) for (let r of e[n.group].slice(0, Tm)) t.push({
+			for (let n of j.value) for (let r of e[n.group].slice(0, Am)) t.push({
 				group: n.group,
 				index: r.index
 			});
@@ -8217,7 +8227,7 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 			});
 		}
 		function te(e) {
-			return (M.value[e] ?? []).slice(0, Tm);
+			return (M.value[e] ?? []).slice(0, Am);
 		}
 		let F = /* @__PURE__ */ U(null), ne = /* @__PURE__ */ U(null), I = /* @__PURE__ */ U(null), R = /* @__PURE__ */ U(!1), re = /* @__PURE__ */ U(null), ie = /* @__PURE__ */ U(null), ae = /* @__PURE__ */ U(null), oe = /* @__PURE__ */ U(null), se = /* @__PURE__ */ U(null), ce = /* @__PURE__ */ U("");
 		function le(e) {
@@ -8270,7 +8280,7 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 					return;
 				}
 				try {
-					let e = i.config.state.style, t = await Kf(n, {
+					let e = i.config.state.style, t = await Zf(n, {
 						enabled: !!e.style_imageCompressEnabled,
 						quality: Number(e.style_imageCompressQuality ?? .82)
 					});
@@ -8311,7 +8321,7 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 			}
 			F.value && URL.revokeObjectURL(F.value.previewUrl), F.value = {
 				file: e,
-				name: qf(e.name),
+				name: Qf(e.name),
 				previewUrl: URL.createObjectURL(e)
 			};
 		}
@@ -8336,7 +8346,7 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 				return;
 			}
 			try {
-				let n = i.config.state.style, r = await Kf(e.file, {
+				let n = i.config.state.style, r = await Zf(e.file, {
 					enabled: !!n.style_imageCompressEnabled,
 					quality: Number(n.style_imageCompressQuality ?? .82)
 				});
@@ -8364,13 +8374,13 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 			let t = i.config.state.moodGroups.find((t) => t.id === e);
 			return t ? t.label : e;
 		}
-		return (e, t) => (q(), J("div", { class: z(["bd-page", { "is-detail": !!m.value }]) }, [Y("div", Xf, [
-			Y("div", Zf, [
-				Y("span", Qf, B(W(r)("bubbleRender.currentChar")) + "：", 1),
-				Y("span", $f, B(a.value.charName), 1),
-				s.value ? Z("", !0) : (q(), J("span", ep, B(W(r)("bubbleRender.noCardTag")), 1))
+		return (e, t) => (q(), J("div", { class: z(["bd-page", { "is-detail": !!m.value }]) }, [Y("div", tp, [
+			Y("div", np, [
+				Y("span", rp, B(W(r)("bubbleRender.currentChar")) + "：", 1),
+				Y("span", ip, B(a.value.charName), 1),
+				s.value ? Z("", !0) : (q(), J("span", ap, B(W(r)("bubbleRender.noCardTag")), 1))
 			]),
-			Y("div", tp, [X(Yf, {
+			Y("div", op, [X(ep, {
 				loading: a.value.statsLoading,
 				"loading-text": W(r)("bubbleRender.loadingStats"),
 				"done-text": W(r)("common.loaded")
@@ -8383,44 +8393,44 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 				class: "bd-mini",
 				disabled: a.value.statsLoading,
 				onClick: t[0] ||= (e) => W(i).refreshScopeStats()
-			}, B(W(r)("bubbleRender.btnRefreshScopeStats")), 9, np)]),
-			Y("div", rp, [
-				Y("div", ip, [Y("span", ap, B(W(r)("bubbleRender.avatarCount")), 1), Y("span", op, B(a.value.avatarCount), 1)]),
-				Y("div", sp, [Y("span", cp, B(W(r)("bubbleRender.moodCount")), 1), Y("span", lp, B(a.value.moodCount), 1)]),
-				Y("div", up, [Y("span", dp, B(W(r)("bubbleRender.totalSize")), 1), Y("span", fp, B(De(a.value.totalBytes)), 1)])
+			}, B(W(r)("bubbleRender.btnRefreshScopeStats")), 9, sp)]),
+			Y("div", cp, [
+				Y("div", lp, [Y("span", up, B(W(r)("bubbleRender.avatarCount")), 1), Y("span", dp, B(a.value.avatarCount), 1)]),
+				Y("div", fp, [Y("span", pp, B(W(r)("bubbleRender.moodCount")), 1), Y("span", mp, B(a.value.moodCount), 1)]),
+				Y("div", hp, [Y("span", gp, B(W(r)("bubbleRender.totalSize")), 1), Y("span", _p, B(De(a.value.totalBytes)), 1)])
 			]),
-			Y("div", pp, [
-				Y("span", mp, B(W(r)("bubbleRender.mode")), 1),
-				Y("div", hp, [
-					Y("div", gp, [Y("button", {
+			Y("div", vp, [
+				Y("span", yp, B(W(r)("bubbleRender.mode")), 1),
+				Y("div", bp, [
+					Y("div", xp, [Y("button", {
 						type: "button",
 						class: z(["bd-seg", { active: c.value === "global" }]),
 						disabled: o.value,
 						onClick: t[1] ||= (e) => W(i).setMode("global")
-					}, B(W(r)("bubbleRender.modeGlobal")), 11, _p), Y("button", {
+					}, B(W(r)("bubbleRender.modeGlobal")), 11, Sp), Y("button", {
 						type: "button",
 						class: z(["bd-seg", { active: c.value === "character" }]),
 						disabled: o.value || !s.value,
 						title: s.value ? "" : W(r)("bubbleRender.noCardHint"),
 						onClick: t[2] ||= (e) => W(i).setMode("character")
-					}, B(W(r)("bubbleRender.modeCharacter")), 11, vp)]),
+					}, B(W(r)("bubbleRender.modeCharacter")), 11, Cp)]),
 					Y("button", {
 						type: "button",
 						class: "bd-mini",
 						disabled: o.value,
 						title: W(r)("bubbleRender.ioScope", { scope: l.value }),
 						onClick: t[3] ||= (e) => de.value?.click()
-					}, B(W(r)("bubbleRender.btnImport")), 9, yp),
+					}, B(W(r)("bubbleRender.btnImport")), 9, wp),
 					Y("button", {
 						type: "button",
 						class: "bd-mini",
 						disabled: o.value,
 						title: W(r)("bubbleRender.ioScope", { scope: l.value }),
 						onClick: t[4] ||= (e) => pe()
-					}, B(W(r)("bubbleRender.btnExport")), 9, bp)
+					}, B(W(r)("bubbleRender.btnExport")), 9, Tp)
 				]),
-				Y("p", xp, B(W(r)("bubbleRender.ioScope", { scope: l.value })), 1),
-				a.value.busy ? (q(), J("div", Sp, [X(Yf, {
+				Y("p", Ep, B(W(r)("bubbleRender.ioScope", { scope: l.value })), 1),
+				a.value.busy ? (q(), J("div", Dp, [X(ep, {
 					loading: a.value.busy,
 					"loading-text": W(r)("bubbleRender.transferring"),
 					"done-text": W(r)("common.loaded")
@@ -8428,8 +8438,8 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 					"loading",
 					"loading-text",
 					"done-text"
-				]), a.value.progress ? (q(), J("span", Cp, B(a.value.progress.done) + " / " + B(a.value.progress.total), 1)) : Z("", !0)])) : Z("", !0),
-				a.value.lastResult ? (q(), J("p", wp, B(a.value.lastResult), 1)) : Z("", !0),
+				]), a.value.progress ? (q(), J("span", Op, B(a.value.progress.done) + " / " + B(a.value.progress.total), 1)) : Z("", !0)])) : Z("", !0),
+				a.value.lastResult ? (q(), J("p", kp, B(a.value.lastResult), 1)) : Z("", !0),
 				Y("input", {
 					ref_key: "importInput",
 					ref: de,
@@ -8439,15 +8449,15 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 					onChange: fe
 				}, null, 544)
 			]),
-			F.value ? (q(), J("div", Dp, [Y("img", {
+			F.value ? (q(), J("div", Mp, [Y("img", {
 				class: "bd-pending-img",
 				src: F.value.previewUrl,
 				alt: ""
-			}, null, 8, Op), Y("div", kp, [Sn(Y("input", {
+			}, null, 8, Np), Y("div", Pp, [Sn(Y("input", {
 				"onUpdate:modelValue": t[8] ||= (e) => F.value.name = e,
 				class: "bd-input",
 				placeholder: W(r)("bubbleRender.namePlaceholder")
-			}, null, 8, Ap), [[os, F.value.name]]), Y("div", jp, [Y("button", {
+			}, null, 8, Fp), [[os, F.value.name]]), Y("div", Ip, [Y("button", {
 				type: "button",
 				class: "bd-btn ghost",
 				onClick: we
@@ -8456,7 +8466,7 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 				class: "bd-btn",
 				disabled: o.value,
 				onClick: Te
-			}, B(W(r)("bubbleRender.btnConfirmAdd")), 9, Mp)])])])) : (q(), J("div", {
+			}, B(W(r)("bubbleRender.btnConfirmAdd")), 9, Lp)])])])) : (q(), J("div", {
 				key: 0,
 				class: z(["bd-drop", { active: R.value }]),
 				onClick: t[5] ||= (e) => ne.value?.click(),
@@ -8465,10 +8475,10 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 				onDrop: ms(Ce, ["prevent"])
 			}, [
 				t[13] ||= Y("div", { class: "bd-drop-plus" }, "＋", -1),
-				Y("div", Tp, B(W(r)("bubbleRender.uploadHint")), 1),
-				Y("div", Ep, B(W(r)("bubbleRender.uploadSub")), 1)
+				Y("div", Ap, B(W(r)("bubbleRender.uploadHint")), 1),
+				Y("div", jp, B(W(r)("bubbleRender.uploadSub")), 1)
 			], 34)),
-			I.value ? (q(), J("p", Np, B(I.value), 1)) : Z("", !0),
+			I.value ? (q(), J("p", Rp, B(I.value), 1)) : Z("", !0),
 			Y("input", {
 				ref_key: "fileInput",
 				ref: ne,
@@ -8481,8 +8491,8 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 				"onUpdate:modelValue": t[9] ||= (e) => d.value = e,
 				class: "bd-input",
 				placeholder: W(r)("bubbleRender.searchPlaceholder")
-			}, null, 8, Pp), [[os, d.value]]),
-			Y("div", Fp, [X(Yf, {
+			}, null, 8, zp), [[os, d.value]]),
+			Y("div", Bp, [X(ep, {
 				loading: x.value,
 				"loading-text": W(r)("bubbleRender.loadingThumbs"),
 				"done-text": W(r)("common.loaded")
@@ -8506,17 +8516,17 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 				class: "bd-hidden-input",
 				onChange: _e
 			}, null, 544),
-			p.value.length === 0 ? (q(), J("div", Ip, B(W(r)("bubbleRender.emptyAvatars")), 1)) : (q(), J("div", Lp, [(q(!0), J(K, null, G(p.value, (e) => (q(), J("button", {
+			p.value.length === 0 ? (q(), J("div", Vp, B(W(r)("bubbleRender.emptyAvatars")), 1)) : (q(), J("div", Hp, [(q(!0), J(K, null, G(p.value, (e) => (q(), J("button", {
 				key: e,
 				type: "button",
 				class: z(["bd-item", { active: m.value === e }]),
 				onClick: (t) => k(e)
-			}, [Y("span", zp, [v.value[e] ? (q(), J("img", {
+			}, [Y("span", Wp, [v.value[e] ? (q(), J("img", {
 				key: 0,
 				class: "bd-thumb",
 				src: v.value[e],
 				alt: ""
-			}, null, 8, Bp)) : (q(), J("span", Vp, B(e.slice(0, 1)), 1)), se.value === e ? Sn((q(), J("input", {
+			}, null, 8, Gp)) : (q(), J("span", Kp, B(e.slice(0, 1)), 1)), se.value === e ? Sn((q(), J("input", {
 				key: 2,
 				class: "bd-rename",
 				"onUpdate:modelValue": t[10] ||= (e) => ce.value = e,
@@ -8525,7 +8535,7 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 				onClick: t[11] ||= ms(() => {}, ["stop"]),
 				onKeydown: [gs(ms((t) => be(e), ["stop"]), ["enter"]), t[12] ||= gs(ms((e) => ye(), ["stop"]), ["esc"])],
 				onBlur: (t) => be(e)
-			}, null, 40, Hp)), [[os, ce.value]]) : (q(), J("span", Up, B(e), 1))]), Y("span", Wp, [
+			}, null, 40, qp)), [[os, ce.value]]) : (q(), J("span", Jp, B(e), 1))]), Y("span", Yp, [
 				Y("span", {
 					class: z(["bd-icon", { on: !!le(e) }]),
 					style: L(le(e) ? { color: le(e) } : void 0),
@@ -8544,7 +8554,7 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 					"fill-opacity": "0.45",
 					stroke: "currentColor",
 					"stroke-width": "1.6"
-				})], -1)]], 14, Gp),
+				})], -1)]], 14, Xp),
 				Y("span", {
 					class: "bd-icon",
 					title: W(r)("bubbleRender.btnReplace"),
@@ -8570,7 +8580,7 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 					"stroke-width": "1.5",
 					"stroke-linecap": "round",
 					"stroke-linejoin": "round"
-				})], -1)]], 8, Kp),
+				})], -1)]], 8, Zp),
 				Y("span", {
 					class: "bd-icon",
 					title: W(r)("bubbleRender.btnRename"),
@@ -8586,23 +8596,23 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 					stroke: "currentColor",
 					"stroke-width": "1.5",
 					"stroke-linejoin": "round"
-				})], -1)]], 8, qp),
+				})], -1)]], 8, Qp),
 				Y("span", {
 					class: z(["bd-item-del", { busy: a.value.deletingName === e }]),
 					title: a.value.deletingName === e ? W(r)("bubbleRender.deleting") : W(r)("bubbleRender.btnDelete"),
 					onClick: ms((t) => Ee(e), ["stop"])
-				}, B(a.value.deletingName === e ? "…" : "×"), 11, Jp)
-			])], 10, Rp))), 128))]))
-		]), Y("div", Yp, [m.value ? (q(), J(K, { key: 1 }, [
-			Y("section", Zp, [
+				}, B(a.value.deletingName === e ? "…" : "×"), 11, $p)
+			])], 10, Up))), 128))]))
+		]), Y("div", em, [m.value ? (q(), J(K, { key: 1 }, [
+			Y("section", nm, [
 				Y("button", {
 					type: "button",
 					class: "bd-back",
 					onClick: A
 				}, [t[17] ||= Y("span", { "aria-hidden": "true" }, "←", -1), da(" " + B(W(r)("bubbleRender.backToList")), 1)]),
 				Y("h3", null, B(m.value), 1),
-				Y("span", Qp, [g.value ? (q(), J(K, { key: 0 }, [da(B(W(r)("bubbleRender.loading")), 1)], 64)) : (q(), J(K, { key: 1 }, [da(B(W(r)("bubbleRender.variantCount", { n: _.value.length })), 1)], 64))]),
-				Y("div", $p, [X(Yf, {
+				Y("span", rm, [g.value ? (q(), J(K, { key: 0 }, [da(B(W(r)("bubbleRender.loading")), 1)], 64)) : (q(), J(K, { key: 1 }, [da(B(W(r)("bubbleRender.variantCount", { n: _.value.length })), 1)], 64))]),
+				Y("div", im, [X(ep, {
 					loading: g.value,
 					"loading-text": W(r)("bubbleRender.loadingVariants"),
 					"done-text": W(r)("common.loaded")
@@ -8612,7 +8622,7 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 					"done-text"
 				])])
 			]),
-			Y("section", em, [Y("h4", tm, B(W(r)("bubbleRender.secVariants")), 1), Y("div", nm, [Y("div", rm, [g.value ? (q(), J("div", im, B(W(r)("bubbleRender.loading")), 1)) : _.value.length === 0 ? (q(), J("div", am, B(W(r)("bubbleRender.noVariants")), 1)) : (q(), J("div", om, [(q(!0), J(K, null, G(_.value, (e) => (q(), J("button", {
+			Y("section", am, [Y("h4", om, B(W(r)("bubbleRender.secVariants")), 1), Y("div", sm, [Y("div", cm, [g.value ? (q(), J("div", lm, B(W(r)("bubbleRender.loading")), 1)) : _.value.length === 0 ? (q(), J("div", um, B(W(r)("bubbleRender.noVariants")), 1)) : (q(), J("div", dm, [(q(!0), J(K, null, G(_.value, (e) => (q(), J("button", {
 				key: e.moodId + e.outfit + e.act,
 				type: "button",
 				class: z(["bd-variant", { active: h.value === e.moodId }]),
@@ -8623,19 +8633,19 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 				src: e.previewUrl,
 				alt: "",
 				loading: "lazy"
-			}, null, 8, cm)) : (q(), J("span", lm, B(Oe(e.mood).slice(0, 1)), 1)), Y("div", um, [Y("span", dm, B(Oe(e.mood)), 1), Y("span", fm, B(e.outfit) + " · " + B(e.act), 1)])], 10, sm))), 128))]))]), Y("div", pm, [D.value ? (q(), J("img", {
+			}, null, 8, pm)) : (q(), J("span", mm, B(Oe(e.mood).slice(0, 1)), 1)), Y("div", hm, [Y("span", gm, B(Oe(e.mood)), 1), Y("span", _m, B(e.outfit) + " · " + B(e.act), 1)])], 10, fm))), 128))]))]), Y("div", vm, [D.value ? (q(), J("img", {
 				key: 0,
 				class: "bd-preview-img",
 				src: D.value,
 				alt: ""
-			}, null, 8, mm)) : (q(), J("div", hm, B(W(r)("bubbleRender.previewHint")), 1))])])]),
+			}, null, 8, ym)) : (q(), J("div", bm, B(W(r)("bubbleRender.previewHint")), 1))])])]),
 			Y("section", null, [
-				Y("h4", gm, [da(B(W(r)("bubbleRender.secCg")) + " ", 1), Y("button", {
+				Y("h4", xm, [da(B(W(r)("bubbleRender.secCg")) + " ", 1), Y("button", {
 					type: "button",
 					class: "bd-mini",
 					onClick: N
 				}, B(W(r)("bubbleRender.btnLoadCg")), 1)]),
-				Y("div", _m, [X(Yf, {
+				Y("div", Sm, [X(ep, {
 					loading: S.value,
 					"loading-text": W(r)("bubbleRender.loadingCg"),
 					"done-text": W(r)("common.loaded")
@@ -8644,35 +8654,35 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 					"loading-text",
 					"done-text"
 				])]),
-				!S.value && j.value.length === 0 ? (q(), J("div", vm, B(W(r)("bubbleRender.noCg")), 1)) : (q(), J("div", ym, [(q(!0), J(K, null, G(j.value, (e) => (q(), J("div", {
+				!S.value && j.value.length === 0 ? (q(), J("div", Cm, B(W(r)("bubbleRender.noCg")), 1)) : (q(), J("div", wm, [(q(!0), J(K, null, G(j.value, (e) => (q(), J("div", {
 					key: e.group,
 					class: "bd-cg-group"
-				}, [Y("div", bm, [Y("span", xm, B(e.group), 1), Y("span", Sm, B((M.value[e.group] || []).length), 1)]), Y("div", Cm, [(q(!0), J(K, null, G(te(e.group), (t) => (q(), J("img", {
+				}, [Y("div", Tm, [Y("span", Em, B(e.group), 1), Y("span", Dm, B((M.value[e.group] || []).length), 1)]), Y("div", Om, [(q(!0), J(K, null, G(te(e.group), (t) => (q(), J("img", {
 					key: t.index,
 					class: "bd-cg-img",
 					src: b.value[e.group + "__" + t.index] || "",
 					alt: ""
-				}, null, 8, wm))), 128))])]))), 128))]))
+				}, null, 8, km))), 128))])]))), 128))]))
 			])
-		], 64)) : (q(), J("div", Xp, B(W(r)("bubbleRender.detailEmpty")), 1))])], 2));
+		], 64)) : (q(), J("div", tm, B(W(r)("bubbleRender.detailEmpty")), 1))])], 2));
 	}
-}), [["__scopeId", "data-v-00a5c258"]]), Om = { class: "bd-tab" }, km = { class: "bd-loading-row" }, Am = { class: "bd-sec" }, jm = { class: "bd-slider-head" }, Mm = { class: "bd-slider-val" }, Nm = [
+}), [["__scopeId", "data-v-00a5c258"]]), Nm = { class: "bd-tab" }, Pm = { class: "bd-loading-row" }, Fm = { class: "bd-sec" }, Im = { class: "bd-slider-head" }, Lm = { class: "bd-slider-val" }, Rm = [
 	"min",
 	"max",
 	"step",
 	"value",
 	"onInput"
-], Pm = { class: "bd-sec" }, Fm = { class: "bd-radio" }, Im = ["disabled"], Lm = { class: "bd-radio" }, Rm = { class: "bd-slider" }, zm = { class: "bd-slider-head" }, Bm = { class: "bd-slider-val" }, Vm = ["value"], Hm = { class: "bd-inline" }, Um = { class: "bd-sec" }, Wm = { class: "bd-slider-head" }, Gm = { class: "bd-slider-val" }, Km = [
+], zm = { class: "bd-sec" }, Bm = { class: "bd-radio" }, Vm = ["disabled"], Hm = { class: "bd-radio" }, Um = { class: "bd-slider" }, Wm = { class: "bd-slider-head" }, Gm = { class: "bd-slider-val" }, Km = ["value"], qm = { class: "bd-inline" }, Jm = { class: "bd-sec" }, Ym = { class: "bd-slider-head" }, Xm = { class: "bd-slider-val" }, Zm = [
 	"min",
 	"max",
 	"step",
 	"value",
 	"onInput"
-], qm = { class: "bd-field-row" }, Jm = { class: "bd-field-label" }, Ym = { class: "bd-segmented" }, Xm = ["onClick"], Zm = { class: "bd-sec" }, Qm = ["value", "onChange"], $m = ["value"], eh = { class: "bd-sec" }, th = { class: "bd-radio" }, nh = { class: "bd-slider" }, rh = { class: "bd-slider-head" }, ih = { class: "bd-slider-val" }, ah = ["value"], oh = { class: "bd-sec" }, sh = { class: "bd-segmented" }, ch = { class: "bd-actions" }, lh = /* @__PURE__ */ Us(/* @__PURE__ */ or({
+], Qm = { class: "bd-field-row" }, $m = { class: "bd-field-label" }, eh = { class: "bd-segmented" }, th = ["onClick"], nh = { class: "bd-sec" }, rh = ["value", "onChange"], ih = ["value"], ah = { class: "bd-sec" }, oh = { class: "bd-radio" }, sh = { class: "bd-slider" }, ch = { class: "bd-slider-head" }, lh = { class: "bd-slider-val" }, uh = ["value"], dh = { class: "bd-sec" }, fh = { class: "bd-segmented" }, ph = { class: "bd-actions" }, mh = /* @__PURE__ */ Us(/* @__PURE__ */ or({
 	__name: "StylePage",
 	props: { controller: {} },
 	setup(e) {
-		let t = e, n = Uf(), r = n.t.bind(n);
+		let t = e, n = Jf(), r = n.t.bind(n);
 		function i(e) {
 			return r(e);
 		}
@@ -8851,8 +8861,8 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 		async function b() {
 			await t.controller.runtime.config.resetStyleAll();
 		}
-		return (e, n) => (q(), J("div", Om, [
-			Y("div", km, [X(Yf, {
+		return (e, n) => (q(), J("div", Nm, [
+			Y("div", Pm, [X(ep, {
 				loading: o.value,
 				"loading-text": W(r)("bubbleRender.loadingConfig"),
 				"done-text": W(r)("common.loaded")
@@ -8861,20 +8871,20 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 				"loading-text",
 				"done-text"
 			])]),
-			Y("section", null, [Y("h4", Am, B(W(r)("bubbleRender.secText")), 1), (q(!0), J(K, null, G(s.slice(0, 6), (e) => (q(), J("div", {
+			Y("section", null, [Y("h4", Fm, B(W(r)("bubbleRender.secText")), 1), (q(!0), J(K, null, G(s.slice(0, 6), (e) => (q(), J("div", {
 				key: e.key,
 				class: "bd-slider"
-			}, [Y("div", jm, [Y("span", null, B(i("bubbleRender.style_" + e.label)), 1), Y("span", Mm, B(v(e.key)) + B(e.unit), 1)]), Y("input", {
+			}, [Y("div", Im, [Y("span", null, B(i("bubbleRender.style_" + e.label)), 1), Y("span", Lm, B(v(e.key)) + B(e.unit), 1)]), Y("input", {
 				type: "range",
 				min: e.min,
 				max: e.max,
 				step: e.step,
 				value: v(e.key),
 				onInput: (t) => y(e.key, t)
-			}, null, 40, Nm)]))), 128))]),
+			}, null, 40, Rm)]))), 128))]),
 			Y("section", null, [
-				Y("h4", Pm, B(W(r)("bubbleRender.secColor")), 1),
-				Y("label", Fm, [
+				Y("h4", zm, B(W(r)("bubbleRender.secColor")), 1),
+				Y("label", Bm, [
 					Sn(Y("input", {
 						type: "radio",
 						value: "global",
@@ -8886,41 +8896,41 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 						class: "bd-color",
 						"onUpdate:modelValue": n[1] ||= (e) => l.value = e,
 						disabled: c.value !== "global"
-					}, null, 8, Im), [[os, l.value]])
+					}, null, 8, Vm), [[os, l.value]])
 				]),
-				Y("label", Lm, [Sn(Y("input", {
+				Y("label", Hm, [Sn(Y("input", {
 					type: "radio",
 					value: "character",
 					"onUpdate:modelValue": n[2] ||= (e) => c.value = e
 				}, null, 512), [[ls, c.value]]), Y("span", null, B(W(r)("bubbleRender.colorCharacter")), 1)]),
-				Y("div", Rm, [Y("div", zm, [Y("span", null, B(W(r)("bubbleRender.style_narrationBgOpacity")), 1), Y("span", Bm, B(v("style_narrationBgOpacity")), 1)]), Y("input", {
+				Y("div", Um, [Y("div", Wm, [Y("span", null, B(W(r)("bubbleRender.style_narrationBgOpacity")), 1), Y("span", Gm, B(v("style_narrationBgOpacity")), 1)]), Y("input", {
 					type: "range",
 					min: "0",
 					max: "1",
 					step: "0.01",
 					value: v("style_narrationBgOpacity"),
 					onInput: n[3] ||= (e) => y("style_narrationBgOpacity", e)
-				}, null, 40, Vm)]),
-				Y("label", Hm, [Y("span", null, B(W(r)("bubbleRender.style_narrationBgColor")), 1), Sn(Y("input", {
+				}, null, 40, Km)]),
+				Y("label", qm, [Y("span", null, B(W(r)("bubbleRender.style_narrationBgColor")), 1), Sn(Y("input", {
 					type: "color",
 					class: "bd-color",
 					"onUpdate:modelValue": n[4] ||= (e) => u.value = e
 				}, null, 512), [[os, u.value]])])
 			]),
 			Y("section", null, [
-				Y("h4", Um, B(W(r)("bubbleRender.secLayout")), 1),
+				Y("h4", Jm, B(W(r)("bubbleRender.secLayout")), 1),
 				(q(!0), J(K, null, G(s.slice(7, 15), (e) => (q(), J("div", {
 					class: "bd-slider",
 					key: e.key
-				}, [Y("div", Wm, [Y("span", null, B(i("bubbleRender.style_" + e.label)), 1), Y("span", Gm, B(v(e.key)) + B(e.unit), 1)]), Y("input", {
+				}, [Y("div", Ym, [Y("span", null, B(i("bubbleRender.style_" + e.label)), 1), Y("span", Xm, B(v(e.key)) + B(e.unit), 1)]), Y("input", {
 					type: "range",
 					min: e.min,
 					max: e.max,
 					step: e.step,
 					value: v(e.key),
 					onInput: (t) => y(e.key, t)
-				}, null, 40, Km)]))), 128)),
-				Y("div", qm, [Y("span", Jm, B(W(r)("bubbleRender.style_avatarShape")), 1), Y("div", Ym, [(q(), J(K, null, G([
+				}, null, 40, Zm)]))), 128)),
+				Y("div", Qm, [Y("span", $m, B(W(r)("bubbleRender.style_avatarShape")), 1), Y("div", eh, [(q(), J(K, null, G([
 					"circle",
 					"rounded",
 					"square"
@@ -8929,9 +8939,9 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 					type: "button",
 					class: z(["bd-seg", { active: d.value === e }]),
 					onClick: (t) => d.value = e
-				}, B(i("bubbleRender.shape_" + e)), 11, Xm)), 64))])])
+				}, B(i("bubbleRender.shape_" + e)), 11, th)), 64))])])
 			]),
-			Y("section", null, [Y("h4", Zm, B(W(r)("bubbleRender.secFont")), 1), (q(!0), J(K, null, G([
+			Y("section", null, [Y("h4", nh, B(W(r)("bubbleRender.secFont")), 1), (q(!0), J(K, null, G([
 				["narrationFont", h.value],
 				["dialogueFont", g.value],
 				["nameFont", _.value]
@@ -8945,23 +8955,23 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 			}, [(q(), J(K, null, G(m, (e) => Y("option", {
 				key: e,
 				value: e
-			}, B(e || W(r)("bubbleRender.fontDefault")), 9, $m)), 64))], 40, Qm)]))), 128))]),
+			}, B(e || W(r)("bubbleRender.fontDefault")), 9, ih)), 64))], 40, rh)]))), 128))]),
 			Y("section", null, [
-				Y("h4", eh, B(W(r)("bubbleRender.secStorage")), 1),
-				Y("label", th, [Sn(Y("input", {
+				Y("h4", ah, B(W(r)("bubbleRender.secStorage")), 1),
+				Y("label", oh, [Sn(Y("input", {
 					type: "checkbox",
 					"onUpdate:modelValue": n[5] ||= (e) => p.value = e
 				}, null, 512), [[ss, p.value]]), Y("span", null, B(W(r)("bubbleRender.compressEnabled")), 1)]),
-				Y("div", nh, [Y("div", rh, [Y("span", null, B(W(r)("bubbleRender.style_compressQuality")), 1), Y("span", ih, B(v("style_imageCompressQuality")), 1)]), Y("input", {
+				Y("div", sh, [Y("div", ch, [Y("span", null, B(W(r)("bubbleRender.style_compressQuality")), 1), Y("span", lh, B(v("style_imageCompressQuality")), 1)]), Y("input", {
 					type: "range",
 					min: "0.3",
 					max: "1",
 					step: "0.02",
 					value: v("style_imageCompressQuality"),
 					onInput: n[6] ||= (e) => y("style_imageCompressQuality", e)
-				}, null, 40, ah)])
+				}, null, 40, uh)])
 			]),
-			Y("section", null, [Y("h4", oh, B(W(r)("bubbleRender.secMarkdown")), 1), Y("div", sh, [Y("button", {
+			Y("section", null, [Y("h4", dh, B(W(r)("bubbleRender.secMarkdown")), 1), Y("div", fh, [Y("button", {
 				type: "button",
 				class: z(["bd-seg", { active: f.value === "basic" }]),
 				onClick: n[7] ||= (e) => f.value = "basic"
@@ -8970,22 +8980,22 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 				class: z(["bd-seg", { active: f.value === "full" }]),
 				onClick: n[8] ||= (e) => f.value = "full"
 			}, B(W(r)("bubbleRender.mdFull")), 3)])]),
-			Y("div", ch, [Y("button", {
+			Y("div", ph, [Y("button", {
 				type: "button",
 				class: "bd-btn",
 				onClick: b
 			}, B(W(r)("bubbleRender.btnResetStyle")), 1)])
 		]));
 	}
-}), [["__scopeId", "data-v-b1577175"]]), uh = { class: "bd-tab" }, dh = { class: "bd-loading-row" }, fh = { class: "bd-sec" }, ph = { class: "bd-warn" }, mh = { class: "bd-actions" }, hh = ["disabled"], gh = { class: "bd-sec" }, _h = { class: "bd-group-head" }, vh = { class: "bd-group-label" }, yh = { class: "bd-group-count" }, bh = ["value", "onInput"], xh = { class: "bd-words" }, Sh = ["onClick"], Ch = { class: "bd-add-row" }, wh = [
+}), [["__scopeId", "data-v-b1577175"]]), hh = { class: "bd-tab" }, gh = { class: "bd-loading-row" }, _h = { class: "bd-sec" }, vh = { class: "bd-warn" }, yh = { class: "bd-actions" }, bh = ["disabled"], xh = { class: "bd-sec" }, Sh = { class: "bd-group-head" }, Ch = { class: "bd-group-label" }, wh = { class: "bd-group-count" }, Th = ["value", "onInput"], Eh = { class: "bd-words" }, Dh = ["onClick"], Oh = { class: "bd-add-row" }, kh = [
 	"onUpdate:modelValue",
 	"placeholder",
 	"onKeyup"
-], Th = ["onClick"], Eh = { class: "bd-actions" }, Dh = /* @__PURE__ */ Us(/* @__PURE__ */ or({
+], Ah = ["onClick"], jh = { class: "bd-actions" }, Mh = /* @__PURE__ */ Us(/* @__PURE__ */ or({
 	__name: "MoodPage",
 	props: { controller: {} },
 	setup(e) {
-		let t = e, n = Uf(), r = n.t.bind(n), i = Q(() => t.controller.runtime.config.state), a = Q(() => !i.value.loaded), o = /* @__PURE__ */ U(""), s = Q(() => o.value !== "" && o.value !== i.value.formatRule);
+		let t = e, n = Jf(), r = n.t.bind(n), i = Q(() => t.controller.runtime.config.state), a = Q(() => !i.value.loaded), o = /* @__PURE__ */ U(""), s = Q(() => o.value !== "" && o.value !== i.value.formatRule);
 		function c() {
 			o.value = i.value.formatRule;
 		}
@@ -9013,8 +9023,8 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 		async function h() {
 			await t.controller.runtime.config.resetMoodGroups();
 		}
-		return (e, t) => (q(), J("div", uh, [
-			Y("div", dh, [X(Yf, {
+		return (e, t) => (q(), J("div", hh, [
+			Y("div", gh, [X(ep, {
 				loading: a.value,
 				"loading-text": W(r)("bubbleRender.loadingConfig"),
 				"done-text": W(r)("common.loaded")
@@ -9024,14 +9034,14 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 				"done-text"
 			])]),
 			Y("section", null, [
-				Y("h4", fh, B(W(r)("bubbleRender.secFormatRule")), 1),
-				Y("div", ph, "⚠ " + B(W(r)("bubbleRender.formatRuleWarn")), 1),
+				Y("h4", _h, B(W(r)("bubbleRender.secFormatRule")), 1),
+				Y("div", vh, "⚠ " + B(W(r)("bubbleRender.formatRuleWarn")), 1),
 				Sn(Y("textarea", {
 					"onUpdate:modelValue": t[0] ||= (e) => o.value = e,
 					class: "bd-textarea",
 					spellcheck: "false"
 				}, null, 512), [[os, o.value]]),
-				Y("div", mh, [Y("button", {
+				Y("div", yh, [Y("button", {
 					type: "button",
 					class: "bd-btn ghost",
 					onClick: d
@@ -9040,48 +9050,48 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 					class: "bd-btn",
 					disabled: !s.value,
 					onClick: u
-				}, B(W(r)("bubbleRender.btnSave")), 9, hh)])
+				}, B(W(r)("bubbleRender.btnSave")), 9, bh)])
 			]),
 			Y("section", null, [
-				Y("h4", gh, B(W(r)("bubbleRender.secMoodWords")), 1),
+				Y("h4", xh, B(W(r)("bubbleRender.secMoodWords")), 1),
 				(q(!0), J(K, null, G(i.value.moodGroups, (e) => (q(), J("div", {
 					key: e.id,
 					class: "bd-group"
 				}, [
-					Y("div", _h, [
+					Y("div", Sh, [
 						Y("span", {
 							class: "bd-group-dot",
 							style: L({ background: e.color })
 						}, null, 4),
-						Y("span", vh, B(e.label), 1),
-						Y("span", yh, B(e.words.length), 1),
+						Y("span", Ch, B(e.label), 1),
+						Y("span", wh, B(e.words.length), 1),
 						Y("input", {
 							type: "color",
 							class: "bd-color",
 							value: e.color,
 							onInput: (t) => m(e.id, t)
-						}, null, 40, bh)
+						}, null, 40, Th)
 					]),
-					Y("div", xh, [(q(!0), J(K, null, G(e.words, (t) => (q(), J("span", {
+					Y("div", Eh, [(q(!0), J(K, null, G(e.words, (t) => (q(), J("span", {
 						key: t,
 						class: "bd-word"
 					}, [da(B(t) + " ", 1), Y("button", {
 						type: "button",
 						class: "bd-word-del",
 						onClick: (n) => p(e.id, t)
-					}, "×", 8, Sh)]))), 128))]),
-					Y("div", Ch, [Sn(Y("input", {
+					}, "×", 8, Dh)]))), 128))]),
+					Y("div", Oh, [Sn(Y("input", {
 						class: "bd-input",
 						"onUpdate:modelValue": (t) => l.value[e.id] = t,
 						placeholder: W(r)("bubbleRender.addWordPlaceholder"),
 						onKeyup: gs((t) => f(e.id), ["enter"])
-					}, null, 40, wh), [[os, l.value[e.id]]]), Y("button", {
+					}, null, 40, kh), [[os, l.value[e.id]]]), Y("button", {
 						type: "button",
 						class: "bd-btn small",
 						onClick: (t) => f(e.id)
-					}, "＋", 8, Th)])
+					}, "＋", 8, Ah)])
 				]))), 128)),
-				Y("div", Eh, [Y("button", {
+				Y("div", jh, [Y("button", {
 					type: "button",
 					class: "bd-btn ghost",
 					onClick: h
@@ -9089,39 +9099,39 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 			])
 		]));
 	}
-}), [["__scopeId", "data-v-0fbf8b60"]]), Oh = { class: "bd-page" }, kh = { class: "bd-panels" }, Ah = {
+}), [["__scopeId", "data-v-0fbf8b60"]]), Nh = { class: "bd-page" }, Ph = { class: "bd-panels" }, Fh = {
 	key: 0,
 	class: "bd-section"
-}, jh = { class: "bd-sec" }, Mh = ["disabled"], Nh = { class: "bd-loading-row" }, Ph = {
+}, Ih = { class: "bd-sec" }, Lh = ["disabled"], Rh = { class: "bd-loading-row" }, zh = {
 	key: 0,
 	class: "bd-detail-empty small"
-}, Fh = {
+}, Bh = {
 	key: 1,
 	class: "bd-table"
-}, Ih = { class: "bd-tr bd-th" }, Lh = { class: "bd-th-actions" }, Rh = ["disabled", "title"], zh = ["disabled"], Bh = ["title"], Vh = ["data-label"], Hh = ["data-label"], Uh = ["data-label"], Wh = { class: "bd-actions" }, Gh = ["disabled", "onClick"], Kh = [
+}, Vh = { class: "bd-tr bd-th" }, Hh = { class: "bd-th-actions" }, Uh = ["disabled", "title"], Wh = ["disabled"], Gh = ["title"], Kh = ["data-label"], qh = ["data-label"], Jh = ["data-label"], Yh = { class: "bd-actions" }, Xh = ["disabled", "onClick"], Zh = [
 	"disabled",
 	"title",
 	"onClick"
-], qh = ["disabled", "onClick"], Jh = { class: "bd-note" }, Yh = {
+], Qh = ["disabled", "onClick"], $h = { class: "bd-note" }, eg = {
 	key: 2,
 	class: "bd-result"
-}, Xh = { class: "bd-section" }, Zh = { class: "bd-sec" }, Qh = { class: "bd-hint" }, $h = { class: "bd-loading-row" }, eg = {
+}, tg = { class: "bd-section" }, ng = { class: "bd-sec" }, rg = { class: "bd-hint" }, ig = { class: "bd-loading-row" }, ag = {
 	key: 0,
 	class: "bd-result"
-}, tg = {
+}, og = {
 	key: 1,
 	class: "bd-hint"
-}, ng = { class: "bd-stats-row" }, rg = { class: "bd-stat" }, ig = { class: "bd-stat-label" }, ag = { class: "bd-stat-value" }, og = { class: "bd-stat" }, sg = { class: "bd-stat-label" }, cg = { class: "bd-stat-value" }, lg = { class: "bd-stat" }, ug = { class: "bd-stat-label" }, dg = { class: "bd-stat-value" }, fg = { class: "bd-stat" }, pg = { class: "bd-stat-label" }, mg = { class: "bd-stat-value" }, hg = { class: "bd-actions-row" }, gg = ["disabled"], _g = { class: "bd-section" }, vg = { class: "bd-sec" }, yg = { class: "bd-hint" }, bg = {
+}, sg = { class: "bd-stats-row" }, cg = { class: "bd-stat" }, lg = { class: "bd-stat-label" }, ug = { class: "bd-stat-value" }, dg = { class: "bd-stat" }, fg = { class: "bd-stat-label" }, pg = { class: "bd-stat-value" }, mg = { class: "bd-stat" }, hg = { class: "bd-stat-label" }, gg = { class: "bd-stat-value" }, _g = { class: "bd-stat" }, vg = { class: "bd-stat-label" }, yg = { class: "bd-stat-value" }, bg = { class: "bd-actions-row" }, xg = ["disabled"], Sg = { class: "bd-section" }, Cg = { class: "bd-sec" }, wg = { class: "bd-hint" }, Tg = {
 	key: 0,
 	class: "bd-detail-empty small"
-}, xg = {
+}, Eg = {
 	key: 1,
 	class: "bd-table"
-}, Sg = { class: "bd-tr bd-th cols-6" }, Cg = ["title"], wg = ["data-label"], Tg = ["data-label"], Eg = ["data-label"], Dg = ["data-label"], Og = { class: "bd-actions" }, kg = ["disabled", "onClick"], Ag = ["disabled", "onClick"], jg = { class: "bd-section" }, Mg = { class: "bd-sec" }, Ng = { class: "bd-stats-row" }, Pg = { class: "bd-stat" }, Fg = { class: "bd-stat-label" }, Ig = { class: "bd-stat-value" }, Lg = { class: "bd-stat" }, Rg = { class: "bd-stat-label" }, zg = { class: "bd-stat-value" }, Bg = { class: "bd-stat" }, Vg = { class: "bd-stat-label" }, Hg = { class: "bd-stat-value" }, Ug = /* @__PURE__ */ Us(/* @__PURE__ */ or({
+}, Dg = { class: "bd-tr bd-th cols-6" }, Og = ["title"], kg = ["data-label"], Ag = ["data-label"], jg = ["data-label"], Mg = ["data-label"], Ng = { class: "bd-actions" }, Pg = ["disabled", "onClick"], Fg = ["disabled", "onClick"], Ig = { class: "bd-section" }, Lg = { class: "bd-sec" }, Rg = { class: "bd-stats-row" }, zg = { class: "bd-stat" }, Bg = { class: "bd-stat-label" }, Vg = { class: "bd-stat-value" }, Hg = { class: "bd-stat" }, Ug = { class: "bd-stat-label" }, Wg = { class: "bd-stat-value" }, Gg = { class: "bd-stat" }, Kg = { class: "bd-stat-label" }, qg = { class: "bd-stat-value" }, Jg = /* @__PURE__ */ Us(/* @__PURE__ */ or({
 	__name: "StoragePage",
 	props: { controller: {} },
 	setup(e) {
-		let t = e, n = Uf(), r = n.t.bind(n), i = t.controller.runtime, a = Q(() => i.state), o = /* @__PURE__ */ U("native"), s = /* @__PURE__ */ U([]), c = /* @__PURE__ */ U(!1), l = /* @__PURE__ */ U(null), u = /* @__PURE__ */ U(null), d = /* @__PURE__ */ U(!1), f = Q(() => a.value.nativeAvailable);
+		let t = e, n = Jf(), r = n.t.bind(n), i = t.controller.runtime, a = Q(() => i.state), o = /* @__PURE__ */ U("native"), s = /* @__PURE__ */ U([]), c = /* @__PURE__ */ U(!1), l = /* @__PURE__ */ U(null), u = /* @__PURE__ */ U(null), d = /* @__PURE__ */ U(!1), f = Q(() => a.value.nativeAvailable);
 		async function p() {
 			c.value = !0;
 			try {
@@ -9196,7 +9206,7 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 		}
 		return xr(() => {
 			p();
-		}), (e, t) => (q(), J("div", Oh, [Y("nav", kh, [Y("button", {
+		}), (e, t) => (q(), J("div", Nh, [Y("nav", Ph, [Y("button", {
 			type: "button",
 			class: z(["bd-panel-btn", { active: o.value === "native" }]),
 			onClick: t[0] ||= (e) => o.value = "native"
@@ -9204,14 +9214,14 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 			type: "button",
 			class: z(["bd-panel-btn", { active: o.value === "legacy" }]),
 			onClick: t[1] ||= (e) => o.value = "legacy"
-		}, B(W(r)("bubbleRender.panelLegacy")), 3)]), o.value === "legacy" ? (q(), J("section", Ah, [
-			Y("h4", jh, [da(B(W(r)("bubbleRender.dbScopesTitle")) + " ", 1), Y("button", {
+		}, B(W(r)("bubbleRender.panelLegacy")), 3)]), o.value === "legacy" ? (q(), J("section", Fh, [
+			Y("h4", Ih, [da(B(W(r)("bubbleRender.dbScopesTitle")) + " ", 1), Y("button", {
 				type: "button",
 				class: "bd-mini",
 				disabled: c.value,
 				onClick: p
-			}, B(W(r)("bubbleRender.btnRescan")), 9, Mh)]),
-			Y("div", Nh, [X(Yf, {
+			}, B(W(r)("bubbleRender.btnRescan")), 9, Lh)]),
+			Y("div", Rh, [X(ep, {
 				loading: c.value,
 				"loading-text": W(r)("bubbleRender.scanDb"),
 				"done-text": W(r)("common.loaded")
@@ -9220,17 +9230,17 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 				"loading-text",
 				"done-text"
 			])]),
-			!c.value && s.value.length === 0 ? (q(), J("div", Ph, B(W(r)("bubbleRender.noDbData")), 1)) : (q(), J("div", Fh, [Y("div", Ih, [
+			!c.value && s.value.length === 0 ? (q(), J("div", zh, B(W(r)("bubbleRender.noDbData")), 1)) : (q(), J("div", Bh, [Y("div", Vh, [
 				Y("span", null, B(W(r)("bubbleRender.colScope")), 1),
 				Y("span", null, B(W(r)("bubbleRender.avatarCount")), 1),
 				Y("span", null, B(W(r)("bubbleRender.moodCount")), 1),
 				Y("span", null, B(W(r)("bubbleRender.colSize")), 1),
-				Y("span", Lh, [d.value ? (q(), J(K, { key: 1 }, [Y("button", {
+				Y("span", Hh, [d.value ? (q(), J(K, { key: 1 }, [Y("button", {
 					type: "button",
 					class: "bd-btn tiny danger",
 					disabled: l.value !== null,
 					onClick: _
-				}, B(W(r)("bubbleRender.btnConfirm")), 9, zh), Y("button", {
+				}, B(W(r)("bubbleRender.btnConfirm")), 9, Wh), Y("button", {
 					type: "button",
 					class: "bd-btn tiny ghost",
 					onClick: t[3] ||= (e) => d.value = !1
@@ -9241,7 +9251,7 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 					disabled: l.value !== null || !f.value,
 					title: f.value ? "" : W(r)("bubbleRender.convertUnavailable"),
 					onClick: t[2] ||= (e) => d.value = !0
-				}, B(W(r)("bubbleRender.btnConvertAllRemove")), 9, Rh))])
+				}, B(W(r)("bubbleRender.btnConvertAllRemove")), 9, Uh))])
 			]), (q(!0), J(K, null, G(s.value, (e) => (q(), J("div", {
 				key: e.charId,
 				class: "bd-tr"
@@ -9249,16 +9259,16 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 				Y("span", {
 					class: "bd-scope",
 					title: e.charId
-				}, B(m(e.charId)), 9, Bh),
-				Y("span", { "data-label": W(r)("bubbleRender.avatarCount") }, B(e.avatars), 9, Vh),
-				Y("span", { "data-label": W(r)("bubbleRender.moodCount") }, B(e.moodAvatars), 9, Hh),
-				Y("span", { "data-label": W(r)("bubbleRender.colSize") }, B(v(e.bytes)), 9, Uh),
-				Y("span", Wh, [u.value === e.charId ? (q(), J(K, { key: 0 }, [Y("button", {
+				}, B(m(e.charId)), 9, Gh),
+				Y("span", { "data-label": W(r)("bubbleRender.avatarCount") }, B(e.avatars), 9, Kh),
+				Y("span", { "data-label": W(r)("bubbleRender.moodCount") }, B(e.moodAvatars), 9, qh),
+				Y("span", { "data-label": W(r)("bubbleRender.colSize") }, B(v(e.bytes)), 9, Jh),
+				Y("span", Yh, [u.value === e.charId ? (q(), J(K, { key: 0 }, [Y("button", {
 					type: "button",
 					class: "bd-btn tiny danger",
 					disabled: l.value !== null,
 					onClick: (t) => g(e.charId)
-				}, B(W(r)("bubbleRender.btnConfirm")), 9, Gh), Y("button", {
+				}, B(W(r)("bubbleRender.btnConfirm")), 9, Xh), Y("button", {
 					type: "button",
 					class: "bd-btn tiny ghost",
 					onClick: t[4] ||= (e) => u.value = null
@@ -9268,20 +9278,20 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 					disabled: l.value !== null || !f.value,
 					title: f.value ? "" : W(r)("bubbleRender.convertUnavailable"),
 					onClick: (t) => h(e.charId)
-				}, B(l.value === e.charId ? W(r)("bubbleRender.converting") : W(r)("bubbleRender.btnConvert")), 9, Kh), Y("button", {
+				}, B(l.value === e.charId ? W(r)("bubbleRender.converting") : W(r)("bubbleRender.btnConvert")), 9, Zh), Y("button", {
 					type: "button",
 					class: "bd-btn tiny ghost danger-text",
 					disabled: l.value !== null,
 					onClick: (t) => u.value = e.charId
-				}, B(W(r)("bubbleRender.btnDelete")), 9, qh)], 64))])
+				}, B(W(r)("bubbleRender.btnDelete")), 9, Qh)], 64))])
 			]))), 128))])),
-			Y("p", Jh, B(W(r)("bubbleRender.dbHint")), 1),
-			a.value.lastResult ? (q(), J("p", Yh, B(a.value.lastResult), 1)) : Z("", !0)
+			Y("p", $h, B(W(r)("bubbleRender.dbHint")), 1),
+			a.value.lastResult ? (q(), J("p", eg, B(a.value.lastResult), 1)) : Z("", !0)
 		])) : (q(), J(K, { key: 1 }, [
-			Y("section", Xh, [
-				Y("h4", Zh, B(W(r)("bubbleRender.statsTitle")), 1),
-				Y("p", Qh, B(W(r)("bubbleRender.statsAllScopesHint")), 1),
-				Y("div", $h, [X(Yf, {
+			Y("section", tg, [
+				Y("h4", ng, B(W(r)("bubbleRender.statsTitle")), 1),
+				Y("p", rg, B(W(r)("bubbleRender.statsAllScopesHint")), 1),
+				Y("div", ig, [X(ep, {
 					loading: a.value.totalStatsLoading,
 					"loading-text": W(r)("bubbleRender.loadingStats"),
 					"done-text": W(r)("common.loaded")
@@ -9290,24 +9300,24 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 					"loading-text",
 					"done-text"
 				])]),
-				a.value.totalStatsError ? (q(), J("p", eg, B(W(r)("bubbleRender.statsUnavailable")), 1)) : a.value.totalStatsStale ? (q(), J("p", tg, B(W(r)("bubbleRender.statsStaleHint")), 1)) : Z("", !0),
-				Y("div", ng, [
-					Y("div", rg, [Y("span", ig, B(W(r)("bubbleRender.totalAvatars")), 1), Y("span", ag, B(a.value.totalAvatars), 1)]),
-					Y("div", og, [Y("span", sg, B(W(r)("bubbleRender.totalMoodAvatars")), 1), Y("span", cg, B(a.value.totalMoodAvatars), 1)]),
-					Y("div", lg, [Y("span", ug, B(W(r)("bubbleRender.totalCgImages")), 1), Y("span", dg, B(a.value.totalCgImages), 1)]),
-					Y("div", fg, [Y("span", pg, B(W(r)("bubbleRender.totalStorageSize")), 1), Y("span", mg, B(v(a.value.totalStorageBytes)), 1)])
+				a.value.totalStatsError ? (q(), J("p", ag, B(W(r)("bubbleRender.statsUnavailable")), 1)) : a.value.totalStatsStale ? (q(), J("p", og, B(W(r)("bubbleRender.statsStaleHint")), 1)) : Z("", !0),
+				Y("div", sg, [
+					Y("div", cg, [Y("span", lg, B(W(r)("bubbleRender.totalAvatars")), 1), Y("span", ug, B(a.value.totalAvatars), 1)]),
+					Y("div", dg, [Y("span", fg, B(W(r)("bubbleRender.totalMoodAvatars")), 1), Y("span", pg, B(a.value.totalMoodAvatars), 1)]),
+					Y("div", mg, [Y("span", hg, B(W(r)("bubbleRender.totalCgImages")), 1), Y("span", gg, B(a.value.totalCgImages), 1)]),
+					Y("div", _g, [Y("span", vg, B(W(r)("bubbleRender.totalStorageSize")), 1), Y("span", yg, B(v(a.value.totalStorageBytes)), 1)])
 				]),
-				Y("div", hg, [Y("button", {
+				Y("div", bg, [Y("button", {
 					type: "button",
 					class: "bd-btn ghost",
 					disabled: a.value.totalStatsLoading,
 					onClick: t[5] ||= (e) => W(i).refreshTotalStats()
-				}, B(W(r)("bubbleRender.btnRefreshStats")), 9, gg)])
+				}, B(W(r)("bubbleRender.btnRefreshStats")), 9, xg)])
 			]),
-			Y("section", _g, [
-				Y("h4", vg, B(W(r)("bubbleRender.dbScopesTitle")), 1),
-				Y("p", yg, B(W(r)("bubbleRender.nativeScopesHint")), 1),
-				a.value.nativeScopes.length === 0 ? (q(), J("div", bg, B(a.value.totalStatsLoading ? W(r)("bubbleRender.loading") : W(r)("bubbleRender.noDbData")), 1)) : (q(), J("div", xg, [Y("div", Sg, [
+			Y("section", Sg, [
+				Y("h4", Cg, B(W(r)("bubbleRender.dbScopesTitle")), 1),
+				Y("p", wg, B(W(r)("bubbleRender.nativeScopesHint")), 1),
+				a.value.nativeScopes.length === 0 ? (q(), J("div", Tg, B(a.value.totalStatsLoading ? W(r)("bubbleRender.loading") : W(r)("bubbleRender.noDbData")), 1)) : (q(), J("div", Eg, [Y("div", Dg, [
 					Y("span", null, B(W(r)("bubbleRender.colScope")), 1),
 					Y("span", null, B(W(r)("bubbleRender.avatarCount")), 1),
 					Y("span", null, B(W(r)("bubbleRender.moodCount")), 1),
@@ -9321,17 +9331,17 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 					Y("span", {
 						class: "bd-scope",
 						title: e.charId
-					}, B(x(e.charId)), 9, Cg),
-					Y("span", { "data-label": W(r)("bubbleRender.avatarCount") }, B(e.avatars), 9, wg),
-					Y("span", { "data-label": W(r)("bubbleRender.moodCount") }, B(e.moodAvatars), 9, Tg),
-					Y("span", { "data-label": W(r)("bubbleRender.colCgCount") }, B(e.cgImages), 9, Eg),
-					Y("span", { "data-label": W(r)("bubbleRender.colSize") }, B(v(e.bytes)), 9, Dg),
-					Y("span", Og, [y.value === e.charId ? (q(), J(K, { key: 0 }, [Y("button", {
+					}, B(x(e.charId)), 9, Og),
+					Y("span", { "data-label": W(r)("bubbleRender.avatarCount") }, B(e.avatars), 9, kg),
+					Y("span", { "data-label": W(r)("bubbleRender.moodCount") }, B(e.moodAvatars), 9, Ag),
+					Y("span", { "data-label": W(r)("bubbleRender.colCgCount") }, B(e.cgImages), 9, jg),
+					Y("span", { "data-label": W(r)("bubbleRender.colSize") }, B(v(e.bytes)), 9, Mg),
+					Y("span", Ng, [y.value === e.charId ? (q(), J(K, { key: 0 }, [Y("button", {
 						type: "button",
 						class: "bd-btn tiny danger",
 						disabled: l.value !== null,
 						onClick: (t) => S(e.charId)
-					}, B(W(r)("bubbleRender.btnConfirm")), 9, kg), Y("button", {
+					}, B(W(r)("bubbleRender.btnConfirm")), 9, Pg), Y("button", {
 						type: "button",
 						class: "bd-btn tiny ghost",
 						onClick: t[6] ||= (e) => y.value = null
@@ -9341,21 +9351,21 @@ var Jf = { class: "ttbd-loading-text" }, Yf = /* @__PURE__ */ Us(/* @__PURE__ */
 						class: "bd-btn tiny ghost danger-text",
 						disabled: l.value !== null || !b(e),
 						onClick: (t) => y.value = e.charId
-					}, B(l.value === e.charId ? W(r)("bubbleRender.deleting") : W(r)("bubbleRender.btnDelete")), 9, Ag))])
+					}, B(l.value === e.charId ? W(r)("bubbleRender.deleting") : W(r)("bubbleRender.btnDelete")), 9, Fg))])
 				]))), 128))]))
 			]),
-			Y("section", jg, [Y("h4", Mg, B(W(r)("bubbleRender.sectionRuntime")), 1), Y("div", Ng, [
-				Y("div", Pg, [Y("span", Fg, B(W(r)("bubbleRender.statReady")), 1), Y("span", Ig, B(a.value.ready ? W(r)("bubbleRender.yes") : W(r)("bubbleRender.no")), 1)]),
-				Y("div", Lg, [Y("span", Rg, B(W(r)("bubbleRender.statBubbles")), 1), Y("span", zg, B(a.value.bubbleCount), 1)]),
-				Y("div", Bg, [Y("span", Vg, B(W(r)("bubbleRender.statInjected")), 1), Y("span", Hg, B(a.value.injected ? W(r)("bubbleRender.yes") : W(r)("bubbleRender.no")), 1)])
+			Y("section", Ig, [Y("h4", Lg, B(W(r)("bubbleRender.sectionRuntime")), 1), Y("div", Rg, [
+				Y("div", zg, [Y("span", Bg, B(W(r)("bubbleRender.statReady")), 1), Y("span", Vg, B(a.value.ready ? W(r)("bubbleRender.yes") : W(r)("bubbleRender.no")), 1)]),
+				Y("div", Hg, [Y("span", Ug, B(W(r)("bubbleRender.statBubbles")), 1), Y("span", Wg, B(a.value.bubbleCount), 1)]),
+				Y("div", Gg, [Y("span", Kg, B(W(r)("bubbleRender.statInjected")), 1), Y("span", qg, B(a.value.injected ? W(r)("bubbleRender.yes") : W(r)("bubbleRender.no")), 1)])
 			])])
 		], 64))]));
 	}
 }), [["__scopeId", "data-v-3aad9d0e"]]);
 //#endregion
 //#region src/features/bubble-render/modules.ts
-function Wg(e) {
-	let t = Ff(e);
+function Yg(e) {
+	let t = Bf(e);
 	return {
 		runtime: t,
 		async activate() {
@@ -9366,7 +9376,7 @@ function Wg(e) {
 		}
 	};
 }
-function Gg(e, t, n, r, i) {
+function Xg(e, t, n, r, i) {
 	return {
 		id: e,
 		area: "bubble-dialogue",
@@ -9376,28 +9386,28 @@ function Gg(e, t, n, r, i) {
 		capabilities: [],
 		defaultEnabled: !0,
 		component: i,
-		createController: Wg
+		createController: Yg
 	};
 }
-var Kg = [
-	Gg("bubble-avatar", "bubbleRender.pageAvatar", "bubbleRender.pageAvatarDesc", 10, Dm),
-	Gg("bubble-style", "bubbleRender.pageStyle", "bubbleRender.pageStyleDesc", 20, lh),
-	Gg("bubble-mood", "bubbleRender.pageMood", "bubbleRender.pageMoodDesc", 30, Dh),
-	Gg("bubble-storage", "bubbleRender.pageStorage", "bubbleRender.pageStorageDesc", 40, Ug)
-], qg = { class: "lg-page" }, Jg = { class: "lg-toolbar" }, Yg = ["disabled"], Xg = ["disabled"], Zg = ["disabled"], Qg = { class: "lg-hint" }, $g = {
+var Zg = [
+	Xg("bubble-avatar", "bubbleRender.pageAvatar", "bubbleRender.pageAvatarDesc", 10, Mm),
+	Xg("bubble-style", "bubbleRender.pageStyle", "bubbleRender.pageStyleDesc", 20, mh),
+	Xg("bubble-mood", "bubbleRender.pageMood", "bubbleRender.pageMoodDesc", 30, Mh),
+	Xg("bubble-storage", "bubbleRender.pageStorage", "bubbleRender.pageStorageDesc", 40, Jg)
+], Qg = { class: "lg-page" }, $g = { class: "lg-toolbar" }, e_ = ["disabled"], t_ = ["disabled"], n_ = ["disabled"], r_ = { class: "lg-hint" }, i_ = {
 	key: 0,
 	class: "lg-error"
-}, e_ = {
+}, a_ = {
 	key: 0,
 	class: "lg-empty"
-}, t_ = { class: "lg-time" }, n_ = { class: "lg-level" }, r_ = { class: "lg-body" }, i_ = {
+}, o_ = { class: "lg-time" }, s_ = { class: "lg-level" }, c_ = { class: "lg-body" }, l_ = {
 	key: 0,
 	class: "lg-target"
-}, a_ = { class: "lg-message" }, o_ = /* @__PURE__ */ Us(/* @__PURE__ */ or({
+}, u_ = { class: "lg-message" }, d_ = /* @__PURE__ */ Us(/* @__PURE__ */ or({
 	__name: "LogsPage",
 	props: { controller: {} },
 	setup(e) {
-		let t = e, n = Uf(), r = n.t.bind(n), i = Q(() => t.controller.state), a = /* @__PURE__ */ U(null), o = Q(() => i.value.recording ? r("logs.statusRecording", { n: i.value.entries.length }) : r("logs.statusStopped", { n: i.value.entries.length }));
+		let t = e, n = Jf(), r = n.t.bind(n), i = Q(() => t.controller.state), a = /* @__PURE__ */ U(null), o = Q(() => i.value.recording ? r("logs.statusRecording", { n: i.value.entries.length }) : r("logs.statusStopped", { n: i.value.entries.length }));
 		function s(e, t = 2) {
 			return String(e).padStart(t, "0");
 		}
@@ -9410,54 +9420,54 @@ var Kg = [
 			await ln();
 			let e = a.value;
 			e && (e.scrollTop = e.scrollHeight);
-		}), (e, n) => (q(), J("div", qg, [
-			Y("div", Jg, [
+		}), (e, n) => (q(), J("div", Qg, [
+			Y("div", $g, [
 				i.value.recording ? (q(), J("button", {
 					key: 1,
 					type: "button",
 					class: "lg-btn danger",
 					disabled: i.value.busy,
 					onClick: n[1] ||= (e) => t.controller.stop()
-				}, B(W(r)("logs.stop")), 9, Xg)) : (q(), J("button", {
+				}, B(W(r)("logs.stop")), 9, t_)) : (q(), J("button", {
 					key: 0,
 					type: "button",
 					class: "lg-btn primary",
 					disabled: i.value.busy,
 					onClick: n[0] ||= (e) => t.controller.start()
-				}, B(W(r)("logs.start")), 9, Yg)),
+				}, B(W(r)("logs.start")), 9, e_)),
 				Y("button", {
 					type: "button",
 					class: "lg-btn ghost",
 					disabled: i.value.entries.length === 0,
 					onClick: n[2] ||= (e) => t.controller.clear()
-				}, B(W(r)("logs.clear")), 9, Zg),
+				}, B(W(r)("logs.clear")), 9, n_),
 				Y("span", { class: z(["lg-status", { on: i.value.recording }]) }, B(o.value), 3)
 			]),
-			Y("p", Qg, B(W(r)("logs.hint")), 1),
-			i.value.error ? (q(), J("p", $g, B(W(r)("logs.unavailable")) + "（" + B(i.value.error) + "）", 1)) : Z("", !0),
+			Y("p", r_, B(W(r)("logs.hint")), 1),
+			i.value.error ? (q(), J("p", i_, B(W(r)("logs.unavailable")) + "（" + B(i.value.error) + "）", 1)) : Z("", !0),
 			Y("div", {
 				ref_key: "listRef",
 				ref: a,
 				class: "lg-list"
-			}, [i.value.entries.length === 0 ? (q(), J("p", e_, B(W(r)("logs.empty")), 1)) : Z("", !0), (q(!0), J(K, null, G(i.value.entries, (e) => (q(), J("div", {
+			}, [i.value.entries.length === 0 ? (q(), J("p", a_, B(W(r)("logs.empty")), 1)) : Z("", !0), (q(!0), J(K, null, G(i.value.entries, (e) => (q(), J("div", {
 				key: e.key,
 				class: z(["lg-row", e.level])
 			}, [
-				Y("span", t_, B(c(e.timestampMs)), 1),
-				Y("span", n_, B(e.level), 1),
-				Y("span", r_, [e.target && e.target !== "main" ? (q(), J("span", i_, B(e.target), 1)) : Z("", !0), Y("span", a_, B(e.message), 1)])
+				Y("span", o_, B(c(e.timestampMs)), 1),
+				Y("span", s_, B(e.level), 1),
+				Y("span", c_, [e.target && e.target !== "main" ? (q(), J("span", l_, B(e.target), 1)) : Z("", !0), Y("span", u_, B(e.message), 1)])
 			], 2))), 128))], 512)
 		]));
 	}
-}), [["__scopeId", "data-v-c906dcce"]]), s_ = "[BubbleDialogue]", c_ = 300, l_ = 50;
-function u_(e, t) {
-	return String(e ?? "").includes(s_) ? !0 : String(t ?? "") === "3p:BubbleDialogue";
+}), [["__scopeId", "data-v-c906dcce"]]), f_ = "[BubbleDialogue]", p_ = 300, m_ = 50;
+function h_(e, t) {
+	return String(e ?? "").includes(f_) ? !0 : String(t ?? "") === "3p:BubbleDialogue";
 }
-function d_(e) {
+function g_(e) {
 	let t = String(e ?? "").toLowerCase();
 	return t === "debug" || t === "warn" || t === "error" ? t : "info";
 }
-function f_(e) {
+function __(e) {
 	let t = /* @__PURE__ */ Dt({
 		recording: !1,
 		busy: !1,
@@ -9467,16 +9477,16 @@ function f_(e) {
 		if (i.has(e.key)) return;
 		i.add(e.key);
 		let n = t.entries.concat(e);
-		if (t.entries = n.length > c_ ? n.slice(n.length - c_) : n, i.size > c_ * 2) {
+		if (t.entries = n.length > p_ ? n.slice(n.length - p_) : n, i.size > p_ * 2) {
 			i.clear();
 			for (let e of t.entries) i.add(e.key);
 		}
 	}, o = (e) => {
 		let t = String(e.message ?? ""), n = String(e.target ?? "main");
-		u_(t, n) && a({
+		h_(t, n) && a({
 			key: `f:${e.id}`,
 			timestampMs: Number(e.timestampMs ?? Date.now()),
-			level: d_(e.level),
+			level: g_(e.level),
 			target: n,
 			message: t
 		});
@@ -9510,7 +9520,7 @@ function f_(e) {
 		try {
 			let e = await i.getConsoleCaptureEnabled();
 			e || (await i.setConsoleCaptureEnabled(!0), r = e);
-			for (let e of await i.list({ limit: l_ })) o(e);
+			for (let e of await i.list({ limit: m_ })) o(e);
 			n = await i.subscribe(o), t.recording = !0;
 		} catch (e) {
 			t.error = e instanceof Error ? e.message : String(e), await s();
@@ -9533,7 +9543,7 @@ function f_(e) {
 }
 //#endregion
 //#region src/features/dev-logs/module.ts
-var p_ = {
+var v_ = {
 	id: "bubble-logs",
 	area: "bubble-dialogue",
 	titleKey: "logs.pageTitle",
@@ -9541,21 +9551,21 @@ var p_ = {
 	order: 50,
 	capabilities: ["dev.frontendLogs", "dev.backendLogs"],
 	defaultEnabled: !0,
-	component: o_,
-	createController: (e) => f_(e)
-}, m_ = [...Kg, p_];
+	component: d_,
+	createController: (e) => __(e)
+}, y_ = [...Zg, v_];
 //#endregion
 //#region src/features/catalog.ts
-function h_(e) {
+function b_(e) {
 	return e.slice().sort((e, t) => e.order - t.order);
 }
-function g_(e) {
-	return h_(m_).filter((t) => e.supportsAll(t.capabilities));
+function x_(e) {
+	return b_(y_).filter((t) => e.supportsAll(t.capabilities));
 }
 //#endregion
 //#region src/features/registry.ts
-function __(e) {
-	let t = /* @__PURE__ */ Dt(g_(e.host).map((t) => ({
+function S_(e) {
+	let t = /* @__PURE__ */ Dt(x_(e.host).map((t) => ({
 		id: t.id,
 		area: t.area,
 		titleKey: t.titleKey,
@@ -9606,7 +9616,7 @@ function __(e) {
 }
 //#endregion
 //#region src/app/shell-store.ts
-function v_(e, t) {
+function C_(e, t) {
 	let n = /* @__PURE__ */ Dt({
 		panelOpen: !1,
 		activeTab: e.state.activeTab
@@ -9633,8 +9643,8 @@ function v_(e, t) {
 }
 //#endregion
 //#region src/app/settings-store.ts
-var y_ = "ttbd:settings";
-function b_() {
+var w_ = "ttbd:settings";
+function T_() {
 	return {
 		enabled: !0,
 		enabledFeatures: {},
@@ -9645,23 +9655,23 @@ function b_() {
 		customBubbleBgTransparent: !1
 	};
 }
-function x_() {
-	let e = localStorage.getItem(y_);
-	if (!e) return b_();
+function E_() {
+	let e = localStorage.getItem(w_);
+	if (!e) return T_();
 	try {
 		let t = JSON.parse(e);
 		return {
-			...b_(),
+			...T_(),
 			...t,
 			appearanceMode: t.appearanceMode === "day" ? "day" : oc,
 			customBubbleIcon: t.customBubbleIcon ?? null,
 			customBubbleBgTransparent: !!t.customBubbleBgTransparent
 		};
 	} catch {
-		return b_();
+		return T_();
 	}
 }
-function S_(e) {
+function D_(e) {
 	return {
 		enabled: e.enabled,
 		enabledFeatures: { ...e.enabledFeatures },
@@ -9672,9 +9682,9 @@ function S_(e) {
 		customBubbleBgTransparent: e.customBubbleBgTransparent
 	};
 }
-function C_() {
-	let e = /* @__PURE__ */ Dt(x_()), t = /* @__PURE__ */ new Set(), n = () => {
-		localStorage.setItem(y_, JSON.stringify(S_(e)));
+function O_() {
+	let e = /* @__PURE__ */ Dt(E_()), t = /* @__PURE__ */ new Set(), n = () => {
+		localStorage.setItem(w_, JSON.stringify(D_(e)));
 	}, r = () => {
 		n(), t.forEach((e) => e());
 	};
@@ -9713,8 +9723,8 @@ function C_() {
 }
 //#endregion
 //#region src/app/layout-store.ts
-var w_ = 768;
-function T_(e = 0, t = 0, n = 0, r = 0) {
+var k_ = 768;
+function A_(e = 0, t = 0, n = 0, r = 0) {
 	return {
 		top: Math.max(0, e),
 		right: Math.max(0, t),
@@ -9722,7 +9732,7 @@ function T_(e = 0, t = 0, n = 0, r = 0) {
 		left: Math.max(0, r)
 	};
 }
-function E_(e = 0, t = 0, n = 0, r = 0) {
+function j_(e = 0, t = 0, n = 0, r = 0) {
 	let i = Math.max(0, e), a = Math.max(0, t), o = Math.max(0, n), s = Math.max(0, r);
 	return {
 		left: i,
@@ -9733,29 +9743,29 @@ function E_(e = 0, t = 0, n = 0, r = 0) {
 		bottom: a + s
 	};
 }
-function D_(e, t, n, r, i) {
+function M_(e, t, n, r, i) {
 	e.left = Math.max(0, t), e.top = Math.max(0, n), e.width = Math.max(0, r), e.height = Math.max(0, i), e.right = e.left + e.width, e.bottom = e.top + e.height;
 }
-function O_(e, t) {
-	let n = t.safeInsets ?? T_();
+function N_(e, t) {
+	let n = t.safeInsets ?? A_();
 	e.safeInsets.top = n.top, e.safeInsets.right = n.right, e.safeInsets.bottom = n.bottom, e.safeInsets.left = n.left;
-	let r = t.viewport ?? E_();
-	D_(e.viewportFrame, r.left, r.top, r.width, r.height);
-	let i = t.safeFrame ?? E_();
-	D_(e.safeFrame, i.left, i.top, i.width, i.height), e.compact = e.safeFrame.width <= w_;
+	let r = t.viewport ?? j_();
+	M_(e.viewportFrame, r.left, r.top, r.width, r.height);
+	let i = t.safeFrame ?? j_();
+	M_(e.safeFrame, i.left, i.top, i.width, i.height), e.compact = e.safeFrame.width <= k_;
 }
-async function k_(e) {
+async function P_(e) {
 	let t = /* @__PURE__ */ Dt({
 		compact: !1,
-		safeInsets: T_(),
-		viewportFrame: E_(),
-		safeFrame: E_()
+		safeInsets: A_(),
+		viewportFrame: j_(),
+		safeFrame: j_()
 	}), n = null, r = !1, i = () => {
 		if (r) throw Error("Layout store is disposed.");
-		O_(t, e.snapshot());
+		N_(t, e.snapshot());
 	};
 	return i(), n = await e.subscribe((e) => {
-		r || O_(t, e);
+		r || N_(t, e);
 	}), {
 		state: t,
 		refresh: i,
@@ -9766,17 +9776,17 @@ async function k_(e) {
 }
 //#endregion
 //#region src/app/create-creator-app.ts
-async function A_(e, t = {}) {
-	let n = t.settings ?? C_(), r = t.i18n ?? Vf();
+async function F_(e, t = {}) {
+	let n = t.settings ?? O_(), r = t.i18n ?? Kf();
 	if (!e.api.layout) throw Error("Host layout API is unavailable.");
-	let i = await k_(e.api.layout), a = Ds(), o = {
+	let i = await P_(e.api.layout), a = Ds(), o = {
 		host: e,
 		settings: n,
-		shell: v_(n, a),
+		shell: C_(n, a),
 		layout: i,
 		bubbleBus: a,
 		i18n: r
-	}, s = __(o);
+	}, s = S_(o);
 	return await s.activateEnabledFeatures(), {
 		...o,
 		registry: s
@@ -9784,22 +9794,22 @@ async function A_(e, t = {}) {
 }
 //#endregion
 //#region src/host/api.ts
-function j_() {
+function I_() {
 	return window.__TAURITAVERN__?.api ?? null;
 }
-async function M_() {
+async function L_() {
 	let e = window.__TAURITAVERN__?.ready ?? window.__TAURITAVERN_MAIN_READY__;
 	e && await e;
 }
 //#endregion
 //#region src/host/client.ts
-function N_(e) {
+function R_(e) {
 	let t = /* @__PURE__ */ new Set();
 	return e.layout && t.add("layout"), e.chat && t.add("chat"), e.dev?.frontendLogs && t.add("dev.frontendLogs"), e.dev?.backendLogs && t.add("dev.backendLogs"), e.dev?.llmApiLogs && t.add("dev.llmApiLogs"), e.worldInfo && t.add("worldInfo"), e.extension?.store && t.add("extension.store"), t;
 }
-function P_(e = j_()) {
+function z_(e = I_()) {
 	if (!e) throw Error("TauriTavern host API is unavailable.");
-	let t = N_(e);
+	let t = R_(e);
 	return {
 		api: e,
 		capabilities: t,
@@ -9821,7 +9831,7 @@ function P_(e = j_()) {
 }
 //#endregion
 //#region src/settings-page/ExtensionsPagePanel.vue?vue&type=script&setup=true&lang.ts
-var F_ = { class: "inline-drawer wide100p ttbd-settings-drawer" }, I_ = { class: "inline-drawer-toggle inline-drawer-header" }, L_ = { class: "ttbd-settings-header" }, R_ = { class: "inline-drawer-content" }, z_ = ["data-ttbd-appearance"], B_ = /* @__PURE__ */ Us(/* @__PURE__ */ or({
+var B_ = { class: "inline-drawer wide100p ttbd-settings-drawer" }, V_ = { class: "inline-drawer-toggle inline-drawer-header" }, H_ = { class: "ttbd-settings-header" }, U_ = { class: "inline-drawer-content" }, W_ = ["data-ttbd-appearance"], G_ = /* @__PURE__ */ Us(/* @__PURE__ */ or({
 	__name: "ExtensionsPagePanel",
 	props: {
 		settings: {},
@@ -9829,7 +9839,7 @@ var F_ = { class: "inline-drawer wide100p ttbd-settings-drawer" }, I_ = { class:
 		setFeatureEnabled: { type: Function }
 	},
 	setup(e) {
-		let t = e, n = Vf(), r = n.t.bind(n), i = Q(() => t.features.map((e) => ({
+		let t = e, n = Kf(), r = n.t.bind(n), i = Q(() => t.features.map((e) => ({
 			id: e.id,
 			area: e.area,
 			titleKey: e.titleKey,
@@ -9846,7 +9856,7 @@ var F_ = { class: "inline-drawer wide100p ttbd-settings-drawer" }, I_ = { class:
 		}, l = async ({ id: e, enabled: n }) => {
 			await t.setFeatureEnabled(e, n);
 		};
-		return (e, u) => (q(), J("div", F_, [Y("div", I_, [Y("div", L_, [u[1] ||= Y("i", { class: "fa-solid fa-comments" }, null, -1), Y("b", null, B(W(r)("settings.title")), 1)]), u[2] ||= Y("div", { class: "inline-drawer-icon fa-solid fa-circle-chevron-down down" }, null, -1)]), Y("div", R_, [Y("div", {
+		return (e, u) => (q(), J("div", B_, [Y("div", V_, [Y("div", H_, [u[1] ||= Y("i", { class: "fa-solid fa-comments" }, null, -1), Y("b", null, B(W(r)("settings.title")), 1)]), u[2] ||= Y("div", { class: "inline-drawer-icon fa-solid fa-circle-chevron-down down" }, null, -1)]), Y("div", U_, [Y("div", {
 			class: "ttbd-theme-root ttbd-settings-surface",
 			"data-ttbd-appearance": t.settings.state.appearanceMode
 		}, [X(jc, {
@@ -9873,32 +9883,32 @@ var F_ = { class: "inline-drawer wide100p ttbd-settings-drawer" }, I_ = { class:
 			"custom-bubble-bg-transparent",
 			"features",
 			"i18n"
-		])], 8, z_)])]));
+		])], 8, W_)])]));
 	}
-}), [["__scopeId", "data-v-80968378"]]), V_ = "tauritavern-bubble-dialogue-root", H_ = "tauritavern-bubble-dialogue-settings-root", U_ = "ttbd-theme-root", W_ = null, G_ = null, K_ = null, q_ = null, J_ = null, Y_ = null, X_ = null, Z_ = null, Q_ = [], $_ = null, ev = Promise.resolve();
-function tv() {
+}), [["__scopeId", "data-v-80968378"]]), K_ = "tauritavern-bubble-dialogue-root", q_ = "tauritavern-bubble-dialogue-settings-root", J_ = "ttbd-theme-root", Y_ = null, X_ = null, Z_ = null, Q_ = null, $_ = null, ev = null, tv = null, nv = null, rv = [], iv = null, av = Promise.resolve();
+function ov() {
 	return document.readyState === "loading" ? new Promise((e) => {
 		document.addEventListener("DOMContentLoaded", () => e(), { once: !0 });
 	}) : Promise.resolve();
 }
-function nv(e, t, n) {
+function sv(e, t, n) {
 	document.getElementById(e)?.remove();
 	let r = document.createElement("div");
 	return r.id = e, r.className = n, t.appendChild(r), r;
 }
-function rv() {
+function cv() {
 	return document.getElementById("extensions_settings2") ?? document.getElementById("extensions_settings");
 }
-function iv() {
-	!G_ || !X_ || (G_.dataset.ttbdAppearance = X_.state.appearanceMode);
+function lv() {
+	!X_ || !tv || (X_.dataset.ttbdAppearance = tv.state.appearanceMode);
 }
-async function av() {
-	if (W_ || !Y_ || !X_ || !X_.state.enabled) return;
-	let e = await A_(Y_, {
-		settings: X_,
-		i18n: Z_
+async function uv() {
+	if (Y_ || !ev || !tv || !tv.state.enabled) return;
+	let e = await F_(ev, {
+		settings: tv,
+		i18n: nv
 	});
-	if (!X_.state.enabled) {
+	if (!tv.state.enabled) {
 		try {
 			await e.registry.deactivateAllFeatures();
 		} finally {
@@ -9906,72 +9916,72 @@ async function av() {
 		}
 		return;
 	}
-	J_ = e, G_ = nv(V_, document.body, U_), iv(), W_ = bs(Kc), W_.provide(Cs, e), W_.provide(Hf, e.i18n), W_.mount(G_);
+	$_ = e, X_ = sv(K_, document.body, J_), lv(), Y_ = bs(Kc), Y_.provide(Cs, e), Y_.provide(qf, e.i18n), Y_.mount(X_);
 }
-async function ov() {
-	let e = J_;
-	if (J_ = null, e) try {
+async function dv() {
+	let e = $_;
+	if ($_ = null, e) try {
 		await e.registry.deactivateAllFeatures();
 	} finally {
 		await e.layout.dispose();
 	}
-	W_?.unmount(), W_ = null, G_?.remove(), G_ = null;
+	Y_?.unmount(), Y_ = null, X_?.remove(), X_ = null;
 }
-async function sv() {
-	if (X_) {
-		if (X_.state.enabled) {
-			await av(), iv();
+async function fv() {
+	if (tv) {
+		if (tv.state.enabled) {
+			await uv(), lv();
 			return;
 		}
-		await ov();
+		await dv();
 	}
 }
-function cv() {
-	return ev = ev.catch((e) => {
+function pv() {
+	return av = av.catch((e) => {
 		console.error("[BubbleDialogue] Runtime lifecycle sync failed.", e);
-	}).then(() => sv()), ev;
+	}).then(() => fv()), av;
 }
-function lv() {
-	if (K_ || !X_) return;
-	let e = rv();
+function mv() {
+	if (Z_ || !tv) return;
+	let e = cv();
 	if (!e) {
 		console.warn("[BubbleDialogue] Extensions settings container is unavailable.");
 		return;
 	}
-	q_ = nv(H_, e, "extension_container");
-	let t = Z_ ?? Vf();
-	K_ = bs(B_, {
-		settings: X_,
-		features: Q_,
+	Q_ = sv(q_, e, "extension_container");
+	let t = nv ?? Kf();
+	Z_ = bs(G_, {
+		settings: tv,
+		features: rv,
 		setFeatureEnabled: async (e, t) => {
-			if (J_) {
-				await J_.registry.setFeatureEnabled(e, t);
+			if ($_) {
+				await $_.registry.setFeatureEnabled(e, t);
 				return;
 			}
-			X_?.setFeatureEnabled(e, t);
+			tv?.setFeatureEnabled(e, t);
 		}
-	}), K_.provide(Hf, t), K_.mount(q_);
+	}), Z_.provide(qf, t), Z_.mount(Q_);
 }
-function uv() {
-	K_?.unmount(), K_ = null, q_?.remove(), q_ = null;
+function hv() {
+	Z_?.unmount(), Z_ = null, Q_?.remove(), Q_ = null;
 }
-function dv() {
-	$_?.(), $_ = null, ev.finally(() => {
-		ov(), uv();
+function gv() {
+	iv?.(), iv = null, av.finally(() => {
+		dv(), hv();
 	});
 }
-async function fv() {
-	await tv(), await M_();
-	let e = j_();
+async function _v() {
+	await ov(), await L_();
+	let e = I_();
 	if (!e) {
 		console.error("[BubbleDialogue] Host API is unavailable.");
 		return;
 	}
-	Y_ = P_(e), X_ = C_(), Z_ = Vf(), Q_ = g_(Y_), lv(), $_ = X_.subscribe(() => {
-		cv();
-	}), await cv(), window.addEventListener("pagehide", dv, { once: !0 });
+	ev = z_(e), tv = O_(), nv = Kf(), rv = x_(ev), mv(), iv = tv.subscribe(() => {
+		pv();
+	}), await pv(), window.addEventListener("pagehide", gv, { once: !0 });
 }
-fv();
+_v();
 //#endregion
 
 //# sourceMappingURL=index.js.map
